@@ -20,7 +20,7 @@ export default function Welcome() {
           <Link className="btn btn-primary btn-large" href="/signin">Get Started <span>→</span></Link>
           <Link className="btn btn-ghost btn-large" href="/signin">Sign In</Link>
         </div>
-        <div className="welcome-trust"><span className="trust-mark">✓</span><span>Serving Eersterust</span><span className="trust-divider" /><span>Delivery R60</span><span className="trust-divider" /><span>Service R45</span></div>
+        <div className="welcome-trust"><span className="trust-mark">✓</span><span>Serving Eersterust</span><span className="trust-divider" /><span>Delivery R65</span></div>
       </section>
     </main>
   );
