@@ -30,6 +30,7 @@ export default function Signin() {
         error?.message ||
           'Password reset email sent. Check your email for the reset link.'
       );
+
       return;
     }
 
@@ -52,14 +53,15 @@ export default function Signin() {
         password,
       });
 
-      setMsg(
-        error?.message ||
-          'Signed in successfully. Open your account.'
-      );
-      {
-      if (!error) {
-  window.location.href = '/account';
-}
+      if (error) {
+        setMsg(error.message);
+        return;
+      }
+
+      setMsg('Signed in successfully.');
+
+      window.location.href = '/account';
+    }
   }
 
   function switchMode() {
