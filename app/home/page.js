@@ -26,7 +26,7 @@ function StoreCard({store}) {
 export default function Home(){
   const [open,setOpen]=useState(false);
   const [stores,setStores]=useState([]);
-  useEffect(()=>{let mounted=true;(async()=>{if(!supabase)return;const {data}=await supabase.from('retailers').select('id,name,slug,marketplace_category,shopping_location,logo_mark,logo_url').eq('active',true).in('shopping_location',['Denlyn Shopping Centre','Tshwane Regional Mall']).order('name');if(mounted)setStores(data||[])})();return()=>{mounted=false}},[]);
+  useEffect(()=>{let mounted=true;(async()=>{if(!supabase)return;const {data}=await supabase.from('retailers').select('id,name,slug,marketplace_category,shopping_location,logo_mark,logo_url').eq('active',true).in('shopping_location',['Eersterust Plaza','Denlyn Shopping Centre','Tshwane Regional Mall','Silver Crossing']).order('name');if(mounted)setStores(data||[])})();return()=>{mounted=false}},[]);
   const foodRetail=stores.filter(s=>s.marketplace_category==='food-retail');
   const fastFood=stores.filter(s=>s.marketplace_category==='fast-food');
   return <main className="app-shell">
@@ -48,7 +48,7 @@ export default function Home(){
       <div className="home-search"><Search size={19}/><span>Search groceries, meals or fast food</span></div>
 
       <section className="marketplace-sections">
-        <div className="section-head"><div><span className="eyebrow">Denlyn + Tshwane Regional Mall</span><h2>Food Retail</h2></div><Link href="/marketplace" className="section-link">View all</Link></div>
+        <div className="section-head"><div><span className="eyebrow">Eersterust + Denlyn + Tshwane + Silver Crossing</span><h2>Food Retail</h2></div><Link href="/marketplace" className="section-link">View all</Link></div>
         <p className="section-subtitle">Groceries, fresh food, meat and everyday essentials.</p>
         <div className="market-store-scroller">{foodRetail.map(store=><StoreCard key={store.id} store={store}/>)}</div>
       </section>
