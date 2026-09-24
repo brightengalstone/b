@@ -1,2 +1,50 @@
+'use client';
+
+import {useEffect,useState} from 'react';
+import {useSearchParams} from 'next/navigation';
+import {supabase} from '../../lib/supabase';
 import Link from 'next/link';
-export default function Page(){return <div className="page"><div className="eyebrow">BG Smart Services</div><h1>Tracking</h1><div className="card"><h2>Tracking dashboard</h2><p>This area is reserved for authenticated tracking workflows. The foundation is ready for secure role-based features.</p><Link className="btn" href="/signin">Sign in</Link></div></div>}
+import {CheckCircle2,Clock3,PackageCheck,ChefHat,Truck,MapPin,ArrowLeft} from 'lucide-react';
+
+const steps=[
+  ['Order placed',CheckCircle2,'Your order has been received.'],
+  ['Confirmed',PackageCheck,'The order is being confirmed.'],
+  ['Preparing',ChefHat,'The merchant is preparing your order.'],
+  ['Driver assigned',Truck,'A driver will collect your order.'],
+  ['Out for delivery',MapPin,'Your order is on its way to Eersterust.'],
+  ['Delivered',CheckCircle2,'Your order has been delivered.']
+];
+
+export default function Tracking(){
+  const params=useSearchParams();
+  const id=params.get('id');
+  const [order,setOrder]=useState(null);
+  const [loading,setLoading]=useState(Boolean(id));
+
+  useEffect(()=>{
+    let active=true;
+    async function load(){
+      if(!id||!supabase){setLoading(false);return}
+      const {data}=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status').eq('id',id).single();
+      if(active){setOrder(data||null);setLoading(false)}
+    }
+    load();
+    return()=>{active=false};
+  },[id]);
+
+  const status=String(order?.status||'pending').toLowerCase();
+  const current=status==='pending'?0:status.includes('confirm')?1:status.includes('prepar')?2:status.includes('assign')?3:status.includes('out')?4:status.includes('deliver')?5:0;
+
+  return <main className="tracking-page">
+    <div className="tracking-shell">
+      <div className="tracking-top"><Link href="/home" className="back-link"><ArrowLeft size={17}/> Back to Home</Link><span className="eyebrow">BG Smart Services</span></div>
+      <section className="tracking-hero"><div><div className="eyebrow">Delivery tracking</div><h1>Follow your order.</h1><p>See the current order stage from confirmation through delivery.</p></div><div className="tracking-status"><Clock3 size={18}/><span>{loading?'Loading status':steps[current][0]}</span></div></section>
+      {loading?<div className="card">Loading order details…</div>:<div className="tracking-grid">
+        <section className="card tracking-card"><div className="tracking-order-head"><div><span className="eyebrow">Order number</span><h2>{id||'No order selected'}</h2></div><span className="tracking-pill">R65 delivery</span></div>
+          <div className="tracking-timeline">{steps.map(([label,Icon,desc],i)=><div className={"tracking-step "+(i<=current?'is-active ':'')+(i===current?'is-current':'')} key={label}><div className="step-line"></div><div className="step-icon"><Icon size={18}/></div><div className="step-copy"><strong>{label}</strong><span>{desc}</span></div></div>)}</div>
+        </section>
+        <aside className="card tracking-summary"><span className="eyebrow">Delivery details</span><div className="tracking-address"><MapPin size={18}/><span>{order?.delivery_address||'Eersterust'}</span></div>{order&&<><div className="summary-row"><span>Subtotal</span><strong>R{Number(order.subtotal||0).toFixed(2)}</strong></div><div className="summary-row"><span>Delivery</span><strong>R{Number(order.delivery_fee??65).toFixed(2)}</strong></div><div className="summary-row summary-total"><span>Total</span><strong>R{(Number(order.subtotal||0)+Number(order.delivery_fee??65)).toFixed(2)}</strong></div></>}<Link className="btn btn-primary" href="/marketplace">Continue Shopping</Link></aside>
+      </div>}
+    </div>
+  </main>
+}
