@@ -56,7 +56,9 @@ export default function Signin() {
         error?.message ||
           'Signed in successfully. Open your account.'
       );
-    }
+    if (!error) {
+  window.location.href = '/account';
+}
   }
 
   function switchMode() {
