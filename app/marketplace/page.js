@@ -1,9 +1,98 @@
 'use client';
-import {useEffect,useState} from 'react';
+
+import {useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
 import {supabase} from '../../lib/supabase';
-const fallback=[{id:'demo-1',name:'Fresh Groceries',description:'Bread, milk, eggs & essentials',price:89},{id:'demo-2',name:'Hot Meals',description:'Local meals ready for delivery',price:75},{id:'demo-3',name:'Household',description:'Everyday household essentials',price:120}];
-export default function Marketplace(){const [products,setProducts]=useState([]);const [loading,setLoading]=useState(true);const [msg,setMsg]=useState('');
-useEffect(()=>{async function load(){if(!supabase){setProducts(fallback);setLoading(false);return}const {data,error}=await supabase.from('products').select('id,name,description,price,image_url,merchants(business_name)').eq('available',true).order('created_at',{ascending:false});if(error){setMsg('Live catalogue is not available yet. Showing starter products.');setProducts(fallback)}else setProducts(data||[]);setLoading(false)}load()},[]);
-function add(p){const cart=JSON.parse(localStorage.getItem('bg_cart')||'[]');const i=cart.findIndex(x=>x.id===p.id);if(i>=0)cart[i].quantity+=1;else cart.push({id:p.id,name:p.name,price:Number(p.price),quantity:1,merchant:p.merchants?.business_name||'Local business'});localStorage.setItem('bg_cart',JSON.stringify(cart));setMsg(`${p.name} added to cart.`)}
-return <div className="page"><div className="eyebrow">Eersterust Marketplace</div><div className="section-head"><div><h1>Start shopping</h1><p>Approved local businesses • Delivery zone: Eersterust</p></div><Link className="btn small" href="/cart">View Cart</Link></div>{msg&&<div className="notice">{msg}</div>}{loading?<div className="card">Loading marketplace…</div>:<div className="grid">{products.map(p=><div className="tile" key={p.id}><span className="pill">LOCAL</span><h3>{p.name}</h3><p>{p.description||'Local product available for delivery.'}</p>{p.merchants?.business_name&&<p className="muted">{p.merchants.business_name}</p>}<div className="bar"><span className="price">R{Number(p.price).toFixed(2)}</span><button className="btn small" onClick={()=>add(p)}>Add to cart</button></div></div>)}</div>}</div>}
+import {Search, ShoppingCart, Store, RefreshCw} from 'lucide-react';
+
+const starter = [
+  {id:'demo-1',name:'Fresh Groceries',description:'Bread, milk, eggs & essentials',price:89,category:'Groceries',retailer:'Pick n Pay'},
+  {id:'demo-2',name:'Hot Meals',description:'Local meals ready for delivery',price:75,category:'Meals',retailer:'Local'},
+  {id:'demo-3',name:'Household Essentials',description:'Everyday household essentials',price:120,category:'Household',retailer:'Checkers'}
+];
+
+export default function Marketplace(){
+  const [retailers,setRetailers]=useState([]);
+  const [products,setProducts]=useState([]);
+  const [retailer,setRetailer]=useState('all');
+  const [query,setQuery]=useState('');
+  const [loading,setLoading]=useState(true);
+  const [msg,setMsg]=useState('');
+
+  async function load(){
+    setLoading(true);
+    if(!supabase){setProducts(starter);setLoading(false);return}
+    const [{data:rs,error:re},{data:ps,error:pe}]=await Promise.all([
+      supabase.from('retailers').select('id,name,slug').eq('active',true).order('name'),
+      supabase.from('retailer_products').select('id,retailer_id,name,description,category,size,price,promo_price,image_url,last_verified_at').eq('available',true).order('name').limit(500)
+    ]);
+    if(re||pe){setMsg('The live retailer catalogue is being connected.');setProducts(starter)}
+    else {setRetailers(rs||[]);setProducts(ps||[])}
+    setLoading(false);
+  }
+
+  useEffect(()=>{load()},[]);
+
+  const visible=useMemo(()=>{
+    const term=query.trim().toLowerCase();
+    return products.filter(p=>{
+      const matchesRetailer=retailer==='all'||p.retailer_id===retailer;
+      const text=[p.name,p.description,p.category,p.size,p.retailer].filter(Boolean).join(' ').toLowerCase();
+      return matchesRetailer&&(!term||text.includes(term));
+    });
+  },[products,retailer,query]);
+
+  function add(p){
+    const cart=JSON.parse(localStorage.getItem('bg_cart')||'[]');
+    const price=Number(p.promo_price??p.price);
+    const i=cart.findIndex(x=>x.id===p.id);
+    if(i>=0)cart[i].quantity+=1;
+    else cart.push({id:p.id,name:p.name,price,quantity:1,merchant:p.retailer||'Retailer'});
+    localStorage.setItem('bg_cart',JSON.stringify(cart));
+    setMsg(p.name+' added to cart.');
+  }
+
+  return <main className="retail-market">
+    <div className="market-shell">
+      <div className="market-top">
+        <Link href="/home" className="market-brand"><span className="brand-mark">BG</span><span>Smart Services</span></Link>
+        <Link href="/cart" className="market-cart"><ShoppingCart size={19}/><span>Cart</span></Link>
+      </div>
+
+      <div className="market-hero">
+        <div><div className="eyebrow">Eersterust Marketplace</div><h1>Shop groceries.</h1><p>Compare participating retailers and build one BG Smart Services order.</p></div>
+      </div>
+
+      <div className="market-search"><Search size={19}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search products, brands or categories"/></div>
+
+      <div className="retailer-tabs">
+        <button className={retailer==='all'?'active':''} onClick={()=>setRetailer('all')}><Store size={17}/>All stores</button>
+        {retailers.map(r=><button key={r.id} className={retailer===r.id?'active':''} onClick={()=>setRetailer(r.id)}>{r.name}</button>)}
+      </div>
+
+      {msg&&<div className="notice">{msg}</div>}
+
+      <div className="market-heading">
+        <div><span className="eyebrow">{retailer==='all'?'Retailer catalogue':'Selected retailer'}</span><h2>{loading?'Loading catalogue…':visible.length+' products'}</h2></div>
+        <button className="refresh-button" onClick={load} aria-label="Refresh catalogue"><RefreshCw size={17}/></button>
+      </div>
+
+      {!loading&&visible.length===0?<div className="market-empty"><Store size={30}/><h2>No products found</h2><p>Try another search or retailer.</p></div>:<div className="product-grid">
+        {visible.map(p=>{
+          const price=Number(p.promo_price??p.price);
+          const hasPromo=p.promo_price!=null&&Number(p.promo_price)<Number(p.price);
+          const store=p.retailer||retailers.find(r=>r.id===p.retailer_id)?.name||'Retailer';
+          return <article className="product-card" key={p.id}>
+            <div className="product-image">{p.image_url?<img src={p.image_url} alt="" />:<Store size={30}/>}</div>
+            <div className="product-store">{store}</div>
+            <h3>{p.name}</h3>
+            {p.size&&<p className="product-size">{p.size}</p>}
+            <div className="product-price-row"><div><strong>R{price.toFixed(2)}</strong>{hasPromo&&<del>R{Number(p.price).toFixed(2)}</del>}</div><button className="btn small" onClick={()=>add({...p,retailer:store})}>Add</button></div>
+            {p.last_verified_at&&<small className="verified-price">Price verified {new Date(p.last_verified_at).toLocaleDateString('en-ZA')}</small>}
+          </article>
+        })}
+      </div>}
+      <div className="delivery-note">Delivery across Eersterust · R65 delivery · Retailer pricing and availability can change by store.</div>
+    </div>
+  </main>
+}
