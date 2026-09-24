@@ -1,0 +1,95 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabase';
+import Link from 'next/link';
+
+export default function ResetPassword() {
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [msg, setMsg] = useState('');
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (supabase) {
+      setReady(true);
+    }
+  }, []);
+
+  async function updatePassword(e) {
+    e.preventDefault();
+    setMsg('');
+
+    if (!ready) {
+      setMsg('Supabase is not configured.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setMsg('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setMsg('Passwords do not match.');
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({
+      password,
+    });
+
+    if (error) {
+      setMsg(error.message);
+      return;
+    }
+
+    setMsg('Password updated successfully. You can now sign in.');
+    setPassword('');
+    setConfirmPassword('');
+  }
+
+  return (
+    <div className="page narrow">
+      <div className="eyebrow">BG Smart Services</div>
+
+      <h1>Set new password</h1>
+
+      <form className="card form" onSubmit={updatePassword}>
+        <p>Choose a new password for your BG Smart Services account.</p>
+
+        <label>
+          New password
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            minLength={6}
+            required
+          />
+        </label>
+
+        <label>
+          Confirm new password
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            minLength={6}
+            required
+          />
+        </label>
+
+        <button className="btn" type="submit">
+          Update password
+        </button>
+
+        {msg && <div className="notice">{msg}</div>}
+
+        <Link className="text-link" href="/signin">
+          Back to Sign In →
+        </Link>
+      </form>
+    </div>
+  );
+}
