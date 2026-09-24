@@ -33,5 +33,6 @@ function MarketplaceContent(){
    <div className="delivery-note"><CheckCircle2 size={14}/> Driver pickup is tied to the selected store location · Delivery across Eersterust · R65 delivery</div>
   </div>
  </main>}
-export default function MarketplaceFallback(){return <main className="retail-market"><div className="market-shell"><div className="market-empty">Loading marketplace…</div></div></main>}
+function MarketplaceFallback(){return <main className="retail-market"><div className="market-shell"><div className="market-empty">Loading marketplace…</div></div></main>}
 function Marketplace(){return <Suspense fallback={<MarketplaceFallback/>}><MarketplaceContent/></Suspense>}
+export default Marketplace;
