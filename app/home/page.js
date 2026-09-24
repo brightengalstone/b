@@ -32,12 +32,12 @@ export default function Home(){
     <section className="home-content">
       <div className="home-intro">
         <div><div className="eyebrow">Eersterust delivery</div><h1>Good to see you.</h1><p>What would you like delivered today?</p></div>
-        <Link href="/cart" className="floating-cart"><ShoppingCart size={19}/></Link>
+        <Link href="/cart" className="floating-cart" aria-label="Open cart"><ShoppingCart size={19}/></Link>
       </div>
       <div className="home-search"><Search size={19}/><span>Search groceries, meals or alcohol</span></div>
       <section>
         <div className="section-head"><div><span className="eyebrow">Marketplace</span><h2>Shop by category</h2></div></div>
-        <div className="home-category-grid">{categories.map(({icon:Icon,title,text})=><Link href="/marketplace" className="home-category-card" key={title}><div className="category-art"><Icon size={30} strokeWidth={1.7}/></div><div><h3>{title}</h3><p>{text}</p></div><span className="card-arrow">→</span></Link>)}</div>
+        <div className="home-category-grid">{categories.map(({icon:Icon,title,text})=><Link href="/marketplace" className="home-category-card" key={title}><div className="category-art"><Icon size={30} strokeWidth={1.7}/></div><div><h3>{title}</h3><p>{text}</p></div><span className="card-arrow" aria-hidden="true">→</span></Link>)}</div>
       </section>
       <section className="delivery-banner"><div className="banner-icon"><Truck size={23}/></div><div><strong>Delivery across Eersterust</strong><p>R65 delivery</p></div><span className="banner-status">Available</span></section>
     </section>
