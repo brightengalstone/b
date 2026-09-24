@@ -16,16 +16,16 @@ const accountLinks = [
 ];
 
 const settingsLinks = [
-  { icon: UserRound, title: 'Personal Information', text: 'Manage your name and contact details' },
-  { icon: MapPin, title: 'Saved Addresses', text: 'Manage your delivery addresses' },
-  { icon: CreditCard, title: 'Payment Methods', text: 'Manage your saved payment options' },
-  { icon: Bell, title: 'Notifications', text: 'Choose how BG Smart Services contacts you' },
+  { href: '/account/personal', icon: UserRound, title: 'Personal Information', text: 'Manage your name and contact details' },
+  { href: '/account/addresses', icon: MapPin, title: 'Saved Addresses', text: 'Manage your delivery addresses' },
+  { href: '/account/payment-methods', icon: CreditCard, title: 'Payment Methods', text: 'Manage your saved payment options' },
+  { href: '/account/notifications', icon: Bell, title: 'Notifications', text: 'Choose how BG Smart Services contacts you' },
 ];
 
 const supportLinks = [
-  { icon: HelpCircle, title: 'Help & Support', text: 'Get assistance with your account or order' },
-  { icon: FileText, title: 'Terms & Conditions', text: 'Read the platform terms' },
-  { icon: ShieldCheck, title: 'Privacy Policy', text: 'Learn how your information is handled' },
+  { href: '/help', icon: HelpCircle, title: 'Help & Support', text: 'Get assistance with your account or order' },
+  { href: '/terms', icon: FileText, title: 'Terms & Conditions', text: 'Read the platform terms' },
+  { href: '/privacy', icon: ShieldCheck, title: 'Privacy Policy', text: 'Learn how your information is handled' },
 ];
 
 export default function Account() {
@@ -100,7 +100,7 @@ export default function Account() {
             <h2>{displayName}</h2>
             <p>{user.email}</p>
           </div>
-          <button className="account-edit" type="button" aria-label="Edit profile"><Pencil size={17} /><span>Edit Profile</span></button>
+          <Link className="account-edit" href="/account/personal" aria-label="Edit profile"><Pencil size={17} /><span>Edit Profile</span></Link>
         </section>
 
         <section className="account-section">
@@ -120,12 +120,12 @@ export default function Account() {
           <section className="account-section">
             <div className="account-section-head"><div><span className="eyebrow">Settings</span><h2>Account preferences</h2></div></div>
             <div className="account-list">
-              {settingsLinks.map(({ icon: Icon, title, text }) => (
-                <button className="account-list-row" type="button" key={title}>
+              {settingsLinks.map(({ href, icon: Icon, title, text }) => (
+                <Link className="account-list-row" href={href} key={title}>
                   <span className="account-link-icon"><Icon size={19} /></span>
                   <span><strong>{title}</strong><small>{text}</small></span>
                   <ChevronRight size={18} />
-                </button>
+                </Link>
               ))}
             </div>
           </section>
@@ -133,12 +133,12 @@ export default function Account() {
           <section className="account-section">
             <div className="account-section-head"><div><span className="eyebrow">Support</span><h2>Need help?</h2></div></div>
             <div className="account-list">
-              {supportLinks.map(({ icon: Icon, title, text }) => (
-                <button className="account-list-row" type="button" key={title}>
+              {supportLinks.map(({ href, icon: Icon, title, text }) => (
+                <Link className="account-list-row" href={href} key={title}>
                   <span className="account-link-icon"><Icon size={19} /></span>
                   <span><strong>{title}</strong><small>{text}</small></span>
                   <ChevronRight size={18} />
-                </button>
+                </Link>
               ))}
             </div>
           </section>
@@ -147,7 +147,7 @@ export default function Account() {
         <section className="account-security-card">
           <div className="account-security-icon"><LockKeyhole size={20} /></div>
           <div><strong>Security</strong><p>Keep your account protected with a secure password.</p></div>
-          <button type="button" className="btn account-password">Change Password</button>
+          <Link href="/account/change-password" className="btn account-password">Change Password</Link>
         </section>
 
         <button className="account-signout" type="button" onClick={out}><LogOut size={18} /><span>Sign out</span></button>
