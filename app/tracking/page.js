@@ -35,7 +35,7 @@ function TrackingContent(){
     }
     load();
     return()=>{active=false};
-  },[id]);
+  },[requestedId]);
 
   const status=String(order?.status||'pending').toLowerCase();
   const current=status==='pending'?0:status.includes('confirm')?1:status.includes('prepar')?2:status.includes('assign')?3:status.includes('picked')?4:status.includes('deliver')?5:0;
