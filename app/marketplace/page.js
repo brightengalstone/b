@@ -14,7 +14,6 @@ const BRANCH_CLASSES={
 };
 function retailerClass(slug,category){return BRANCH_CLASSES[slug]||(category==='fast-food'?'retailer-fast-food':'retailer-generic')}
 
-const BRAND_DOMAINS={'pick-n-pay':'pnp.co.za','checkers':'checkers.co.za','shoprite':'shoprite.co.za','woolworths':'woolworths.co.za','boxer-denlyn':'boxer.co.za'};
 function RetailerLogo({slug,large=false,logoUrl=null,name='Store',category='food-retail'}){const src=logoUrl||(BRAND_DOMAINS[slug]?('https://www.google.com/s2/favicons?domain='+BRAND_DOMAINS[slug]+'&sz=128'):null);return <div className={'retailer-logo '+retailerClass(slug,category)+(large?' large':'')} aria-label={name+' logo'}>{src?<img src={src} alt="" loading="lazy"/>:<span>{name.slice(0,2).toUpperCase()}</span>}</div>}
 
 function MarketplaceContent(){
