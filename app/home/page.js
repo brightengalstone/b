@@ -12,7 +12,7 @@ function StoreCard({store}) {
   const [brand, location] = store.name.split(' — ');
   return <Link href={'/marketplace?retailer='+store.slug} className={'market-store-card '+(store.marketplace_category==='fast-food'?'fast-food-card':'food-retail-card')}>
     <div className="market-store-top">
-      <div className="market-store-mark">{store.logo_mark||brand.slice(0,1)}</div>
+      <div className="market-store-mark">{store.logo_url?<img src={store.logo_url} alt="" loading="lazy"/>:<span>{store.logo_mark||brand.slice(0,1)}</span>}</div>
       <div className="market-store-copy">
         <h3>{brand}</h3>
         <p>{location||store.shopping_location}</p>
@@ -26,7 +26,7 @@ function StoreCard({store}) {
 export default function Home(){
   const [open,setOpen]=useState(false);
   const [stores,setStores]=useState([]);
-  useEffect(()=>{let mounted=true;(async()=>{if(!supabase)return;const {data}=await supabase.from('retailers').select('id,name,slug,marketplace_category,shopping_location,logo_mark').eq('active',true).in('shopping_location',['Denlyn Shopping Centre','Tshwane Regional Mall']).order('name');if(mounted)setStores(data||[])})();return()=>{mounted=false}},[]);
+  useEffect(()=>{let mounted=true;(async()=>{if(!supabase)return;const {data}=await supabase.from('retailers').select('id,name,slug,marketplace_category,shopping_location,logo_mark,logo_url').eq('active',true).in('shopping_location',['Denlyn Shopping Centre','Tshwane Regional Mall']).order('name');if(mounted)setStores(data||[])})();return()=>{mounted=false}},[]);
   const foodRetail=stores.filter(s=>s.marketplace_category==='food-retail');
   const fastFood=stores.filter(s=>s.marketplace_category==='fast-food');
   return <main className="app-shell">
