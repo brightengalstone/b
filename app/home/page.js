@@ -2,9 +2,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
-import { ShoppingCart, Package, Truck, Heart, UserRound, Settings, CircleHelp, LogOut, House, Store, X, Search, Bell, ShoppingBasket, Utensils, Wine } from 'lucide-react';
+import { ShoppingCart, Package, Heart, UserRound, Settings, CircleHelp, LogOut, House, Store, X, Search, Bell, ShoppingBasket, Utensils, Wine } from 'lucide-react';
 
-const menuItems=[[House,'Home','/home'],[Store,'Marketplace','/marketplace'],[ShoppingCart,'Cart','/cart'],[Package,'My Orders','/orders'],[Truck,'Track Delivery','/tracking'],[Heart,'Favourites','/account'],[UserRound,'My Account','/account'],[Settings,'Settings','/account'],[CircleHelp,'Help','/account']];
+function TukTuk({size=19,strokeWidth=1.9}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 15h14l-1-6H8l-3 6Z"/><path d="M8 9V6h7l3 3"/><path d="M5 15v2h14v-2"/><path d="M8 17a2 2 0 1 0 4 0M16 17a2 2 0 1 0 4 0"/><path d="M19 9h1.5a1.5 1.5 0 0 1 0 3H19"/></svg>}
+
+const menuItems=[[House,'Home','/home'],[Store,'Marketplace','/marketplace'],[ShoppingCart,'Cart','/cart'],[Package,'My Orders','/orders'],[TukTuk,'Track Delivery','/tracking'],[Heart,'Favourites','/account'],[UserRound,'My Account','/account'],[Settings,'Settings','/account'],[CircleHelp,'Help','/account']];
 const categories=[{icon:ShoppingBasket,title:'Groceries',text:'Everyday essentials'},{icon:Utensils,title:'Meals & Food',text:'Fresh meals and local favourites'},{icon:Wine,title:'Alcohol',text:'Approved sellers with age verification'}];
 
 export default function Home(){
@@ -39,7 +41,7 @@ export default function Home(){
         <div className="section-head"><div><span className="eyebrow">Marketplace</span><h2>Shop by category</h2></div></div>
         <div className="home-category-grid">{categories.map(({icon:Icon,title,text})=><Link href="/marketplace" className="home-category-card" key={title}><div className="category-art"><Icon size={30} strokeWidth={1.7}/></div><div><h3>{title}</h3><p>{text}</p></div><span className="card-arrow" aria-hidden="true">→</span></Link>)}</div>
       </section>
-      <section className="delivery-banner"><div className="banner-icon"><Truck size={23}/></div><div><strong>Delivery across Eersterust</strong><p>R65 delivery</p></div><span className="banner-status">Available</span></section>
+      <section className="delivery-banner"><div className="banner-icon"><TukTuk size={23} strokeWidth={1.8}/></div><div><strong>Delivery across Eersterust</strong><p>R65 delivery</p></div><span className="banner-status">Available</span></section>
     </section>
   </main>
 }
