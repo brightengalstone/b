@@ -1,0 +1,3 @@
+'use client';
+import {useEffect,useState} from 'react';import {supabase} from '../../lib/supabase';import Link from 'next/link';
+export default function Account(){const [user,setUser]=useState(null);useEffect(()=>{supabase?.auth.getUser().then(({data})=>setUser(data.user))},[]);async function out(){await supabase?.auth.signOut();setUser(null)}return <div className="page"><div className="eyebrow">BG Smart Services</div><h1>Account</h1><div className="card">{user?<><h2>Welcome</h2><p>{user.email}</p><button className="btn" onClick={out}>Sign out</button></>:<><h2>You’re not signed in</h2><p>Sign in to manage your BG Smart Services account and orders.</p><Link className="btn" href="/signin">Sign in</Link></>}</div></div>}
