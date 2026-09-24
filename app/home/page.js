@@ -1,21 +1,34 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
-import { ShoppingCart, Package, Heart, UserRound, Settings, CircleHelp, LogOut, House, Store, X, Search, Bell, CheckCircle2 } from 'lucide-react';
+import { ShoppingCart, Package, Heart, UserRound, Settings, CircleHelp, LogOut, House, Store, X, Search, Bell, CheckCircle2, MapPin, ArrowRight } from 'lucide-react';
 
 function TukTuk({size=19,strokeWidth=1.9}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 15h14l-1-6H8l-3 6Z"/><path d="M8 9V6h7l3 3"/><path d="M5 15v2h14v-2"/><path d="M8 17a2 2 0 1 0 4 0M16 17a2 2 0 1 0 4 0"/><path d="M19 9h1.5a1.5 1.5 0 0 1 0 3H19"/></svg>}
 
 const menuItems=[[House,'Home','/home'],[Store,'Marketplace','/marketplace'],[ShoppingCart,'Cart','/cart'],[Package,'My Orders','/orders'],[TukTuk,'Track Delivery','/tracking'],[Heart,'Favourites','/account'],[UserRound,'My Account','/account'],[Settings,'Settings','/account'],[CircleHelp,'Help','/account']];
-const shops=[
-  {name:'Pick n Pay',slug:'pick-n-pay',tag:'Groceries & everyday essentials',mark:'P',className:'shop-pnp'},
-  {name:'Checkers',slug:'checkers',tag:'Groceries, fresh food & essentials',mark:'C',className:'shop-checkers'},
-  {name:'Shoprite',slug:'shoprite',tag:'Everyday groceries & household',mark:'S',className:'shop-shoprite'},
-  {name:'Woolworths',slug:'woolworths',tag:'Quality food & fresh produce',mark:'W',className:'shop-woolworths'}
-];
+
+function StoreCard({store}) {
+  const [brand, location] = store.name.split(' — ');
+  return <Link href={'/marketplace?retailer='+store.slug} className={'market-store-card '+(store.marketplace_category==='fast-food'?'fast-food-card':'food-retail-card')}>
+    <div className="market-store-top">
+      <div className="market-store-mark">{store.logo_mark||brand.slice(0,1)}</div>
+      <div className="market-store-copy">
+        <h3>{brand}</h3>
+        <p>{location||store.shopping_location}</p>
+      </div>
+      <ArrowRight size={17}/>
+    </div>
+    <div className="market-store-bottom"><span><MapPin size={12}/>{store.shopping_location}</span><span>Shop</span></div>
+  </Link>
+}
 
 export default function Home(){
   const [open,setOpen]=useState(false);
+  const [stores,setStores]=useState([]);
+  useEffect(()=>{let mounted=true;(async()=>{if(!supabase)return;const {data}=await supabase.from('retailers').select('id,name,slug,marketplace_category,shopping_location,logo_mark').eq('active',true).in('shopping_location',['Denlyn Shopping Centre','Tshwane Regional Mall']).order('name');if(mounted)setStores(data||[])})();return()=>{mounted=false}},[]);
+  const foodRetail=stores.filter(s=>s.marketplace_category==='food-retail');
+  const fastFood=stores.filter(s=>s.marketplace_category==='fast-food');
   return <main className="app-shell">
     <header className="app-header">
       <Link href="/home" className="app-brand"><span className="brand-mark">BG</span><span>Smart Services</span></Link>
@@ -32,11 +45,20 @@ export default function Home(){
     </div>}
     <section className="home-content">
       <div className="home-intro"><div><div className="eyebrow">Eersterust delivery</div><h1>Good to see you.</h1><p>What would you like delivered today?</p></div><Link href="/cart" className="floating-cart" aria-label="Open cart"><ShoppingCart size={19}/></Link></div>
-      <div className="home-search"><Search size={19}/><span>Search groceries, meals or alcohol</span></div>
-      <section>
-        <div className="section-head"><div><span className="eyebrow">Marketplace</span><h2>Shop by category</h2></div><Link href="/marketplace" className="section-link">View all</Link></div>
-        <div className="home-category-grid shop-grid">{shops.map(shop=><Link href={'/marketplace?retailer='+shop.slug} className={'home-category-card shop-card '+shop.className} key={shop.slug}><div className="shop-brand-row"><div className="shop-mark">{shop.mark}</div><div><h3>{shop.name}</h3><p>{shop.tag}</p></div></div><div className="shop-card-bottom"><span><CheckCircle2 size={14}/> Participating store</span><span className="card-arrow">→</span></div></Link>)}</div>
+      <div className="home-search"><Search size={19}/><span>Search groceries, meals or fast food</span></div>
+
+      <section className="marketplace-sections">
+        <div className="section-head"><div><span className="eyebrow">Denlyn + Tshwane Regional Mall</span><h2>Food Retail</h2></div><Link href="/marketplace" className="section-link">View all</Link></div>
+        <p className="section-subtitle">Groceries, fresh food, meat and everyday essentials.</p>
+        <div className="market-store-scroller">{foodRetail.map(store=><StoreCard key={store.id} store={store}/>)}</div>
       </section>
+
+      <section className="marketplace-sections">
+        <div className="section-head"><div><span className="eyebrow">Quick meals</span><h2>Fast Food</h2></div><Link href="/marketplace" className="section-link">View all</Link></div>
+        <p className="section-subtitle">Order from participating takeaway and fast-food stores.</p>
+        <div className="market-store-scroller">{fastFood.map(store=><StoreCard key={store.id} store={store}/>)}</div>
+      </section>
+
       <section className="delivery-banner"><div className="banner-icon"><TukTuk size={23} strokeWidth={1.8}/></div><div><strong>Delivery across Eersterust</strong><p>R65 delivery</p></div><span className="banner-status">Available</span></section>
     </section>
   </main>
