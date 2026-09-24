@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect,useState} from 'react';
+import {Suspense,useEffect,useState} from 'react';
 import {useSearchParams} from 'next/navigation';
 import {supabase} from '../../lib/supabase';
 import Link from 'next/link';
@@ -15,7 +15,7 @@ const steps=[
   ['Delivered',CheckCircle2,'Your order has been delivered.']
 ];
 
-export default function Tracking(){
+function TrackingContent(){
   const params=useSearchParams();
   const id=params.get('id');
   const [order,setOrder]=useState(null);
@@ -47,4 +47,10 @@ export default function Tracking(){
       </div>}
     </div>
   </main>
+}
+
+export default function Tracking(){
+  return <Suspense fallback={<main className="tracking-page"><div className="tracking-shell"><div className="card">Loading tracking…</div></div></main>}>
+    <TrackingContent />
+  </Suspense>
 }
