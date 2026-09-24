@@ -31,6 +31,7 @@ function ProductThumb({ item }) {
 export default function Cart() {
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState(() => getOrderingStatus());
+  const [storeNotice, setStoreNotice] = useState('');
 
   useEffect(() => {
     try { setItems(JSON.parse(localStorage.getItem('bg_cart') || '[]')); }
@@ -69,7 +70,13 @@ export default function Cart() {
   function removeItem(id) { save(items.filter(item => item.id !== id)); }
   function clearCart() { save([]); }
 
-  const canCheckout = items.length > 0 && status.open;
+  function continueWithStore(storeName) {
+    const keep = items.filter(item => (item.storeName || item.store || item.merchantName || 'Marketplace') === storeName);
+    save(keep);
+    setStoreNotice('Your cart is now limited to ' + storeName + '.');
+  }
+
+  const canCheckout = items.length > 0 && stores.length === 1 && status.open;
 
   return (
     <main className="cart-page">
@@ -86,6 +93,7 @@ export default function Cart() {
             <div className="eyebrow">Shopping cart</div>
             <h1>Your cart</h1>
             <p>{items.length ? itemCount + ' ' + (itemCount === 1 ? 'item' : 'items') + ' from ' + stores.length + ' ' + (stores.length === 1 ? 'store' : 'stores') : 'Review your items before checkout.'}</p>
+          {storeNotice && <div className="notice cart-store-notice">{storeNotice}</div>}
           </div>
           <div className="cart-hero-icon"><CartIcon /></div>
         </header>
@@ -102,6 +110,7 @@ export default function Cart() {
             <section className="cart-items-column" aria-label="Cart items">
               {stores.map(([storeName, storeItems]) => (
                 <section className="cart-store-card" key={storeName}>
+                  {stores.length > 1 && <div className="cart-store-switch"><span>Only one store can be checked out at a time.</span><button type="button" className="text-button" onClick={() => continueWithStore(storeName)}>Keep this store</button></div>}
                   <div className="cart-store-header">
                     <div className="cart-store-icon"><StoreIcon /></div>
                     <div>
@@ -157,6 +166,8 @@ export default function Cart() {
                 <div><span>Delivery</span><strong>R65.00</strong></div>
               </div>
               <div className="cart-summary-total"><span>Total</span><strong>R{total.toFixed(2)}</strong></div>
+
+              {stores.length > 1 && <div className="hours-warning cart-hours"><strong>Multiple stores selected</strong><span>BG Smart Services checkout supports one store per order. Choose “Keep this store” above to continue with that store.</span></div>}
 
               <div className="cart-delivery-note">
                 <span className="cart-note-icon"><StoreIcon /></span>
