@@ -17,23 +17,28 @@ const steps=[
 
 function TrackingContent(){
   const params=useSearchParams();
-  const id=params.get('id');
+  const requestedId=params.get('id');
+  const [id,setId]=useState(requestedId||'');
   const [order,setOrder]=useState(null);
-  const [loading,setLoading]=useState(Boolean(id));
+  const [loading,setLoading]=useState(true);
 
   useEffect(()=>{
     let active=true;
     async function load(){
-      if(!id||!supabase){setLoading(false);return}
-      const {data}=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status').eq('id',id).single();
-      if(active){setOrder(data||null);setLoading(false)}
+      if(!supabase){setLoading(false);return}
+      const {data:{user}}=await supabase.auth.getUser();
+      if(!user){if(active){setLoading(false);window.location.href='/signin'}return}
+      let data=null;
+      if(requestedId){const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status').eq('id',requestedId).single();data=q.data}
+      else{const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status').eq('customer_id',user.id).in('status',['pending','confirmed','preparing','ready','assigned','picked_up']).order('created_at',{ascending:false}).limit(1).maybeSingle();data=q.data}
+      if(active){setOrder(data||null);setId(data?.id||requestedId||'');setLoading(false)}
     }
     load();
     return()=>{active=false};
   },[id]);
 
   const status=String(order?.status||'pending').toLowerCase();
-  const current=status==='pending'?0:status.includes('confirm')?1:status.includes('prepar')?2:status.includes('assign')?3:status.includes('out')?4:status.includes('deliver')?5:0;
+  const current=status==='pending'?0:status.includes('confirm')?1:status.includes('prepar')?2:status.includes('assign')?3:status.includes('picked')?4:status.includes('deliver')?5:0;
 
   return <main className="tracking-page">
     <div className="tracking-shell">
