@@ -2,18 +2,15 @@ import './globals.css';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'BG Smart Services | Local shopping in Eersterust',
-  description: 'Shop groceries, meals and approved local businesses through BG Smart Services.',
+  title: 'BG Smart Services',
+  description: 'Local shopping, delivered in Eersterust.',
 };
 
 export default function Layout({ children }) {
   return (
     <>
       <header className="site-header">
-        <Link href="/" className="brand">
-          <span className="brand-mark">BG</span>
-          <span className="brand-name">Smart Services</span>
-        </Link>
+        <Link href="/" className="brand"><span className="brand-mark">BG</span><span className="brand-name">Smart Services</span></Link>
         <nav className="main-nav">
           <Link href="/marketplace">Marketplace</Link>
           <Link href="/account">Account</Link>
@@ -22,10 +19,7 @@ export default function Layout({ children }) {
         </nav>
       </header>
       <main>{children}</main>
-      <footer className="site-footer">
-        <div><strong>BG Smart Services</strong><span>Local shopping, delivered in Eersterust.</span></div>
-        <span>Delivery R60 • Service R45</span>
-      </footer>
+      <footer className="site-footer"><div><strong>BG Smart Services</strong><span>Local shopping, delivered in Eersterust.</span></div><span>Delivery R60 • Service R45</span></footer>
     </>
   );
 }
