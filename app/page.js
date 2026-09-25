@@ -1,14 +1,3 @@
 import Link from 'next/link';
-import { ShoppingCart } from 'lucide-react';
-
-export default function Welcome() {
-  return <main className="reference-welcome">
-    <div className="reference-welcome-bg"><div className="reference-glow one"/><div className="reference-glow two"/><div className="reference-tuk"><ShoppingCart size={150}/></div></div>
-    <section className="reference-welcome-content">
-      <div className="reference-logo"><span>BG</span><ShoppingCart size={28}/><strong>SMART SERVICES</strong></div>
-      <div className="reference-tagline">Shop · Pay · We Deliver</div>
-      <div className="reference-welcome-copy"><h1>Your everyday needs,<br/>made simple.</h1><p>Local shopping, delivered across Eersterust.</p></div>
-      <Link className="reference-green-button" href="/signin">Get Started</Link>
-    </section>
-  </main>;
-}
+import {ShoppingCart} from 'lucide-react';
+export default function Welcome(){return <main className="reference-welcome"><div className="reference-welcome-bg"><div className="reference-glow one"/><div className="reference-glow two"/><div className="reference-tuk"><ShoppingCart size={150}/></div></div><section className="reference-welcome-content"><div className="reference-logo"><span>BG</span><ShoppingCart size={28}/><strong>SMART SERVICES</strong></div><div className="reference-tagline">Shop · Pay · We Deliver</div><div className="reference-welcome-copy"><h1>Your everyday needs,<br/>made simple.</h1><p>Local shopping, delivered across Eersterust.</p></div><Link className="reference-green-button" href="/signin">Get Started</Link></section></main>}
