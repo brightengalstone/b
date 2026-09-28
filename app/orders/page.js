@@ -14,14 +14,35 @@ export default function Orders(){
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState('');
  const [signedIn,setSignedIn]=useState(true);
+ const [ratings,setRatings]=useState({});
+ const [ratingDrafts,setRatingDrafts]=useState({});
+ const [ratingBusy,setRatingBusy]=useState({});
+
+ async function submitDriverRating(order){
+  const rating=Number(ratingDrafts[order.id]||0);
+  if(!order.driver_id || !rating) return;
+  setRatingBusy(current=>({...current,[order.id]:true}));setError('');
+  const {data:{user}}=await supabase.auth.getUser();
+  const feedback=window.prompt('Optional feedback for your driver:','')||null;
+  const {data,error:insertError}=await supabase.from('driver_ratings').insert({order_id:order.id,driver_id:order.driver_id,customer_id:user.id,rating,feedback}).select('order_id,rating,feedback').single();
+  if(insertError)setError(insertError.message);else {setRatings(current=>({...current,[order.id]:data}));setRatingDrafts(current=>({...current,[order.id]:0}));}
+  setRatingBusy(current=>({...current,[order.id]:false}));
+ }
 
  async function loadOrders(){
   setLoading(true);setError('');
   const {data:{user}}=await supabase.auth.getUser();
   if(!user){setSignedIn(false);setOrders([]);setLoading(false);return}
   setSignedIn(true);
-  const {data,error:queryError}=await supabase.from('orders').select('id,status,subtotal,delivery_fee,total,delivery_address,created_at,updated_at,retailer_id,retailers(name,logo_url),order_items(quantity,unit_price,retailer_products(name,image_url,size))').eq('customer_id',user.id).order('created_at',{ascending:false}).limit(50);
-  if(queryError){setError('We could not load your orders right now. Please try again.');setOrders([])}else setOrders(data||[]);
+  const {data,error:queryError}=await supabase.from('orders').select('id,status,subtotal,delivery_fee,total,delivery_address,created_at,updated_at,retailer_id,driver_id,retailers(name,logo_url),order_items(quantity,unit_price,retailer_products(name,image_url,size))').eq('customer_id',user.id).order('created_at',{ascending:false}).limit(50);
+  if(queryError){setError('We could not load your orders right now. Please try again.');setOrders([])}else {
+   setOrders(data||[]);
+   const deliveredIds=(data||[]).filter(o=>o.status==='delivered').map(o=>o.id);
+   if(deliveredIds.length){
+    const {data:ratingData}=await supabase.from('driver_ratings').select('order_id,rating,feedback').in('order_id',deliveredIds);
+    const mapped={};(ratingData||[]).forEach(r=>{mapped[r.order_id]=r});setRatings(mapped);
+   } else setRatings({});
+  }
   setLoading(false);
  }
 
@@ -32,6 +53,6 @@ export default function Orders(){
  return <main className="orders-page"><div className="orders-shell">
   <div className="orders-top"><Link href="/home" className="orders-brand"><span className="brand-mark">BG</span><span>Smart Services</span></Link><button className="icon-button" onClick={loadOrders} aria-label="Refresh orders"><RefreshCw size={18}/></button></div>
   <div className="orders-hero"><div><div className="eyebrow">Your activity</div><h1>My Orders</h1><p>Keep track of every BG Smart Services order in one place.</p></div><Link href="/marketplace" className="btn btn-primary">Shop now <ArrowRight size={17}/></Link></div>
-  {loading?<div className="orders-list">{[1,2,3].map(i=><div className="order-skeleton" key={i}/>)}</div>:error?<div className="orders-message"><p>{error}</p><button className="btn btn-primary" onClick={loadOrders}>Try again</button></div>:orders.length===0?<div className="orders-empty"><div className="orders-empty-icon"><ShoppingBag size={28}/></div><div className="eyebrow">No orders yet</div><h2>Your first order starts here.</h2><p>Shop groceries, meals and approved alcohol sellers across Eersterust.</p><Link className="btn btn-primary" href="/marketplace">Start shopping <ArrowRight size={17}/></Link></div>:<div className="orders-list">{orders.map(order=><article className="order-card" key={order.id}><div className="order-card-top"><div><span className="order-status"><PackageCheck size={14}/>{statusLabel[order.status]||'Order placed'}</span><h2>Order #{order.id.slice(0,8).toUpperCase()}</h2>{order.retailers?.name&&<div className="order-store">{order.retailers.name}</div>}<p><Clock3 size={14}/>{dateLabel(order.created_at)}</p></div><strong className="order-total">{money(order.total ?? Number(order.subtotal||0)+Number(order.delivery_fee||0))}</strong></div>{order.order_items?.length>0&&<div className="order-items">{order.order_items.slice(0,4).map((item,index)=><div className="order-item" key={item.retailer_product_id||index}><span className="order-item-image">{item.retailer_products?.image_url?<img src={item.retailer_products.image_url} alt=""/>:<ShoppingBag size={16}/>}</span><span className="order-item-name">{item.retailer_products?.name||'Item'}{item.retailer_products?.size&&<small>{item.retailer_products.size}</small>}</span><strong>×{item.quantity}</strong><b>{money(Number(item.unit_price)*Number(item.quantity))}</b></div>)}</div>}<div className="order-meta"><div><MapPin size={15}/><span>{order.delivery_address||'Eersterust delivery'}</span></div><div><span>Delivery</span><strong>{money(order.delivery_fee)}</strong></div></div><div className="order-card-actions"><Link href={`/tracking?id=${order.id}`} className="btn btn-primary">Track Delivery <ArrowRight size={16}/></Link><Link href={`/order-success?id=${order.id}`} className="btn btn-ghost">View Order</Link></div></article>)}</div>}
+  {loading?<div className="orders-list">{[1,2,3].map(i=><div className="order-skeleton" key={i}/>)}</div>:error?<div className="orders-message"><p>{error}</p><button className="btn btn-primary" onClick={loadOrders}>Try again</button></div>:orders.length===0?<div className="orders-empty"><div className="orders-empty-icon"><ShoppingBag size={28}/></div><div className="eyebrow">No orders yet</div><h2>Your first order starts here.</h2><p>Shop groceries, meals and approved alcohol sellers across Eersterust.</p><Link className="btn btn-primary" href="/marketplace">Start shopping <ArrowRight size={17}/></Link></div>:<div className="orders-list">{orders.map(order=><article className="order-card" key={order.id}><div className="order-card-top"><div><span className="order-status"><PackageCheck size={14}/>{statusLabel[order.status]||'Order placed'}</span><h2>Order #{order.id.slice(0,8).toUpperCase()}</h2>{order.retailers?.name&&<div className="order-store">{order.retailers.name}</div>}<p><Clock3 size={14}/>{dateLabel(order.created_at)}</p></div><strong className="order-total">{money(order.total ?? Number(order.subtotal||0)+Number(order.delivery_fee||0))}</strong></div>{order.order_items?.length>0&&<div className="order-items">{order.order_items.slice(0,4).map((item,index)=><div className="order-item" key={item.retailer_product_id||index}><span className="order-item-image">{item.retailer_products?.image_url?<img src={item.retailer_products.image_url} alt=""/>:<ShoppingBag size={16}/>}</span><span className="order-item-name">{item.retailer_products?.name||'Item'}{item.retailer_products?.size&&<small>{item.retailer_products.size}</small>}</span><strong>×{item.quantity}</strong><b>{money(Number(item.unit_price)*Number(item.quantity))}</b></div>)}</div>}<div className="order-meta"><div><MapPin size={15}/><span>{order.delivery_address||'Eersterust delivery'}</span></div><div><span>Delivery</span><strong>{money(order.delivery_fee)}</strong></div></div><div className="order-card-actions"><Link href={`/tracking?id=${order.id}`} className="btn btn-primary">Track Delivery <ArrowRight size={16}/></Link><Link href={`/order-success?id=${order.id}`} className="btn btn-ghost">View Order</Link></div>{order.status==='delivered'&&order.driver_id&&<div className="driver-rating-box"><div><strong>{ratings[order.id]?'Driver rated':'Rate your driver'}</strong><small>{ratings[order.id]?'Thank you for rating your driver.':'How was your delivery experience?'}</small></div>{ratings[order.id]?<span className="driver-rating-stars">{'★'.repeat(Number(ratings[order.id].rating))}{'☆'.repeat(5-Number(ratings[order.id].rating))}</span>:<div className="driver-rating-actions">{[1,2,3,4,5].map(value=><button key={value} type="button" className={ratingDrafts[order.id]===value?'selected':''} onClick={()=>setRatingDrafts(current=>({...current,[order.id]:value}))} aria-label={`Rate driver ${value} out of 5`}>★</button>)}<button className="btn btn-ghost" disabled={!ratingDrafts[order.id]||ratingBusy[order.id]} onClick={()=>submitDriverRating(order)}>{ratingBusy[order.id]?'Saving…':'Submit'}</button></div>}</div>}</article>)}</div>}
  </div></main>
 }
