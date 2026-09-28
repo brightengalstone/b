@@ -236,45 +236,37 @@ export default function Checkout() {
       return;
     }
 
-    const retailerId = first.retailer_id || null;
+    const retailerId = first.retailer_id || first.storeId || null;
 
-    const { data: cartOrder, error } = await supabase
-      .from('orders')
-      .insert({
-        customer_id: user.id,
-        merchant_id: null,
-        retailer_id: retailerId,
-        subtotal,
-        delivery_fee: deliveryFee,
-        service_fee: 0,
-        delivery_address: verifiedAddress.label,
-        delivery_latitude: verifiedAddress.latitude,
-        delivery_longitude: verifiedAddress.longitude,
-        delivery_address_verified: true,
-        notes
-      })
-      .select()
-      .single();
-
-    if (error) {
-      setMsg(error.message);
+    if (!retailerId) {
+      setMsg('We could not identify the selected store. Return to your cart and select a store again.');
       setBusy(false);
       return;
     }
 
-    const rows = items.map(x => ({
-      order_id: cartOrder.id,
-      product_id: null,
+    const rpcItems = items.map(x => ({
       retailer_product_id: x.id,
-      quantity: Number(x.quantity || 1),
-      unit_price: Number(x.price || 0)
+      quantity: Number(x.quantity || 1)
     }));
 
-    const { error: itemError } = await supabase.from('order_items').insert(rows);
+    const { data: orderId, error: orderError } = await supabase.rpc('create_order_with_items', {
+      p_retailer_id: retailerId,
+      p_items: rpcItems,
+      p_delivery_address: verifiedAddress.label,
+      p_delivery_latitude: verifiedAddress.latitude,
+      p_delivery_longitude: verifiedAddress.longitude,
+      p_delivery_address_verified: true,
+      p_notes: notes
+    });
 
-    if (itemError) {
-      await supabase.from('orders').delete().eq('id', cartOrder.id).eq('customer_id', user.id);
-      setMsg('We could not save your order items. Please return to your cart and try again.');
+    if (orderError) {
+      setMsg(orderError.message || 'We could not place the order. Please try again.');
+      setBusy(false);
+      return;
+    }
+
+    if (!orderId) {
+      setMsg('The order was not created. Please try again.');
       setBusy(false);
       return;
     }
