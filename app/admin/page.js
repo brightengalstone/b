@@ -62,6 +62,7 @@ export default function AdminPage() {
     drivers: [],
     payments: [],
     ratings: [],
+    driverApplications: [],
   });
 
   useEffect(() => {
@@ -117,7 +118,7 @@ export default function AdminPage() {
     if (showSpinner) setRefreshing(true);
     setError('');
 
-    const [orders, shops, products, customers, drivers, payments, ratings] = await Promise.all([
+    const [orders, shops, products, customers, drivers, payments, ratings, driverApplications] = await Promise.all([
       supabase
         .from('orders')
         .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id')
@@ -151,9 +152,14 @@ export default function AdminPage() {
         .select('id, order_id, driver_id, customer_id, rating, feedback, created_at')
         .order('created_at', { ascending: false })
         .limit(500),
+      supabase
+        .from('driver_applications')
+        .select('id, user_id, full_name, phone, id_number, address, vehicle_type, vehicle_registration, drivers_license_number, status, admin_notes, created_at')
+        .order('created_at', { ascending: false })
+        .limit(100),
     ]);
 
-    const failures = [orders, shops, products, customers, drivers, payments, ratings].filter((item) => item.error);
+    const failures = [orders, shops, products, customers, drivers, payments, ratings, driverApplications].filter((item) => item.error);
     if (failures.length) {
       setError(failures.map((item) => item.error.message).join(' | '));
     }
@@ -166,6 +172,7 @@ export default function AdminPage() {
       drivers: drivers.data || [],
       payments: payments.data || [],
       ratings: ratings.data || [],
+      driverApplications: driverApplications.data || [],
     });
 
     if (showSpinner) setRefreshing(false);
@@ -192,6 +199,25 @@ export default function AdminPage() {
     }));
   }
 
+  async function reviewDriverApplication(applicationId, approved) {
+    if (!supabase) return;
+    const notes = window.prompt(approved ? 'Optional approval note:' : 'Reason for declining this application:');
+    if (!approved && !notes?.trim()) {
+      setError('A reason is required when declining an application.');
+      return;
+    }
+    const { error: reviewError } = await supabase.rpc('admin_review_driver_application', {
+      p_application_id: applicationId,
+      p_approved: approved,
+      p_notes: notes || null,
+    });
+    if (reviewError) {
+      setError(reviewError.message);
+      return;
+    }
+    await loadDashboard(false);
+  }
+
   async function signOut() {
     if (supabase) await supabase.auth.signOut();
     window.location.href = '/signin';
@@ -209,6 +235,7 @@ export default function AdminPage() {
       shops: data.shops.filter((shop) => shop.active).length,
       products: data.products.filter((product) => product.available).length,
       drivers: data.drivers.filter((driver) => driver.approved).length,
+      pendingDriverApplications: data.driverApplications.filter((item) => item.status === 'pending').length,
     };
   }, [data]);
 
@@ -300,6 +327,7 @@ export default function AdminPage() {
               <Stat icon={Clock3} label="Orders in progress" value={stats.pending} />
               <Stat icon={CircleDollarSign} label="Delivered sales" value={money(stats.revenue)} />
               <Stat icon={Users} label="Customers" value={stats.customers} />
+              <Stat icon={Truck} label="Pending driver applications" value={stats.pendingDriverApplications} />
             </div>
 
             <div className="admin-grid-two">
@@ -385,7 +413,33 @@ export default function AdminPage() {
         )}
 
         {active === 'drivers' && (
-          <Panel title="Driver Management" subtitle="Availability, delivery history, ratings and performance for every driver.">
+          <>
+            <Panel title="Driver applications" subtitle="Review applicants and accept or decline their driver access.">
+              <div className="admin-card-grid">
+                {data.driverApplications.map((application) => (
+                  <div className="admin-mini-card" key={application.id}>
+                    <div className="admin-row">
+                      <div className="admin-square"><Truck size={19} /></div>
+                      <div><strong>{application.full_name}</strong><span>{application.phone}</span></div>
+                    </div>
+                    <div className="admin-badges">
+                      <span className={application.status === 'pending' ? 'admin-status warning' : application.status === 'approved' ? 'admin-status success' : 'admin-status danger'}>{application.status}</span>
+                    </div>
+                    <small>ID: {application.id_number}</small>
+                    <small>{application.address}</small>
+                    <small>{application.vehicle_type} · {application.vehicle_registration}</small>
+                    <small>Licence: {application.drivers_license_number}</small>
+                    {application.admin_notes && <small>Admin note: {application.admin_notes}</small>}
+                    <div className="admin-application-actions">
+                      <button className="admin-primary" disabled={application.status !== 'pending'} onClick={() => reviewDriverApplication(application.id, true)}>Accept driver</button>
+                      <button className="admin-secondary" disabled={application.status !== 'pending'} onClick={() => reviewDriverApplication(application.id, false)}>Decline</button>
+                    </div>
+                  </div>
+                ))}
+                {!data.driverApplications.length && <div className="admin-empty">No driver applications yet.</div>}
+              </div>
+            </Panel>
+            <Panel title="Driver Management" subtitle="Availability, delivery history, ratings and performance for every driver.">
             <div className="admin-card-grid">
               {data.drivers.map((driver) => {
                 const driverOrders = data.orders.filter((order) => order.driver_id === driver.id);
