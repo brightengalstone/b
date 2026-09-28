@@ -29,7 +29,7 @@ function TrackingContent(){
       const {data:{user}}=await supabase.auth.getUser();
       if(!user){if(active){setLoading(false);window.location.href='/signin'}return}
       let data=null;
-      if(requestedId){const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status').eq('id',requestedId).single();data=q.data}
+      if(requestedId){const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status').eq('id',requestedId).eq('customer_id',user.id).single();data=q.data}
       else{const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status').eq('customer_id',user.id).in('status',['pending','confirmed','preparing','ready','assigned','picked_up']).order('created_at',{ascending:false}).limit(1).maybeSingle();data=q.data}
       if(active){setOrder(data||null);setId(data?.id||requestedId||'');setLoading(false)}
     }
