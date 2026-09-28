@@ -1,5 +1,7 @@
 'use client';
 
+import './driver-apply.css';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, Clock3, FileText, Loader2, ShieldCheck, Truck, Upload, XCircle } from 'lucide-react';
