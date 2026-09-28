@@ -409,7 +409,7 @@ export default function Checkout() {
               {stores.length !== 1 && <div className="notice">Only one store can be checked out at a time. Return to your cart to select one store.</div>}
               {msg && <div className="notice checkout-message">{msg}</div>}
 
-              <button className="btn btn-primary btn-large checkout-place" disabled={busy || !status.open || stores.length !== 1 || !address.trim()} onClick={place}>
+              <button className="btn btn-primary btn-large checkout-place" disabled={busy} onClick={place}>
                 {busy ? 'Placing order…' : 'Place order'}
               </button>
 
