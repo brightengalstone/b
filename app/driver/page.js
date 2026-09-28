@@ -1,5 +1,7 @@
 'use client';
 
+import './driver.css';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CheckCircle2, Clock3, LogOut, MapPin, Package, RefreshCw, Truck } from 'lucide-react';
