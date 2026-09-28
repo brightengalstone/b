@@ -14,23 +14,6 @@ function money(value) {
   return 'R' + Number(value || 0).toFixed(2);
 }
 
-function isEersterust(result) {
-  const a = result?.address || {};
-  const text = String(result?.display_name || '').toLowerCase();
-  return (
-    String(a.suburb || '').toLowerCase() === 'eersterust' ||
-    text.includes('eersterust')
-  );
-}
-
-function mapEmbedUrl(lat, lon) {
-  const la = Number(lat);
-  const lo = Number(lon);
-  const d = 0.0028;
-  const bbox = [lo - d, la - d, lo + d, la + d].join('%2C');
-  return 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + encodeURIComponent(la) + '%2C' + encodeURIComponent(lo);
-}
-
 export default function Checkout() {
   const [items, setItems] = useState([]);
   const [address, setAddress] = useState('');
