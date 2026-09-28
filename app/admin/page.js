@@ -154,7 +154,7 @@ export default function AdminPage() {
         .limit(500),
       supabase
         .from('driver_applications')
-        .select('id, user_id, full_name, phone, id_number, address, vehicle_type, vehicle_registration, drivers_license_number, status, admin_notes, created_at')
+        .select('id, user_id, full_name, phone, id_number, address, vehicle_type, vehicle_registration, drivers_license_number, id_document_path, drivers_license_document_path, vehicle_registration_document_path, proof_of_address_document_path, status, admin_notes, created_at')
         .order('created_at', { ascending: false })
         .limit(100),
     ]);
@@ -197,6 +197,18 @@ export default function AdminPage() {
         order.id === orderId ? { ...order, ...patch } : order
       ),
     }));
+  }
+
+  async function viewDriverDocument(application, path, label) {
+    if (!supabase || !path) return;
+    const { data, error: urlError } = await supabase.storage
+      .from('driver-documents')
+      .createSignedUrl(path, 300);
+    if (urlError || !data?.signedUrl) {
+      setError(urlError?.message || 'Could not open document.');
+      return;
+    }
+    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
   }
 
   async function reviewDriverApplication(applicationId, approved) {
@@ -429,6 +441,12 @@ export default function AdminPage() {
                     <small>{application.address}</small>
                     <small>{application.vehicle_type} · {application.vehicle_registration}</small>
                     <small>Licence: {application.drivers_license_number}</small>
+                    <div className="admin-document-actions">
+                      <button className="admin-secondary" onClick={() => viewDriverDocument(application, application.id_document_path, 'ID document')}>ID document</button>
+                      <button className="admin-secondary" onClick={() => viewDriverDocument(application, application.drivers_license_document_path, 'Driver licence')}>Driver licence</button>
+                      <button className="admin-secondary" onClick={() => viewDriverDocument(application, application.vehicle_registration_document_path, 'Vehicle document')}>Vehicle document</button>
+                      <button className="admin-secondary" onClick={() => viewDriverDocument(application, application.proof_of_address_document_path, 'Proof of address')}>Proof of address</button>
+                    </div>
                     {application.admin_notes && <small>Admin note: {application.admin_notes}</small>}
                     <div className="admin-application-actions">
                       <button className="admin-primary" disabled={application.status !== 'pending'} onClick={() => reviewDriverApplication(application.id, true)}>Accept driver</button>
