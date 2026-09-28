@@ -6,7 +6,6 @@ import { ArrowLeft, CheckCircle2, Clock3, MapPin, Minus, Plus, Search, ShieldChe
 import { supabase } from '../../lib/supabase';
 import { getOrderingStatus } from '../../lib/operating-hours';
 
-const MAP_SEARCH_URL = 'https://nominatim.openstreetmap.org/search';
 
 function money(value) {
   return 'R' + Number(value || 0).toFixed(2);
@@ -21,9 +20,53 @@ function isEersterust(result) {
   );
 }
 
-function isPreciseAddress(result) {
+function normalizePart(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[.,']/g, ' ')
+    .replace(/\\b(st|street|str)\\b/g, 'street')
+    .replace(/\\b(rd|road)\\b/g, 'road')
+    .replace(/\\b(ave|avenue)\\b/g, 'avenue')
+    .replace(/\\b(dr|drive)\\b/g, 'drive')
+    .replace(/\\b(ct|court)\\b/g, 'court')
+    .replace(/\\s+/g, ' ')
+    .trim();
+}
+
+function parseStreetAddress(value) {
+  const cleaned = String(value || '')
+    .replace(/,?\\s*eersterust\\b/gi, '')
+    .replace(/,?\\s*pretoria\\b/gi, '')
+    .replace(/,?\\s*gauteng\\b/gi, '')
+    .replace(/,?\\s*south africa\\b/gi, '')
+    .trim();
+
+  const match = cleaned.match(/^([0-9]+[A-Za-z]?(?:\\s*[-/]\\s*[0-9]+[A-Za-z]?)?)\\s+(.+)$/);
+  if (!match) return null;
+
+  return {
+    houseNumber: match[1].replace(/\\s+/g, ''),
+    streetName: match[2].replace(/,\\s*$/, '').trim(),
+  };
+}
+
+function normalizeHouseNumber(value) {
+  return String(value || '').toLowerCase().replace(/\\s+/g, '');
+}
+
+function isExactAddress(result, parsed) {
   const a = result?.address || {};
-  return Boolean(a.house_number) || ['house', 'building'].includes(String(result?.type || '').toLowerCase());
+  const resultNumber = normalizeHouseNumber(a.house_number || a.housenumber);
+  const requestedNumber = normalizeHouseNumber(parsed?.houseNumber);
+  const resultRoad = normalizePart(a.road);
+  const requestedRoad = normalizePart(parsed?.streetName);
+
+  if (!resultNumber || !requestedNumber || resultNumber !== requestedNumber) return false;
+  if (!resultRoad || !requestedRoad) return false;
+
+  return resultRoad === requestedRoad ||
+    resultRoad.includes(requestedRoad) ||
+    requestedRoad.includes(resultRoad);
 }
 
 function mapEmbedUrl(lat, lon) {
@@ -104,52 +147,40 @@ export default function Checkout() {
       return;
     }
 
+    const parsed = parseStreetAddress(query);
+    if (!parsed) {
+      setMsg('Enter the house number and street name, for example: 12 Example Street.');
+      return;
+    }
+
     setSearching(true);
     setMsg('');
     setAddressResults([]);
     setVerifiedAddress(null);
 
     try {
-      // Use Nominatim's structured address search as well as free-form search.
-      // Structured search is more reliable when the customer enters a
-      // house number + street name, and the Eersterust viewbox keeps results
-      // focused on the actual delivery zone.
-      const encoded = encodeURIComponent(query);
-      const viewbox = '28.285,-25.735,28.345,-25.680';
-      const urls = [
-        MAP_SEARCH_URL +
-          '?format=jsonv2&addressdetails=1&limit=10&countrycodes=za&layer=address&viewbox=' +
-          viewbox + '&q=' + encoded + ', Eersterust, Pretoria, South Africa',
-        MAP_SEARCH_URL +
-          '?format=jsonv2&addressdetails=1&limit=10&countrycodes=za&layer=address&viewbox=' +
-          viewbox + '&q=' + encoded + ', Pretoria, South Africa'
-      ];
+      // The previous client-side free-form search could be rejected on some
+      // Android/webview environments and could also return a street without
+      // the requested house number. Use one server-side structured request,
+      // then require the returned house number and road to match the input.
+      const response = await fetch('/api/geocode?street=' + encodeURIComponent(parsed.houseNumber + ' ' + parsed.streetName), {
+        headers: { Accept: 'application/json' },
+        cache: 'no-store',
+      });
 
-      let matches = [];
-
-      for (const url of urls) {
-        const response = await fetch(url, { headers: { Accept: 'application/json' } });
-        if (!response.ok) continue;
-
-        const results = await response.json();
-        matches = [...matches, ...results.filter(isEersterust)];
-
-        if (matches.some(isPreciseAddress)) break;
+      if (!response.ok) {
+        setMsg('The address service could not verify the address right now. Please try again.');
+        return;
       }
 
-      const unique = Array.from(
-        new Map(matches.map(result => [String(result.place_id), result])).values()
-      );
+      const payload = await response.json();
+      const results = Array.isArray(payload.results) ? payload.results : [];
+      const exact = results.filter(result => isExactAddress(result, parsed));
 
-      const precise = unique.filter(isPreciseAddress);
-      const resultsToShow = precise.length ? precise : unique;
+      setAddressResults(exact.slice(0, 8));
 
-      setAddressResults(resultsToShow.slice(0, 8));
-
-      if (!resultsToShow.length) {
-        setMsg('We could not find that address inside Eersterust. Check the street name and house number and try again.');
-      } else if (!precise.length) {
-        setMsg('The map found the Eersterust street, but not the exact house number. Choose a result only if it is your exact address.');
+      if (!exact.length) {
+        setMsg('We could not find that exact house number and street inside Eersterust. Check the spelling and house number.');
       }
     } catch {
       setMsg('The map could not verify the address right now. Please try again.');
@@ -159,8 +190,9 @@ export default function Checkout() {
   }
 
   function selectAddress(result) {
-    if (!isPreciseAddress(result)) {
-      setMsg('Please choose the exact house or building address shown by the map, not a street-only result.');
+    const parsed = parseStreetAddress(address);
+    if (!parsed || !isExactAddress(result, parsed)) {
+      setMsg('Please choose the exact house number and street returned by the map.');
       return;
     }
 
@@ -356,13 +388,13 @@ export default function Checkout() {
               )}
 
               <label className="checkout-field">
-                <span>Street address and house number</span>
+                <span>House number and street address</span>
                 <div className="address-search-row">
                   <input
                     value={address}
                     onChange={e => { setAddress(e.target.value); setVerifiedAddress(null); setAddressResults([]); }}
                     required
-                    placeholder="Example: 12 Example Street"
+                    placeholder="Example: 12 Example Street, Eersterust"
                     autoComplete="street-address"
                   />
                   <button type="button" className="btn address-verify-btn" onClick={verifyAddress} disabled={searching}>
