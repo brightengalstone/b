@@ -58,8 +58,6 @@ export default function AdminPage() {
     products: [],
     customers: [],
     payments: [],
-    ratings: [],
-    driverApplications: [],
   });
 
   useEffect(() => {
@@ -115,7 +113,7 @@ export default function AdminPage() {
     if (showSpinner) setRefreshing(true);
     setError('');
 
-    const [orders, shops, products, customers, drivers, payments, ratings, driverApplications] = await Promise.all([
+    const [orders, shops, products, customers, payments] = await Promise.all([
       supabase
         .from('orders')
         .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id')
@@ -140,19 +138,9 @@ export default function AdminPage() {
         .select('id, order_id, amount, status, provider, created_at')
         .order('created_at', { ascending: false })
         .limit(100),
-      supabase
-        .from('driver_ratings')
-        .select('id, order_id, driver_id, customer_id, rating, feedback, created_at')
-        .order('created_at', { ascending: false })
-        .limit(500),
-      supabase
-        .from('driver_applications')
-        .select('id, user_id, full_name, phone, id_number, address, vehicle_type, vehicle_registration, drivers_license_number, id_document_path, drivers_license_document_path, vehicle_registration_document_path, proof_of_address_document_path, status, admin_notes, created_at')
-        .order('created_at', { ascending: false })
-        .limit(100),
     ]);
 
-    const failures = [orders, shops, products, customers, drivers, payments, ratings, driverApplications].filter((item) => item.error);
+    const failures = [orders, shops, products, customers, payments].filter((item) => item.error);
     if (failures.length) {
       setError(failures.map((item) => item.error.message).join(' | '));
     }
@@ -163,8 +151,6 @@ export default function AdminPage() {
       products: products.data || [],
       customers: customers.data || [],
       payments: payments.data || [],
-      ratings: ratings.data || [],
-      driverApplications: driverApplications.data || [],
     });
 
     if (showSpinner) setRefreshing(false);
@@ -191,37 +177,6 @@ export default function AdminPage() {
     }));
   }
 
-  async function viewDriverDocument(application, path, label) {
-    if (!supabase || !path) return;
-    const { data, error: urlError } = await supabase.storage
-      .from('driver-documents')
-      .createSignedUrl(path, 300);
-    if (urlError || !data?.signedUrl) {
-      setError(urlError?.message || 'Could not open document.');
-      return;
-    }
-    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
-  }
-
-  async function reviewDriverApplication(applicationId, approved) {
-    if (!supabase) return;
-    const notes = window.prompt(approved ? 'Optional approval note:' : 'Reason for declining this application:');
-    if (!approved && !notes?.trim()) {
-      setError('A reason is required when declining an application.');
-      return;
-    }
-    const { error: reviewError } = await supabase.rpc('admin_review_driver_application', {
-      p_application_id: applicationId,
-      p_approved: approved,
-      p_notes: notes || null,
-    });
-    if (reviewError) {
-      setError(reviewError.message);
-      return;
-    }
-    await loadDashboard(false);
-  }
-
   async function signOut() {
     if (supabase) await supabase.auth.signOut();
     window.location.href = '/signin';
@@ -238,7 +193,6 @@ export default function AdminPage() {
       customers: data.customers.filter((item) => item.role === 'customer').length,
       shops: data.shops.filter((shop) => shop.active).length,
       products: data.products.filter((product) => product.available).length,
-      pendingDriverApplications: data.driverApplications.filter((item) => item.status === 'pending').length,
     };
   }, [data]);
 
@@ -330,7 +284,6 @@ export default function AdminPage() {
               <Stat icon={Clock3} label="Orders in progress" value={stats.pending} />
               <Stat icon={CircleDollarSign} label="Delivered sales" value={money(stats.revenue)} />
               <Stat icon={Users} label="Customers" value={stats.customers} />
-              <Stat icon={Truck} label="Pending driver applications" value={stats.pendingDriverApplications} />
             </div>
 
             <div className="admin-grid-two">
@@ -342,7 +295,6 @@ export default function AdminPage() {
                 <div className="admin-operation-list">
                   <Operation icon={Store} label="Active shops" value={stats.shops} />
                   <Operation icon={ShoppingBag} label="Available products" value={stats.products} />
-                  <Operation icon={Truck} label="Approved drivers" value={stats.drivers} />
                   <Operation icon={CircleDollarSign} label="Paid transactions" value={data.payments.filter((p) => p.status === 'paid').length} />
                 </div>
               </Panel>
