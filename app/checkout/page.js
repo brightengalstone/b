@@ -102,10 +102,10 @@ export default function Checkout() {
       if (results[0]?.lat && results[0]?.lon) {
         const center = [Number(results[0].lat), Number(results[0].lon)];
         setMapCenter(center);
-        setMsg('We found the area. Now tap your exact home or building on the map.');
+        setMsg('Address found. Confirm your exact home or building by tapping that location on the map.');
       } else {
-        setMsg('We could not find the typed address, but you can still choose your delivery point directly on the Eersterust map.');
-        setMapCenter([-25.7162, 28.3125]);
+        setMsg(payload.error || 'We could not find that address in Eersterust. Check the street name and house number, then try again.');
+        setMapCenter([-25.7069, 28.3092]);
       }
     } catch {
       setMsg('The map search is unavailable right now. You can still choose your delivery point directly on the map.');
