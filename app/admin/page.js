@@ -61,6 +61,7 @@ export default function AdminPage() {
     customers: [],
     drivers: [],
     payments: [],
+    ratings: [],
   });
 
   useEffect(() => {
@@ -116,7 +117,7 @@ export default function AdminPage() {
     if (showSpinner) setRefreshing(true);
     setError('');
 
-    const [orders, shops, products, customers, drivers, payments] = await Promise.all([
+    const [orders, shops, products, customers, drivers, payments, ratings] = await Promise.all([
       supabase
         .from('orders')
         .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id')
@@ -145,9 +146,14 @@ export default function AdminPage() {
         .select('id, order_id, amount, status, provider, created_at')
         .order('created_at', { ascending: false })
         .limit(100),
+      supabase
+        .from('driver_ratings')
+        .select('id, order_id, driver_id, customer_id, rating, feedback, created_at')
+        .order('created_at', { ascending: false })
+        .limit(500),
     ]);
 
-    const failures = [orders, shops, products, customers, drivers, payments].filter((item) => item.error);
+    const failures = [orders, shops, products, customers, drivers, payments, ratings].filter((item) => item.error);
     if (failures.length) {
       setError(failures.map((item) => item.error.message).join(' | '));
     }
@@ -159,6 +165,7 @@ export default function AdminPage() {
       customers: customers.data || [],
       drivers: drivers.data || [],
       payments: payments.data || [],
+      ratings: ratings.data || [],
     });
 
     if (showSpinner) setRefreshing(false);
@@ -378,22 +385,48 @@ export default function AdminPage() {
         )}
 
         {active === 'drivers' && (
-          <Panel title="Drivers" subtitle="Approved delivery drivers and current availability.">
+          <Panel title="Driver Management" subtitle="Availability, delivery history, ratings and performance for every driver.">
             <div className="admin-card-grid">
-              {data.drivers.map((driver) => (
-                <div className="admin-mini-card" key={driver.id}>
-                  <div className="admin-row">
-                    <div className="admin-square"><Truck size={19} /></div>
-                    <div><strong>{customerById[driver.id]?.full_name || 'Driver account'}</strong><span>{driver.vehicle_type || 'Tuk-tuk / delivery vehicle'}</span></div>
+              {data.drivers.map((driver) => {
+                const driverOrders = data.orders.filter((order) => order.driver_id === driver.id);
+                const completed = driverOrders.filter((order) => order.status === 'delivered').length;
+                const cancelled = driverOrders.filter((order) => order.status === 'cancelled').length;
+                const driverRatings = data.ratings.filter((rating) => rating.driver_id === driver.id);
+                const average = driverRatings.length ? driverRatings.reduce((sum, item) => sum + Number(item.rating), 0) / driverRatings.length : 0;
+                const onTime = completed && driverOrders.length ? Math.round((completed / driverOrders.length) * 1000) / 10 : 0;
+                return (
+                  <div className="admin-mini-card" key={driver.id}>
+                    <div className="admin-row">
+                      <div className="admin-square"><Truck size={19} /></div>
+                      <div><strong>{customerById[driver.id]?.full_name || 'Driver account'}</strong><span>{driver.vehicle_type || 'Delivery vehicle'}</span></div>
+                    </div>
+                    <div className="admin-badges">
+                      <span className={driver.approved ? 'admin-status success' : 'admin-status warning'}>{driver.approved ? 'Approved' : 'Pending approval'}</span>
+                      <span className={driver.available ? 'admin-status success' : 'admin-status muted'}>{driver.available ? 'Available' : 'Offline'}</span>
+                    </div>
+                    <div className="admin-driver-stats">
+                      <div><strong>{average ? average.toFixed(1) : '—'}</strong><span>Rating</span></div>
+                      <div><strong>{driverRatings.length}</strong><span>Ratings</span></div>
+                      <div><strong>{completed}</strong><span>Completed</span></div>
+                      <div><strong>{cancelled}</strong><span>Cancelled</span></div>
+                      <div><strong>{onTime}%</strong><span>Completion</span></div>
+                    </div>
+                    <small>{driver.vehicle_registration || 'Registration not set'}</small>
                   </div>
-                  <div className="admin-badges">
-                    <span className={driver.approved ? 'admin-status success' : 'admin-status warning'}>{driver.approved ? 'Approved' : 'Pending approval'}</span>
-                    <span className={driver.available ? 'admin-status success' : 'admin-status muted'}>{driver.available ? 'Available' : 'Offline'}</span>
-                  </div>
-                  <small>{driver.vehicle_registration || 'Registration not set'}</small>
+                );
+              })}
+              {!data.drivers.length && <div className="admin-empty">No drivers registered yet.</div>}
+            </div>
+            <div className="admin-driver-rating-list">
+              <h3>Recent customer ratings</h3>
+              {data.ratings.slice(0, 8).map((rating) => (
+                <div className="admin-rating-row" key={rating.id}>
+                  <strong>{customerById[rating.driver_id]?.full_name || 'Driver'}</strong>
+                  <span>{'★'.repeat(Number(rating.rating))}{'☆'.repeat(5 - Number(rating.rating))}</span>
+                  <small>{rating.feedback || 'No written feedback'}</small>
                 </div>
               ))}
-              {!data.drivers.length && <div className="admin-empty">No drivers registered yet.</div>}
+              {!data.ratings.length && <div className="admin-empty">No driver ratings yet. Customers can rate drivers after completed deliveries.</div>}
             </div>
           </Panel>
         )}
