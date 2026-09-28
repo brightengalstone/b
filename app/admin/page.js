@@ -164,6 +164,27 @@ export default function AdminPage() {
     if (showSpinner) setRefreshing(false);
   }
 
+  async function updateOrder(orderId, patch) {
+    if (!supabase) return;
+    setError('');
+    const { error: updateError } = await supabase
+      .from('orders')
+      .update(patch)
+      .eq('id', orderId);
+
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+
+    setData((currentData) => ({
+      ...currentData,
+      orders: currentData.orders.map((order) =>
+        order.id === orderId ? { ...order, ...patch } : order
+      ),
+    }));
+  }
+
   async function signOut() {
     if (supabase) await supabase.auth.signOut();
     window.location.href = '/signin';
@@ -276,7 +297,7 @@ export default function AdminPage() {
 
             <div className="admin-grid-two">
               <Panel title="Recent orders" action={() => setActive('orders')}>
-                <OrderTable orders={recentOrders} shopById={shopById} customerById={customerById} />
+                <OrderTable orders={recentOrders} shopById={shopById} customerById={customerById} drivers={data.drivers} updateOrder={updateOrder} />
               </Panel>
 
               <Panel title="Operations">
@@ -293,7 +314,7 @@ export default function AdminPage() {
 
         {active === 'orders' && (
           <Panel title="All orders" subtitle="Monitor and manage every BG Smart Services order.">
-            <OrderTable orders={data.orders} shopById={shopById} customerById={customerById} detailed />
+            <OrderTable orders={data.orders} shopById={shopById} customerById={customerById} drivers={data.drivers} updateOrder={updateOrder} detailed />
           </Panel>
         )}
 
@@ -413,23 +434,74 @@ function Operation({ icon: Icon, label, value }) {
   return <div className="admin-operation"><Icon size={18} /><span>{label}</span><strong>{value}</strong></div>;
 }
 
-function OrderTable({ orders, shopById, customerById, detailed = false }) {
+function OrderTable({ orders, shopById, customerById, drivers = [], updateOrder, detailed = false }) {
   return (
     <div className="admin-table-wrap">
       <table className="admin-table">
-        <thead><tr><th>Order</th><th>Customer</th><th>Shop</th><th>Status</th><th>Total</th>{detailed && <th>Created</th>}</tr></thead>
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Shop</th>
+            <th>Status</th>
+            <th>Total</th>
+            {detailed && <th>Driver</th>}
+            {detailed && <th>Created</th>}
+          </tr>
+        </thead>
         <tbody>
-          {orders.map((order) => (
-            <tr key={order.id}>
-              <td><strong>#{order.id.slice(0, 8).toUpperCase()}</strong></td>
-              <td>{customerById[order.customer_id]?.full_name || 'Customer'}</td>
-              <td>{shopById[order.retailer_id]?.name || 'Shop'}</td>
-              <td><span className={`admin-status ${order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : 'warning'}`}>{order.status.replace('_', ' ')}</span></td>
-              <td>{money(order.total)}</td>
-              {detailed && <td>{formatDate(order.created_at)}</td>}
-            </tr>
-          ))}
-          {!orders.length && <EmptyRow label="No orders yet." colSpan={detailed ? 6 : 5} />}
+          {orders.map((order) => {
+            const driver = drivers.find((item) => item.id === order.driver_id);
+            return (
+              <tr key={order.id}>
+                <td>
+                  <strong>#{order.id.slice(0, 8).toUpperCase()}</strong>
+                  {detailed && <small className="admin-order-address">{order.delivery_address || 'No delivery address'}</small>}
+                </td>
+                <td>{customerById[order.customer_id]?.full_name || 'Customer'}</td>
+                <td>{shopById[order.retailer_id]?.name || 'Shop'}</td>
+                <td>
+                  {detailed ? (
+                    <select
+                      className="admin-select"
+                      value={order.status}
+                      onChange={(event) => updateOrder(order.id, { status: event.target.value })}
+                      aria-label={`Update status for order ${order.id.slice(0, 8)}`}
+                    >
+                      {ORDER_STATUSES.map((status) => (
+                        <option key={status} value={status}>{status.replace('_', ' ')}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span className={`admin-status ${order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : 'warning'}`}>
+                      {order.status.replace('_', ' ')}
+                    </span>
+                  )}
+                </td>
+                <td>{money(order.total)}</td>
+                {detailed && (
+                  <td>
+                    <select
+                      className="admin-select"
+                      value={order.driver_id || ''}
+                      onChange={(event) => updateOrder(order.id, { driver_id: event.target.value || null, status: event.target.value && order.status === 'ready' ? 'assigned' : order.status })}
+                      aria-label={`Assign driver for order ${order.id.slice(0, 8)}`}
+                    >
+                      <option value="">Unassigned</option>
+                      {drivers.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {customerById[item.id]?.full_name || 'Driver'}{item.available ? ' — Available' : ' — Offline'}
+                        </option>
+                      ))}
+                    </select>
+                    {driver && <small className="admin-driver-note">{driver.vehicle_type || 'Delivery vehicle'}</small>}
+                  </td>
+                )}
+                {detailed && <td>{formatDate(order.created_at)}</td>}
+              </tr>
+            );
+          })}
+          {!orders.length && <EmptyRow label="No orders yet." colSpan={detailed ? 7 : 5} />}
         </tbody>
       </table>
     </div>
