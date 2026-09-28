@@ -19,6 +19,7 @@ export default function DriverPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [performance, setPerformance] = useState(null);
 
   async function load() {
     if (!supabase) return;
@@ -48,7 +49,7 @@ export default function DriverPage() {
 
     const { data: orderData, error: orderError } = await supabase
       .from('orders')
-      .select('id, status, subtotal, delivery_fee, total, delivery_address, notes, created_at, customer_id, retailer_id')
+      .select('id, status, subtotal, delivery_fee, total, delivery_address, notes, created_at, updated_at, customer_id, retailer_id, order_items(quantity, unit_price, retailer_product_id, retailer_products(name, size))')
       .eq('driver_id', currentUser.id)
       .in('status', [...activeStatuses, 'delivered'])
       .order('created_at', { ascending: false });
@@ -63,6 +64,8 @@ export default function DriverPage() {
       retailerIds.length ? supabase.from('retailers').select('id, name, pickup_address, shopping_location').in('id', retailerIds) : Promise.resolve({ data: [] }),
     ]);
 
+    const { data: performanceData } = await supabase.from('driver_performance').select('completed_deliveries,cancelled_deliveries,average_rating,rating_count,completion_rate').eq('driver_id', currentUser.id).maybeSingle();
+    setPerformance(performanceData || null);
     setOrders(orderData || []);
     setCustomers(Object.fromEntries((customerData || []).map(x => [x.id, x])));
     setShops(Object.fromEntries((retailerData || []).map(x => [x.id, x])));
@@ -88,6 +91,12 @@ export default function DriverPage() {
     setRefreshing(true);
     await load();
     setRefreshing(false);
+  }
+
+  async function toggleAvailability() {
+    if (!driver) return;
+    const { error: e } = await supabase.from('driver_profiles').update({ available: !driver.available }).eq('id', user.id);
+    if (e) setError(e.message); else setDriver({ ...driver, available: !driver.available });
   }
 
   async function signOut() {
@@ -118,12 +127,14 @@ export default function DriverPage() {
 
     <section className="driver-welcome">
       <div><span className="driver-eyebrow">Driver dashboard</span><h1>Hello, {profile.full_name || 'Driver'}.</h1><p>Assigned deliveries for Eersterust.</p></div>
-      <div className="driver-vehicle"><Truck size={18}/><span>{driver.vehicle_type || 'Delivery vehicle'} · {driver.vehicle_registration || 'Registration pending'}</span></div>
+      <div className="driver-header-tools"><div className="driver-vehicle"><Truck size={18}/><span>{driver.vehicle_type || 'Delivery vehicle'} · {driver.vehicle_registration || 'Registration pending'}</span></div><button className={`driver-availability ${driver.available ? 'available' : 'offline'}`} onClick={toggleAvailability}>{driver.available ? 'Available' : 'Offline'}</button></div>
     </section>
 
     <section className="driver-stats">
       <div><Clock3 size={18}/><span>Active deliveries</span><strong>{active.length}</strong></div>
-      <div><CheckCircle2 size={18}/><span>Delivered</span><strong>{delivered.length}</strong></div>
+      <div><CheckCircle2 size={18}/><span>Completed</span><strong>{performance?.completed_deliveries ?? delivered.length}</strong></div>
+      <div><span>Rating</span><strong>{performance?.average_rating ? `${Number(performance.average_rating).toFixed(1)} / 5` : '—'}</strong><small>{performance?.rating_count ?? 0} customer ratings</small></div>
+      <div><span>Completion</span><strong>{performance?.completion_rate ? `${Number(performance.completion_rate).toFixed(1)}%` : '—'}</strong></div>
     </section>
 
     <section className="driver-list">
@@ -142,6 +153,7 @@ export default function DriverPage() {
             <div className="driver-route-point"><MapPin size={18}/><div><small>Deliver to</small><strong>{customer?.full_name || 'Customer'}</strong><span>{order.delivery_address || 'Eersterust'}</span>{customer?.phone && <span>{customer.phone}</span>}</div></div>
           </div>
           {order.notes && <div className="driver-notes">{order.notes}</div>}
+          <div className="driver-items">{(order.order_items || []).map((item, index) => <div key={item.retailer_product_id || index}><span>{item.retailer_products?.name || 'Item'}{item.retailer_products?.size ? ` · ${item.retailer_products.size}` : ''}</span><strong>×{item.quantity}</strong></div>)}</div>
           <div className="driver-order-bottom"><div><span>Order total</span><strong>R{Number(order.total || 0).toFixed(2)}</strong></div>{next ? <button className="btn btn-primary" onClick={() => changeStatus(order,next)}>{next === 'picked_up' ? 'Confirm pickup' : 'Mark delivered'}</button> : <span className="driver-complete"><CheckCircle2 size={17}/> Delivered</span>}</div>
         </article>;
       })}
