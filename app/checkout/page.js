@@ -110,16 +110,44 @@ export default function Checkout() {
     setVerifiedAddress(null);
 
     try {
-      const url = MAP_SEARCH_URL + '?format=jsonv2&addressdetails=1&limit=8&countrycodes=za&q=' +
-        encodeURIComponent(query + ', Eersterust, Pretoria, South Africa');
-      const response = await fetch(url, { headers: { Accept: 'application/json' } });
-      if (!response.ok) throw new Error('Map search failed');
-      const results = await response.json();
-      const valid = results.filter(isEersterust);
-      setAddressResults(valid);
+      // Nominatim can miss an exact house number even when the street exists.
+      // Search the full address first, then use a broader Eersterust query as a
+      // fallback so valid streets are not rejected just because the map index
+      // is incomplete.
+      const queries = [
+        query + ', Eersterust, Pretoria, South Africa',
+        query + ', Pretoria, South Africa',
+        query.replace(/,?\\s*Eersterust.*$/i, '').trim() + ', Eersterust, Pretoria, South Africa'
+      ];
 
-      if (!valid.length) {
-        setMsg('We could not verify that address on the map inside Eersterust. Please check the street name and house number.');
+      let matches = [];
+      for (const searchQuery of [...new Set(queries)].filter(Boolean)) {
+        const url = MAP_SEARCH_URL + '?format=jsonv2&addressdetails=1&limit=10&countrycodes=za&q=' +
+          encodeURIComponent(searchQuery);
+
+        const response = await fetch(url, { headers: { Accept: 'application/json' } });
+        if (!response.ok) continue;
+
+        const results = await response.json();
+        const eersterustMatches = results.filter(isEersterust);
+        matches = [...matches, ...eersterustMatches];
+
+        if (matches.some(isPreciseAddress)) break;
+      }
+
+      // Remove duplicate map places while keeping the best results first.
+      const unique = Array.from(
+        new Map(matches.map(result => [String(result.place_id), result])).values()
+      );
+
+      const precise = unique.filter(isPreciseAddress);
+      const resultsToShow = precise.length ? precise : unique;
+      setAddressResults(resultsToShow.slice(0, 8));
+
+      if (!resultsToShow.length) {
+        setMsg('We could not find that address inside Eersterust. Check the street name and house number and try again.');
+      } else if (!precise.length) {
+        setMsg('We found the street in Eersterust, but not the exact house number. Please check the house number and try again.');
       }
     } catch {
       setMsg('The map could not verify the address right now. Please try again.');
