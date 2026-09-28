@@ -154,3 +154,8 @@
   .admin-stat strong{font-size:18px}
   .admin-card-grid{grid-template-columns:1fr}
 }
+
+.admin-select{max-width:150px;border:1px solid #dfe4eb;background:#fff;border-radius:8px;padding:7px 9px;color:#344054;font:inherit;font-size:11px;cursor:pointer}
+.admin-order-address,.admin-driver-note{display:block;font-size:10px;color:#98a2b3;margin-top:4px;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.admin-driver-note{max-width:none}
+@media(max-width:700px){.admin-select{max-width:130px}}
