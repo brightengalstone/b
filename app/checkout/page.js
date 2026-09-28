@@ -24,34 +24,34 @@ function normalizePart(value) {
   return String(value || '')
     .toLowerCase()
     .replace(/[.,']/g, ' ')
-    .replace(/\\b(st|street|str)\\b/g, 'street')
-    .replace(/\\b(rd|road)\\b/g, 'road')
-    .replace(/\\b(ave|avenue)\\b/g, 'avenue')
-    .replace(/\\b(dr|drive)\\b/g, 'drive')
-    .replace(/\\b(ct|court)\\b/g, 'court')
-    .replace(/\\s+/g, ' ')
+    .replace(/\b(st|street|str)\b/g, 'street')
+    .replace(/\b(rd|road)\b/g, 'road')
+    .replace(/\b(ave|avenue)\b/g, 'avenue')
+    .replace(/\b(dr|drive)\b/g, 'drive')
+    .replace(/\b(ct|court)\b/g, 'court')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
 function parseStreetAddress(value) {
   const cleaned = String(value || '')
-    .replace(/,?\\s*eersterust\\b/gi, '')
-    .replace(/,?\\s*pretoria\\b/gi, '')
-    .replace(/,?\\s*gauteng\\b/gi, '')
-    .replace(/,?\\s*south africa\\b/gi, '')
+    .replace(/,?\s*eersterust\b/gi, '')
+    .replace(/,?\s*pretoria\b/gi, '')
+    .replace(/,?\s*gauteng\b/gi, '')
+    .replace(/,?\s*south africa\b/gi, '')
     .trim();
 
-  const match = cleaned.match(/^([0-9]+[A-Za-z]?(?:\\s*[-/]\\s*[0-9]+[A-Za-z]?)?)\\s+(.+)$/);
+  const match = cleaned.match(/^([0-9]+[A-Za-z]?(?:\s*[-/]\s*[0-9]+[A-Za-z]?)?)\s+(.+)$/);
   if (!match) return null;
 
   return {
-    houseNumber: match[1].replace(/\\s+/g, ''),
-    streetName: match[2].replace(/,\\s*$/, '').trim(),
+    houseNumber: match[1].replace(/\s+/g, ''),
+    streetName: match[2].replace(/,\s*$/, '').trim(),
   };
 }
 
 function normalizeHouseNumber(value) {
-  return String(value || '').toLowerCase().replace(/\\s+/g, '');
+  return String(value || '').toLowerCase().replace(/\s+/g, '');
 }
 
 function isExactAddress(result, parsed) {
