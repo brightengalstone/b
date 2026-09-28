@@ -9,7 +9,6 @@ A Next.js starter upgraded for the BG Smart Services Eersterust local-commerce p
 - Checkout foundation with R60 delivery + R45 service fees
 - Supabase email/password sign-in and registration
 - Account sign-out
-- Admin, merchant, driver and tracking route foundations
 - Responsive styling
 - Supabase environment-variable support
 
@@ -28,4 +27,4 @@ A Next.js starter upgraded for the BG Smart Services Eersterust local-commerce p
 Upload the project to GitHub and connect the repository to Vercel. Set the same two environment variables in Vercel, then deploy.
 
 ## Important
-The database schema exists separately in Supabase. Production checkout and role-based admin/merchant/driver permissions should be hardened server-side before accepting real orders or payments.
+The database schema exists separately in Supabase. Production checkout and role-based admin permissions should be hardened server-side before accepting real orders or payments.
