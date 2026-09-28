@@ -16,7 +16,6 @@ import {
   Settings,
   ShoppingBag,
   Store,
-  Truck,
   Users,
   XCircle,
 } from 'lucide-react';
@@ -28,7 +27,6 @@ const NAV = [
   { id: 'shops', label: 'Shops', icon: Store },
   { id: 'products', label: 'Products', icon: ShoppingBag },
   { id: 'customers', label: 'Customers', icon: Users },
-  { id: 'drivers', label: 'Drivers', icon: Truck },
 ];
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'assigned', 'picked_up', 'delivered', 'cancelled'];
@@ -59,7 +57,6 @@ export default function AdminPage() {
     shops: [],
     products: [],
     customers: [],
-    drivers: [],
     payments: [],
     ratings: [],
     driverApplications: [],
@@ -139,10 +136,6 @@ export default function AdminPage() {
         .order('created_at', { ascending: false })
         .limit(100),
       supabase
-        .from('driver_profiles')
-        .select('id, vehicle_type, vehicle_registration, approved, available')
-        .order('id'),
-      supabase
         .from('payments')
         .select('id, order_id, amount, status, provider, created_at')
         .order('created_at', { ascending: false })
@@ -169,7 +162,6 @@ export default function AdminPage() {
       shops: shops.data || [],
       products: products.data || [],
       customers: customers.data || [],
-      drivers: drivers.data || [],
       payments: payments.data || [],
       ratings: ratings.data || [],
       driverApplications: driverApplications.data || [],
@@ -246,7 +238,6 @@ export default function AdminPage() {
       customers: data.customers.filter((item) => item.role === 'customer').length,
       shops: data.shops.filter((shop) => shop.active).length,
       products: data.products.filter((product) => product.available).length,
-      drivers: data.drivers.filter((driver) => driver.approved).length,
       pendingDriverApplications: data.driverApplications.filter((item) => item.status === 'pending').length,
     };
   }, [data]);
@@ -344,7 +335,7 @@ export default function AdminPage() {
 
             <div className="admin-grid-two">
               <Panel title="Recent orders" action={() => setActive('orders')}>
-                <OrderTable orders={recentOrders} shopById={shopById} customerById={customerById} drivers={data.drivers} updateOrder={updateOrder} />
+                <OrderTable orders={recentOrders} shopById={shopById} customerById={customerById} updateOrder={updateOrder} />
               </Panel>
 
               <Panel title="Operations">
@@ -361,7 +352,7 @@ export default function AdminPage() {
 
         {active === 'orders' && (
           <Panel title="All orders" subtitle="Monitor and manage every BG Smart Services order.">
-            <OrderTable orders={data.orders} shopById={shopById} customerById={customerById} drivers={data.drivers} updateOrder={updateOrder} detailed />
+            <OrderTable orders={data.orders} shopById={shopById} customerById={customerById} updateOrder={updateOrder} detailed />
           </Panel>
         )}
 
@@ -424,85 +415,6 @@ export default function AdminPage() {
           </Panel>
         )}
 
-        {active === 'drivers' && (
-          <>
-            <Panel title="Driver applications" subtitle="Review applicants and accept or decline their driver access.">
-              <div className="admin-card-grid">
-                {data.driverApplications.map((application) => (
-                  <div className="admin-mini-card" key={application.id}>
-                    <div className="admin-row">
-                      <div className="admin-square"><Truck size={19} /></div>
-                      <div><strong>{application.full_name}</strong><span>{application.phone}</span></div>
-                    </div>
-                    <div className="admin-badges">
-                      <span className={application.status === 'pending' ? 'admin-status warning' : application.status === 'approved' ? 'admin-status success' : 'admin-status danger'}>{application.status}</span>
-                    </div>
-                    <small>ID: {application.id_number}</small>
-                    <small>{application.address}</small>
-                    <small>{application.vehicle_type} · {application.vehicle_registration}</small>
-                    <small>Licence: {application.drivers_license_number}</small>
-                    <div className="admin-document-actions">
-                      <button className="admin-secondary" onClick={() => viewDriverDocument(application, application.id_document_path, 'ID document')}>ID document</button>
-                      <button className="admin-secondary" onClick={() => viewDriverDocument(application, application.drivers_license_document_path, 'Driver licence')}>Driver licence</button>
-                      <button className="admin-secondary" onClick={() => viewDriverDocument(application, application.vehicle_registration_document_path, 'Vehicle document')}>Vehicle document</button>
-                      <button className="admin-secondary" onClick={() => viewDriverDocument(application, application.proof_of_address_document_path, 'Proof of address')}>Proof of address</button>
-                    </div>
-                    {application.admin_notes && <small>Admin note: {application.admin_notes}</small>}
-                    <div className="admin-application-actions">
-                      <button className="admin-primary" disabled={application.status !== 'pending'} onClick={() => reviewDriverApplication(application.id, true)}>Accept driver</button>
-                      <button className="admin-secondary" disabled={application.status !== 'pending'} onClick={() => reviewDriverApplication(application.id, false)}>Decline</button>
-                    </div>
-                  </div>
-                ))}
-                {!data.driverApplications.length && <div className="admin-empty">No driver applications yet.</div>}
-              </div>
-            </Panel>
-            <Panel title="Driver Management" subtitle="Availability, delivery history, ratings and performance for every driver.">
-            <div className="admin-card-grid">
-              {data.drivers.map((driver) => {
-                const driverOrders = data.orders.filter((order) => order.driver_id === driver.id);
-                const completed = driverOrders.filter((order) => order.status === 'delivered').length;
-                const cancelled = driverOrders.filter((order) => order.status === 'cancelled').length;
-                const driverRatings = data.ratings.filter((rating) => rating.driver_id === driver.id);
-                const average = driverRatings.length ? driverRatings.reduce((sum, item) => sum + Number(item.rating), 0) / driverRatings.length : 0;
-                const onTime = completed && driverOrders.length ? Math.round((completed / driverOrders.length) * 1000) / 10 : 0;
-                return (
-                  <div className="admin-mini-card" key={driver.id}>
-                    <div className="admin-row">
-                      <div className="admin-square"><Truck size={19} /></div>
-                      <div><strong>{customerById[driver.id]?.full_name || 'Driver account'}</strong><span>{driver.vehicle_type || 'Delivery vehicle'}</span></div>
-                    </div>
-                    <div className="admin-badges">
-                      <span className={driver.approved ? 'admin-status success' : 'admin-status warning'}>{driver.approved ? 'Approved' : 'Pending approval'}</span>
-                      <span className={driver.available ? 'admin-status success' : 'admin-status muted'}>{driver.available ? 'Available' : 'Offline'}</span>
-                    </div>
-                    <div className="admin-driver-stats">
-                      <div><strong>{average ? average.toFixed(1) : '—'}</strong><span>Rating</span></div>
-                      <div><strong>{driverRatings.length}</strong><span>Ratings</span></div>
-                      <div><strong>{completed}</strong><span>Completed</span></div>
-                      <div><strong>{cancelled}</strong><span>Cancelled</span></div>
-                      <div><strong>{onTime}%</strong><span>Completion</span></div>
-                    </div>
-                    <small>{driver.vehicle_registration || 'Registration not set'}</small>
-                  </div>
-                );
-              })}
-              {!data.drivers.length && <div className="admin-empty">No drivers registered yet.</div>}
-            </div>
-            <div className="admin-driver-rating-list">
-              <h3>Recent customer ratings</h3>
-              {data.ratings.slice(0, 8).map((rating) => (
-                <div className="admin-rating-row" key={rating.id}>
-                  <strong>{customerById[rating.driver_id]?.full_name || 'Driver'}</strong>
-                  <span>{'★'.repeat(Number(rating.rating))}{'☆'.repeat(5 - Number(rating.rating))}</span>
-                  <small>{rating.feedback || 'No written feedback'}</small>
-                </div>
-              ))}
-              {!data.ratings.length && <div className="admin-empty">No driver ratings yet. Customers can rate drivers after completed deliveries.</div>}
-            </div>
-          </Panel>
-        )}
-
         {active === 'settings' && (
           <Panel title="Admin settings" subtitle="Operational settings for BG Smart Services.">
             <div className="admin-settings">
@@ -539,7 +451,7 @@ function Operation({ icon: Icon, label, value }) {
   return <div className="admin-operation"><Icon size={18} /><span>{label}</span><strong>{value}</strong></div>;
 }
 
-function OrderTable({ orders, shopById, customerById, drivers = [], updateOrder, detailed = false }) {
+function OrderTable({ orders, shopById, customerById, updateOrder, detailed = false }) {
   return (
     <div className="admin-table-wrap">
       <table className="admin-table">
@@ -550,13 +462,11 @@ function OrderTable({ orders, shopById, customerById, drivers = [], updateOrder,
             <th>Shop</th>
             <th>Status</th>
             <th>Total</th>
-            {detailed && <th>Driver</th>}
             {detailed && <th>Created</th>}
           </tr>
         </thead>
         <tbody>
           {orders.map((order) => {
-            const driver = drivers.find((item) => item.id === order.driver_id);
             return (
               <tr key={order.id}>
                 <td>
@@ -584,29 +494,11 @@ function OrderTable({ orders, shopById, customerById, drivers = [], updateOrder,
                   )}
                 </td>
                 <td>{money(order.total)}</td>
-                {detailed && (
-                  <td>
-                    <select
-                      className="admin-select"
-                      value={order.driver_id || ''}
-                      onChange={(event) => updateOrder(order.id, { driver_id: event.target.value || null, status: event.target.value && order.status === 'ready' ? 'assigned' : order.status })}
-                      aria-label={`Assign driver for order ${order.id.slice(0, 8)}`}
-                    >
-                      <option value="">Unassigned</option>
-                      {drivers.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {customerById[item.id]?.full_name || 'Driver'}{item.available ? ' — Available' : ' — Offline'}
-                        </option>
-                      ))}
-                    </select>
-                    {driver && <small className="admin-driver-note">{driver.vehicle_type || 'Delivery vehicle'}</small>}
-                  </td>
-                )}
                 {detailed && <td>{formatDate(order.created_at)}</td>}
               </tr>
             );
           })}
-          {!orders.length && <EmptyRow label="No orders yet." colSpan={detailed ? 7 : 5} />}
+          {!orders.length && <EmptyRow label="No orders yet." colSpan={detailed ? 6 : 5} />}
         </tbody>
       </table>
     </div>
