@@ -272,7 +272,7 @@ export default function Checkout() {
     }
 
     localStorage.removeItem('bg_cart');
-    window.location.href = '/order-success?id=' + encodeURIComponent(cartOrder.id);
+    window.location.href = '/order-success?id=' + encodeURIComponent(orderId);
   }
 
   return (
