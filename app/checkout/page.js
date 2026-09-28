@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Clock3, MapPin, Minus, Plus, Search, ShieldCheck, Store, Trash2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock3, MapPin, Search, ShieldCheck, Store, CreditCard, Banknote, Landmark, Check } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { getOrderingStatus } from '../../lib/operating-hours';
 
@@ -26,6 +26,7 @@ export default function Checkout() {
   const [mapCenter, setMapCenter] = useState([-25.7162, 28.3125]);
   const [deliveryPin, setDeliveryPin] = useState(null);
   const [verifiedAddress, setVerifiedAddress] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery');
 
   useEffect(() => {
     try {
@@ -257,6 +258,17 @@ export default function Checkout() {
       return;
     }
 
+    const { error: paymentError } = await supabase.from('orders').update({ payment_method: paymentMethod }).eq('id', orderId).eq('customer_id', user.id);
+    if (paymentError) {
+      setMsg(paymentError.message || 'The order was created, but the payment method could not be saved.');
+      setBusy(false);
+      return;
+    }
+
+    if (paymentMethod !== 'cash_on_delivery') {
+      await supabase.from('payments').upsert({ order_id: orderId, provider: paymentMethod === 'card' ? 'payfast' : 'eft', amount: total, status: 'pending' }, { onConflict: 'order_id' });
+    }
+
     localStorage.removeItem('bg_cart');
     window.location.href = '/order-success?id=' + encodeURIComponent(orderId);
   }
@@ -380,7 +392,27 @@ export default function Checkout() {
 
             <section className="checkout-card">
               <div className="checkout-section-head">
-                <div><span className="eyebrow">03</span><h2>Delivery notes</h2></div>
+                <div><span className="eyebrow">03</span><h2>Payment method</h2></div>
+                <span className="checkout-count">Choose how to pay</span>
+              </div>
+              <div className="payment-methods">
+                <button type="button" className={paymentMethod === 'cash_on_delivery' ? 'payment-method active' : 'payment-method'} onClick={() => setPaymentMethod('cash_on_delivery')}>
+                  <span className="payment-icon"><Banknote size={20} /></span><span><strong>Cash on Delivery</strong><small>Pay the driver when your order arrives.</small></span><span className="payment-radio">{paymentMethod === 'cash_on_delivery' && <Check size={14} />}</span>
+                </button>
+                <button type="button" className={paymentMethod === 'card' ? 'payment-method active' : 'payment-method'} onClick={() => setPaymentMethod('card')}>
+                  <span className="payment-icon"><CreditCard size={20} /></span><span><strong>Card</strong><small>You'll continue to secure online card payment after placing the order.</small></span><span className="payment-radio">{paymentMethod === 'card' && <Check size={14} />}</span>
+                </button>
+                <button type="button" className={paymentMethod === 'eft' ? 'payment-method active' : 'payment-method'} onClick={() => setPaymentMethod('eft')}>
+                  <span className="payment-icon"><Landmark size={20} /></span><span><strong>EFT</strong><small>Pay by electronic bank transfer. Payment remains pending until confirmed.</small></span><span className="payment-radio">{paymentMethod === 'eft' && <Check size={14} />}</span>
+                </button>
+              </div>
+              {paymentMethod === 'card' && <div className="payment-note"><ShieldCheck size={17} /><span>Your card details will be handled by the payment provider, not stored by BG Smart Services.</span></div>}
+              {paymentMethod === 'eft' && <div className="payment-note"><Landmark size={17} /><span>Your order will be marked payment pending until the EFT is confirmed.</span></div>}
+            </section>
+
+            <section className="checkout-card">
+              <div className="checkout-section-head">
+                <div><span className="eyebrow">04</span><h2>Delivery notes</h2></div>
               </div>
               <label className="checkout-field">
                 <span>Optional instructions</span>
