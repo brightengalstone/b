@@ -110,44 +110,46 @@ export default function Checkout() {
     setVerifiedAddress(null);
 
     try {
-      // Nominatim can miss an exact house number even when the street exists.
-      // Search the full address first, then use a broader Eersterust query as a
-      // fallback so valid streets are not rejected just because the map index
-      // is incomplete.
-      const queries = [
-        query + ', Eersterust, Pretoria, South Africa',
-        query + ', Pretoria, South Africa',
-        query.replace(/,?\\s*Eersterust.*$/i, '').trim() + ', Eersterust, Pretoria, South Africa'
+      // Use Nominatim's structured address search as well as free-form search.
+      // Structured search is more reliable when the customer enters a
+      // house number + street name, and the Eersterust viewbox keeps results
+      // focused on the actual delivery zone.
+      const encoded = encodeURIComponent(query);
+      const viewbox = '28.285,-25.735,28.345,-25.680';
+      const urls = [
+        MAP_SEARCH_URL +
+          '?format=jsonv2&addressdetails=1&limit=10&countrycodes=za&layer=address&viewbox=' +
+          viewbox + '&q=' + encoded + ', Eersterust, Pretoria, South Africa',
+        MAP_SEARCH_URL +
+          '?format=jsonv2&addressdetails=1&limit=10&countrycodes=za&layer=address&viewbox=' +
+          viewbox + '&q=' + encoded + ', Pretoria, South Africa'
       ];
 
       let matches = [];
-      for (const searchQuery of [...new Set(queries)].filter(Boolean)) {
-        const url = MAP_SEARCH_URL + '?format=jsonv2&addressdetails=1&limit=10&countrycodes=za&q=' +
-          encodeURIComponent(searchQuery);
 
+      for (const url of urls) {
         const response = await fetch(url, { headers: { Accept: 'application/json' } });
         if (!response.ok) continue;
 
         const results = await response.json();
-        const eersterustMatches = results.filter(isEersterust);
-        matches = [...matches, ...eersterustMatches];
+        matches = [...matches, ...results.filter(isEersterust)];
 
         if (matches.some(isPreciseAddress)) break;
       }
 
-      // Remove duplicate map places while keeping the best results first.
       const unique = Array.from(
         new Map(matches.map(result => [String(result.place_id), result])).values()
       );
 
       const precise = unique.filter(isPreciseAddress);
       const resultsToShow = precise.length ? precise : unique;
+
       setAddressResults(resultsToShow.slice(0, 8));
 
       if (!resultsToShow.length) {
         setMsg('We could not find that address inside Eersterust. Check the street name and house number and try again.');
       } else if (!precise.length) {
-        setMsg('We found the street in Eersterust, but not the exact house number. Please check the house number and try again.');
+        setMsg('The map found the Eersterust street, but not the exact house number. Choose a result only if it is your exact address.');
       }
     } catch {
       setMsg('The map could not verify the address right now. Please try again.');
