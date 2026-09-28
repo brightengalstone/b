@@ -34,7 +34,25 @@ function TrackingContent(){
       if(active){setOrder(data||null);setId(data?.id||requestedId||'');setLoading(false)}
     }
     load();
-    return()=>{active=false};
+
+    let channel;
+    supabase?.auth.getUser().then(({ data }) => {
+      if (!active || !data?.user) return;
+      channel = supabase.channel('customer-order-tracking')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, (payload) => {
+          if (!active) return;
+          if (payload?.new?.customer_id !== data.user.id) return;
+          if (requestedId && payload?.new?.id !== requestedId) return;
+          setOrder((current) => ({ ...(current || {}), ...payload.new }));
+          setId(payload?.new?.id || requestedId || '');
+        })
+        .subscribe();
+    });
+
+    return()=>{
+      active=false;
+      if(channel && supabase) supabase.removeChannel(channel);
+    };
   },[requestedId]);
 
   const status=String(order?.status||'pending').toLowerCase();
