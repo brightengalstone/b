@@ -243,7 +243,8 @@ export default function Checkout() {
       p_delivery_latitude: verifiedAddress?.latitude ?? null,
       p_delivery_longitude: verifiedAddress?.longitude ?? null,
       p_delivery_address_verified: Boolean(verifiedAddress),
-      p_notes: notes
+      p_notes: notes,
+      p_payment_method: paymentMethod
     });
 
     if (orderError) {
@@ -256,17 +257,6 @@ export default function Checkout() {
       setMsg('The order was not created. Please try again.');
       setBusy(false);
       return;
-    }
-
-    const { error: paymentError } = await supabase.from('orders').update({ payment_method: paymentMethod }).eq('id', orderId).eq('customer_id', user.id);
-    if (paymentError) {
-      setMsg(paymentError.message || 'The order was created, but the payment method could not be saved.');
-      setBusy(false);
-      return;
-    }
-
-    if (paymentMethod !== 'cash_on_delivery') {
-      await supabase.from('payments').upsert({ order_id: orderId, provider: paymentMethod === 'card' ? 'payfast' : 'eft', amount: total, status: 'pending' }, { onConflict: 'order_id' });
     }
 
     localStorage.removeItem('bg_cart');
