@@ -182,8 +182,8 @@ export default function Checkout() {
       return;
     }
 
-    if (!verifiedAddress) {
-      setMsg('Please enter your delivery address and verify it before placing the order.');
+    if (!address.trim()) {
+      setMsg('Please enter a delivery address before placing the order.');
       return;
     }
 
@@ -238,10 +238,10 @@ export default function Checkout() {
     const { data: orderId, error: orderError } = await supabase.rpc('create_order_with_items', {
       p_retailer_id: retailerId,
       p_items: rpcItems,
-      p_delivery_address: verifiedAddress.label,
-      p_delivery_latitude: verifiedAddress.latitude,
-      p_delivery_longitude: verifiedAddress.longitude,
-      p_delivery_address_verified: true,
+      p_delivery_address: verifiedAddress?.label || address.trim(),
+      p_delivery_latitude: verifiedAddress?.latitude ?? null,
+      p_delivery_longitude: verifiedAddress?.longitude ?? null,
+      p_delivery_address_verified: Boolean(verifiedAddress),
       p_notes: notes
     });
 
@@ -409,7 +409,7 @@ export default function Checkout() {
               {stores.length !== 1 && <div className="notice">Only one store can be checked out at a time. Return to your cart to select one store.</div>}
               {msg && <div className="notice checkout-message">{msg}</div>}
 
-              <button className="btn btn-primary btn-large checkout-place" disabled={busy || !status.open || stores.length !== 1 || !verifiedAddress} onClick={place}>
+              <button className="btn btn-primary btn-large checkout-place" disabled={busy || !status.open || stores.length !== 1 || !address.trim()} onClick={place}>
                 {busy ? 'Placing order…' : 'Place order'}
               </button>
 
