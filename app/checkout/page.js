@@ -1,10 +1,13 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, Clock3, MapPin, Minus, Plus, Search, ShieldCheck, Store, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { getOrderingStatus } from '../../lib/operating-hours';
+
+const DeliveryMap = dynamic(() => import('../../components/DeliveryMap'), { ssr: false });
 
 
 function money(value) {
@@ -18,55 +21,6 @@ function isEersterust(result) {
     String(a.suburb || '').toLowerCase() === 'eersterust' ||
     text.includes('eersterust')
   );
-}
-
-function normalizePart(value) {
-  return String(value || '')
-    .toLowerCase()
-    .replace(/[.,']/g, ' ')
-    .replace(/\b(st|street|str)\b/g, 'street')
-    .replace(/\b(rd|road)\b/g, 'road')
-    .replace(/\b(ave|avenue)\b/g, 'avenue')
-    .replace(/\b(dr|drive)\b/g, 'drive')
-    .replace(/\b(ct|court)\b/g, 'court')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function parseStreetAddress(value) {
-  const cleaned = String(value || '')
-    .replace(/,?\s*eersterust\b/gi, '')
-    .replace(/,?\s*pretoria\b/gi, '')
-    .replace(/,?\s*gauteng\b/gi, '')
-    .replace(/,?\s*south africa\b/gi, '')
-    .trim();
-
-  const match = cleaned.match(/^([0-9]+[A-Za-z]?(?:\s*[-/]\s*[0-9]+[A-Za-z]?)?)\s+(.+)$/);
-  if (!match) return null;
-
-  return {
-    houseNumber: match[1].replace(/\s+/g, ''),
-    streetName: match[2].replace(/,\s*$/, '').trim(),
-  };
-}
-
-function normalizeHouseNumber(value) {
-  return String(value || '').toLowerCase().replace(/\s+/g, '');
-}
-
-function isExactAddress(result, parsed) {
-  const a = result?.address || {};
-  const resultNumber = normalizeHouseNumber(a.house_number || a.housenumber);
-  const requestedNumber = normalizeHouseNumber(parsed?.houseNumber);
-  const resultRoad = normalizePart(a.road);
-  const requestedRoad = normalizePart(parsed?.streetName);
-
-  if (!resultNumber || !requestedNumber || resultNumber !== requestedNumber) return false;
-  if (!resultRoad || !requestedRoad) return false;
-
-  return resultRoad === requestedRoad ||
-    resultRoad.includes(requestedRoad) ||
-    requestedRoad.includes(resultRoad);
 }
 
 function mapEmbedUrl(lat, lon) {
@@ -86,7 +40,8 @@ export default function Checkout() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState(() => getOrderingStatus());
   const [searching, setSearching] = useState(false);
-  const [addressResults, setAddressResults] = useState([]);
+  const [mapCenter, setMapCenter] = useState([-25.7162, 28.3125]);
+  const [deliveryPin, setDeliveryPin] = useState(null);
   const [verifiedAddress, setVerifiedAddress] = useState(null);
 
   useEffect(() => {
@@ -136,7 +91,7 @@ export default function Checkout() {
     const d = savedAddresses.find(x => x.id === value);
     setAddress(d ? [d.address_line, d.suburb].filter(Boolean).join(', ') : '');
     setVerifiedAddress(null);
-    setAddressResults([]);
+    setDeliveryPin(null);
     setMsg('');
   }
 
@@ -147,72 +102,84 @@ export default function Checkout() {
       return;
     }
 
-    const parsed = parseStreetAddress(query);
-    if (!parsed) {
-      setMsg('Enter the house number and street name, for example: 12 Example Street.');
-      return;
-    }
-
     setSearching(true);
     setMsg('');
-    setAddressResults([]);
     setVerifiedAddress(null);
+    setDeliveryPin(null);
 
     try {
-      // The previous client-side free-form search could be rejected on some
-      // Android/webview environments and could also return a street without
-      // the requested house number. Use one server-side structured request,
-      // then require the returned house number and road to match the input.
-      const response = await fetch('/api/geocode?street=' + encodeURIComponent(parsed.houseNumber + ' ' + parsed.streetName), {
+      const response = await fetch('/api/geocode?street=' + encodeURIComponent(query), {
         headers: { Accept: 'application/json' },
         cache: 'no-store',
       });
 
-      if (!response.ok) {
-        setMsg('The address service could not verify the address right now. Please try again.');
-        return;
-      }
-
-      const payload = await response.json();
+      const payload = response.ok ? await response.json() : { results: [] };
       const results = Array.isArray(payload.results) ? payload.results : [];
-      const exact = results.filter(result => isExactAddress(result, parsed));
 
-      setAddressResults(exact.slice(0, 8));
-
-      if (!exact.length) {
-        setMsg('We could not find that exact house number and street inside Eersterust. Check the spelling and house number.');
+      if (results[0]?.lat && results[0]?.lon) {
+        const center = [Number(results[0].lat), Number(results[0].lon)];
+        setMapCenter(center);
+        setMsg('We found the area. Now tap your exact home or building on the map.');
+      } else {
+        setMsg('We could not find the typed address, but you can still choose your delivery point directly on the Eersterust map.');
+        setMapCenter([-25.7162, 28.3125]);
       }
     } catch {
-      setMsg('The map could not verify the address right now. Please try again.');
+      setMsg('The map search is unavailable right now. You can still choose your delivery point directly on the map.');
     } finally {
       setSearching(false);
     }
   }
 
-  function selectAddress(result) {
-    const parsed = parseStreetAddress(address);
-    if (!parsed || !isExactAddress(result, parsed)) {
-      setMsg('Please choose the exact house number and street returned by the map.');
-      return;
-    }
-
-    const a = result.address || {};
-    const formatted = [
-      [a.house_number, a.road].filter(Boolean).join(' '),
-      a.suburb || 'Eersterust',
-      a.city || 'Pretoria',
-      a.postcode
-    ].filter(Boolean).join(', ');
-
-    setAddress(formatted || result.display_name);
-    setVerifiedAddress({
-      label: formatted || result.display_name,
-      latitude: Number(result.lat),
-      longitude: Number(result.lon),
-      displayName: result.display_name
-    });
-    setAddressResults([]);
+  async function verifyPin(pin) {
+    setSearching(true);
     setMsg('');
+
+    try {
+      const response = await fetch('/api/geocode?lat=' + encodeURIComponent(pin.latitude) + '&lon=' + encodeURIComponent(pin.longitude), {
+        headers: { Accept: 'application/json' },
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        setMsg('We could not verify this map point. Please try again.');
+        setDeliveryPin(null);
+        return;
+      }
+
+      const payload = await response.json();
+      if (!payload.inEersterust || !payload.result) {
+        setMsg('That delivery point is outside Eersterust. Move the pin to your address inside Eersterust.');
+        setDeliveryPin(null);
+        setVerifiedAddress(null);
+        return;
+      }
+
+      const result = payload.result;
+      const a = result.address || {};
+      const label = [
+        [a.house_number, a.road].filter(Boolean).join(' '),
+        a.suburb || 'Eersterust',
+        a.city || 'Pretoria',
+        a.postcode
+      ].filter(Boolean).join(', ') || result.display_name;
+
+      setDeliveryPin(pin);
+      setVerifiedAddress({
+        label,
+        latitude: pin.latitude,
+        longitude: pin.longitude,
+      });
+      setAddress(label);
+      setMapCenter([pin.latitude, pin.longitude]);
+      setMsg('');
+    } catch {
+      setMsg('The map could not verify this point right now. Please try again.');
+      setDeliveryPin(null);
+      setVerifiedAddress(null);
+    } finally {
+      setSearching(false);
+    }
   }
 
   async function place(e) {
@@ -227,11 +194,6 @@ export default function Checkout() {
 
     if (!verifiedAddress) {
       setMsg('Please verify your exact delivery address on the map before placing the order.');
-      return;
-    }
-
-    if (!isEersterust({ display_name: verifiedAddress.label })) {
-      setMsg('Delivery is available in Eersterust only.');
       return;
     }
 
@@ -372,7 +334,7 @@ export default function Checkout() {
 
               <div className="address-security">
                 <ShieldCheck size={19} />
-                <div><strong>Exact address required</strong><p>We only accept a map-verified house or building address inside Eersterust.</p></div>
+                <div><strong>Map location required</strong><p>Search your address, then tap or drag the pin onto your exact home or building. The point must verify inside Eersterust.</p></div>
               </div>
 
               {savedAddresses.length > 0 && (
@@ -388,11 +350,11 @@ export default function Checkout() {
               )}
 
               <label className="checkout-field">
-                <span>House number and street address</span>
+                <span>Delivery address</span>
                 <div className="address-search-row">
                   <input
                     value={address}
-                    onChange={e => { setAddress(e.target.value); setVerifiedAddress(null); setAddressResults([]); }}
+                    onChange={e => { setAddress(e.target.value); setVerifiedAddress(null); setDeliveryPin(null); }}
                     required
                     placeholder="Example: 12 Example Street, Eersterust"
                     autoComplete="street-address"
@@ -403,25 +365,27 @@ export default function Checkout() {
                 </div>
               </label>
 
-              {addressResults.length > 0 && (
-                <div className="address-results">
-                  <div className="address-results-title">Choose the exact map result</div>
-                  {addressResults.map((result, index) => (
-                    <button type="button" className="address-result" key={result.place_id || index} onClick={() => selectAddress(result)}>
-                      <MapPin size={18} />
-                      <span><strong>{result.address?.house_number ? [result.address.house_number, result.address.road].filter(Boolean).join(' ') : result.display_name}</strong><small>{result.display_name}</small></span>
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="delivery-map-card">
+                <DeliveryMap
+                  center={mapCenter}
+                  pin={deliveryPin}
+                  onChange={verifyPin}
+                />
+              </div>
 
               {verifiedAddress && (
                 <div className="verified-address">
-                  <div className="verified-address-copy"><CheckCircle2 size={19} /><div><strong>Address verified</strong><span>{verifiedAddress.label}</span></div></div>
+                  <div className="verified-address-copy">
+                    <CheckCircle2 size={19} />
+                    <div>
+                      <strong>Delivery point verified</strong>
+                      <span>{verifiedAddress.label}</span>
+                    </div>
+                  </div>
                   <a href={'https://www.openstreetmap.org/?mlat=' + verifiedAddress.latitude + '&mlon=' + verifiedAddress.longitude + '#map=18/' + verifiedAddress.latitude + '/' + verifiedAddress.longitude} target="_blank" rel="noreferrer">Open map</a>
-                  <iframe title="Verified delivery location" src={mapEmbedUrl(verifiedAddress.latitude, verifiedAddress.longitude)} loading="lazy" />
                 </div>
               )}
+
             </section>
 
             <section className="checkout-card">
