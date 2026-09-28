@@ -102,7 +102,14 @@ export default function Checkout() {
       if (results[0]?.lat && results[0]?.lon) {
         const center = [Number(results[0].lat), Number(results[0].lon)];
         setMapCenter(center);
-        setMsg('Address found. Confirm your exact home or building by tapping that location on the map.');
+        const result = results[0];
+        const a = result.address || {};
+        const label = result.display_name || [[a.house_number, a.road].filter(Boolean).join(' '), a.suburb || 'Eersterust', a.city || 'Pretoria', a.postcode].filter(Boolean).join(', ');
+        const verified = { label, latitude: Number(result.lat), longitude: Number(result.lon) };
+        setDeliveryPin({ latitude: verified.latitude, longitude: verified.longitude });
+        setVerifiedAddress(verified);
+        setAddress(label);
+        setMsg('Address verified successfully.');
       } else {
         setMsg(payload.error || 'We could not find that address in Eersterust. Check the street name and house number, then try again.');
         setMapCenter([-25.7069, 28.3092]);
@@ -176,7 +183,7 @@ export default function Checkout() {
     }
 
     if (!verifiedAddress) {
-      setMsg('Please verify your exact delivery address on the map before placing the order.');
+      setMsg('Please enter your delivery address and verify it before placing the order.');
       return;
     }
 
@@ -317,7 +324,7 @@ export default function Checkout() {
 
               <div className="address-security">
                 <ShieldCheck size={19} />
-                <div><strong>Map location required</strong><p>Search your address, then tap or drag the pin onto your exact home or building. The point must verify inside Eersterust.</p></div>
+                <div><strong>Map location required</strong><p>Type your full street address and select Verify. If the address is found in Eersterust, it is automatically verified and the map is positioned at the address.</p></div>
               </div>
 
               {savedAddresses.length > 0 && (
