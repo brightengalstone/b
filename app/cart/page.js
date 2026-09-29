@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { getOrderingStatus } from '../../lib/operating-hours';
+import NotificationBell from '../../components/NotificationBell';
 
 const CartIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -85,7 +86,7 @@ export default function Cart() {
           <Link className="cart-brand" href="/marketplace" aria-label="Back to marketplace">
             <span className="brand-mark"><CartIcon /></span><span>BG Smart Services</span>
           </Link>
-          <Link className="cart-back" href="/marketplace">Continue shopping</Link>
+          <div className="cart-top-actions"><NotificationBell /><Link className="cart-back" href="/marketplace">Continue shopping</Link></div>
         </div>
 
         <header className="cart-hero">
