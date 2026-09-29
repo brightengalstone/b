@@ -60,6 +60,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [creatingDriver, setCreatingDriver] = useState(false);
+  const [sendingSupportReply, setSendingSupportReply] = useState(null);
   const [driverForm, setDriverForm] = useState({ email: '', password: '', full_name: '', phone: '', vehicle_type: '', vehicle_registration: '' });
   const [error, setError] = useState('');
   const [data, setData] = useState({
@@ -280,6 +281,43 @@ export default function AdminPage() {
         request.id === requestId ? { ...request, ...patch } : request
       ),
     }));
+  }
+
+  async function sendSupportReply(requestId) {
+    if (!supabase) return;
+    const request = data.supportRequests.find((item) => item.id === requestId);
+    const reply = (request?.admin_reply || '').trim();
+
+    if (!reply) {
+      setError('Please write a reply before sending it to the customer.');
+      return;
+    }
+
+    setSendingSupportReply(requestId);
+    setError('');
+
+    const { error: replyError } = await supabase
+      .from('support_requests')
+      .update({
+        admin_reply: reply,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', requestId);
+
+    if (replyError) {
+      setError(replyError.message);
+      setSendingSupportReply(null);
+      return;
+    }
+
+    setData((currentData) => ({
+      ...currentData,
+      supportRequests: currentData.supportRequests.map((item) =>
+        item.id === requestId ? { ...item, admin_reply: reply } : item
+      ),
+    }));
+
+    setSendingSupportReply(null);
   }
 
   async function updateDriver(driverId, patch) {
@@ -659,16 +697,32 @@ export default function AdminPage() {
                       <select className="admin-select" value={request.status} onChange={(event) => updateSupportRequest(request.id, { status: event.target.value })}>
                         {['open', 'in_progress', 'resolved', 'closed'].map((status) => <option key={status} value={status}>{status.replace('_', ' ')}</option>)}
                       </select>
-                      <textarea
-                        className="admin-support-reply"
-                        rows={3}
-                        placeholder="Write a reply to the customer..."
-                        defaultValue={request.admin_reply || ''}
-                        onBlur={(event) => {
-                          const next = event.target.value.trim();
-                          if (next !== (request.admin_reply || '')) updateSupportRequest(request.id, { admin_reply: next || null });
-                        }}
-                      />
+                      <div className="admin-support-reply-wrap">
+                        <textarea
+                          className="admin-support-reply"
+                          rows={3}
+                          placeholder="Write a reply to the customer..."
+                          value={request.admin_reply || ''}
+                          onChange={(event) => {
+                            const value = event.target.value;
+                            setData((currentData) => ({
+                              ...currentData,
+                              supportRequests: currentData.supportRequests.map((item) =>
+                                item.id === request.id ? { ...item, admin_reply: value } : item
+                              ),
+                            }));
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="admin-primary admin-support-send"
+                          onClick={() => sendSupportReply(request.id)}
+                          disabled={sendingSupportReply === request.id}
+                        >
+                          <MessageSquare size={15} />
+                          {sendingSupportReply === request.id ? 'Sending...' : 'Send Reply'}
+                        </button>
+                      </div>
                     </div>
                     <small className="admin-support-date">{formatDate(request.created_at)}</small>
                   </article>
