@@ -222,7 +222,21 @@ export default function AdminPage() {
     });
 
     if (functionError) {
-      setError(functionError.message || 'Unable to create driver');
+      let detail = functionError.message || 'Unable to create driver';
+      try {
+        if (functionError.context) {
+          const raw = await functionError.context.text();
+          if (raw) {
+            try {
+              const parsed = JSON.parse(raw);
+              if (parsed?.error) detail = parsed.error;
+            } catch {
+              detail = raw;
+            }
+          }
+        }
+      } catch {}
+      setError(detail);
       setCreatingDriver(false);
       return;
     }
