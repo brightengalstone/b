@@ -56,6 +56,8 @@ export default function AdminPage() {
   const [active, setActive] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [creatingDriver, setCreatingDriver] = useState(false);
+  const [driverForm, setDriverForm] = useState({ email: '', password: '', full_name: '', phone: '', vehicle_type: '', vehicle_registration: '' });
   const [error, setError] = useState('');
   const [data, setData] = useState({
     orders: [],
@@ -207,6 +209,33 @@ export default function AdminPage() {
         payment.id === paymentId ? { ...payment, ...patch } : payment
       ),
     }));
+  }
+
+  async function createDriver(event) {
+    event.preventDefault();
+    if (!supabase) return;
+    setCreatingDriver(true);
+    setError('');
+
+    const { data: result, error: functionError } = await supabase.functions.invoke('admin-create-driver', {
+      body: driverForm,
+    });
+
+    if (functionError) {
+      setError(functionError.message || 'Unable to create driver');
+      setCreatingDriver(false);
+      return;
+    }
+
+    if (result?.error) {
+      setError(result.error);
+      setCreatingDriver(false);
+      return;
+    }
+
+    setDriverForm({ email: '', password: '', full_name: '', phone: '', vehicle_type: '', vehicle_registration: '' });
+    await loadDashboard(false);
+    setCreatingDriver(false);
   }
 
   async function updateDriver(driverId, patch) {
@@ -401,6 +430,21 @@ export default function AdminPage() {
 
         {active === 'drivers' && (
           <Panel title="Drivers" subtitle="Drivers are created and controlled by administrators. No public driver deployment is enabled.">
+            <form className="admin-driver-form" onSubmit={createDriver}>
+              <div className="admin-driver-form-head">
+                <div><h3>Add driver account</h3><p>Create the account here. New drivers start pending approval and offline.</p></div>
+              </div>
+              <div className="admin-driver-form-grid">
+                <input className="admin-input" type="text" placeholder="Full name" value={driverForm.full_name} onChange={(event) => setDriverForm({ ...driverForm, full_name: event.target.value })} required />
+                <input className="admin-input" type="email" placeholder="Email address" value={driverForm.email} onChange={(event) => setDriverForm({ ...driverForm, email: event.target.value })} required />
+                <input className="admin-input" type="tel" placeholder="Phone number" value={driverForm.phone} onChange={(event) => setDriverForm({ ...driverForm, phone: event.target.value })} />
+                <input className="admin-input" type="password" placeholder="Temporary password (8+ characters)" value={driverForm.password} onChange={(event) => setDriverForm({ ...driverForm, password: event.target.value })} minLength={8} required />
+                <input className="admin-input" type="text" placeholder="Vehicle type" value={driverForm.vehicle_type} onChange={(event) => setDriverForm({ ...driverForm, vehicle_type: event.target.value })} />
+                <input className="admin-input" type="text" placeholder="Vehicle registration" value={driverForm.vehicle_registration} onChange={(event) => setDriverForm({ ...driverForm, vehicle_registration: event.target.value })} />
+              </div>
+              <button className="admin-primary" type="submit" disabled={creatingDriver}>{creatingDriver ? 'Creating driver...' : 'Create driver account'}</button>
+            </form>
+
             <div className="admin-stat-grid">
               <Stat icon={Users} label="Driver accounts" value={data.driverProfiles.length} />
               <Stat icon={CheckCircle2} label="Approved" value={data.driverProfiles.filter((driver) => driver.approved).length} />
