@@ -521,7 +521,7 @@ export default function AdminPage() {
                               {customerById[order.driver_id]?.full_name || 'Driver assigned automatically'}
                             </span>
                           ) : (
-                            <span className="admin-status muted">Waiting for available driver</span>
+                            <span className="admin-status muted">Finding a driver</span>
                           )}
                         </td>
                         <td><span className={`admin-status ${order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : 'warning'}`}>{order.status.replace('_', ' ')}</span></td>
