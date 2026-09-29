@@ -16,6 +16,7 @@ import {
   Settings,
   ShoppingBag,
   Store,
+  Truck,
   Users,
   XCircle,
 } from 'lucide-react';
@@ -28,6 +29,7 @@ const NAV = [
   { id: 'products', label: 'Products', icon: ShoppingBag },
   { id: 'customers', label: 'Customers', icon: Users },
   { id: 'payments', label: 'Payments', icon: CircleDollarSign },
+  { id: 'delivery', label: 'Delivery', icon: Truck },
 ];
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'assigned', 'picked_up', 'delivered', 'cancelled'];
@@ -362,6 +364,59 @@ export default function AdminPage() {
                     );
                   })}
                   {!data.payments.length && <EmptyRow label="No payment records yet." colSpan={7} />}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+        )}
+
+        {active === 'delivery' && (
+          <Panel title="Delivery Management" subtitle="Assign deliveries and monitor the delivery status of every active order.">
+            <div className="admin-stat-grid">
+              <Stat icon={Clock3} label="Awaiting assignment" value={data.orders.filter((order) => !order.driver_id && !['delivered', 'cancelled'].includes(order.status)).length} />
+              <Stat icon={Truck} label="Assigned" value={data.orders.filter((order) => order.driver_id && !['delivered', 'cancelled'].includes(order.status)).length} />
+              <Stat icon={CheckCircle2} label="Delivered" value={data.orders.filter((order) => order.status === 'delivered').length} />
+              <Stat icon={XCircle} label="Cancelled" value={data.orders.filter((order) => order.status === 'cancelled').length} />
+            </div>
+
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead><tr><th>Order</th><th>Customer</th><th>Address</th><th>Driver</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>
+                  {data.orders.filter((order) => !['delivered', 'cancelled'].includes(order.status)).map((order) => {
+                    const customer = customerById[order.customer_id];
+                    const drivers = data.customers.filter((person) => person.role === 'driver');
+                    return (
+                      <tr key={order.id}>
+                        <td><strong>#{order.id.slice(0, 8).toUpperCase()}</strong></td>
+                        <td>{customer?.full_name || 'Customer'}</td>
+                        <td><small className="admin-order-address">{order.delivery_address || 'Address not set'}</small></td>
+                        <td>
+                          <select
+                            className="admin-select"
+                            value={order.driver_id || ''}
+                            onChange={(event) => updateOrder(order.id, { driver_id: event.target.value || null, status: event.target.value && order.status === 'pending' ? 'assigned' : order.status })}
+                            aria-label={`Assign driver to order ${order.id.slice(0, 8)}`}
+                          >
+                            <option value="">Unassigned</option>
+                            {drivers.map((driver) => <option key={driver.id} value={driver.id}>{driver.full_name || driver.phone || 'Driver'}</option>)}
+                          </select>
+                        </td>
+                        <td><span className={`admin-status ${order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : 'warning'}`}>{order.status.replace('_', ' ')}</span></td>
+                        <td>
+                          <select
+                            className="admin-select"
+                            value={order.status}
+                            onChange={(event) => updateOrder(order.id, { status: event.target.value })}
+                            aria-label={`Update delivery status for order ${order.id.slice(0, 8)}`}
+                          >
+                            {ORDER_STATUSES.map((status) => <option key={status} value={status}>{status.replace('_', ' ')}</option>)}
+                          </select>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {!data.orders.filter((order) => !['delivered', 'cancelled'].includes(order.status)).length && <EmptyRow label="No active deliveries." colSpan={6} />}
                 </tbody>
               </table>
             </div>
