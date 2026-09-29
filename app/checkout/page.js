@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, Clock3, MapPin, Search, ShieldCheck, Store, CreditCard, Banknote, Landmark, Check } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import NotificationBell from '../../components/NotificationBell';
 import { getOrderingStatus } from '../../lib/operating-hours';
 
 const DeliveryMap = dynamic(() => import('../../components/DeliveryMap'), { ssr: false });
@@ -271,7 +272,7 @@ export default function Checkout() {
             <span className="brand-mark">BG</span>
             <span>BG Smart Services</span>
           </Link>
-          <Link href="/cart" className="checkout-back"><ArrowLeft size={17} /> Back to cart</Link>
+          <div className="checkout-top-actions"><NotificationBell /><Link href="/cart" className="checkout-back"><ArrowLeft size={17} /> Back to cart</Link></div>
         </header>
 
         <div className="checkout-heading">
