@@ -371,7 +371,7 @@ export default function AdminPage() {
         )}
 
         {active === 'delivery' && (
-          <Panel title="Delivery Management" subtitle="Assign deliveries and monitor the delivery status of every active order.">
+          <Panel title="Delivery Management" subtitle="Driver dispatch is automatic. Available approved drivers receive the next eligible order.">
             <div className="admin-stat-grid">
               <Stat icon={Clock3} label="Awaiting assignment" value={data.orders.filter((order) => !order.driver_id && !['delivered', 'cancelled'].includes(order.status)).length} />
               <Stat icon={Truck} label="Assigned" value={data.orders.filter((order) => order.driver_id && !['delivered', 'cancelled'].includes(order.status)).length} />
@@ -385,22 +385,19 @@ export default function AdminPage() {
                 <tbody>
                   {data.orders.filter((order) => !['delivered', 'cancelled'].includes(order.status)).map((order) => {
                     const customer = customerById[order.customer_id];
-                    const drivers = data.customers.filter((person) => person.role === 'driver');
                     return (
                       <tr key={order.id}>
                         <td><strong>#{order.id.slice(0, 8).toUpperCase()}</strong></td>
                         <td>{customer?.full_name || 'Customer'}</td>
                         <td><small className="admin-order-address">{order.delivery_address || 'Address not set'}</small></td>
                         <td>
-                          <select
-                            className="admin-select"
-                            value={order.driver_id || ''}
-                            onChange={(event) => updateOrder(order.id, { driver_id: event.target.value || null, status: event.target.value && order.status === 'pending' ? 'assigned' : order.status })}
-                            aria-label={`Assign driver to order ${order.id.slice(0, 8)}`}
-                          >
-                            <option value="">Unassigned</option>
-                            {drivers.map((driver) => <option key={driver.id} value={driver.id}>{driver.full_name || driver.phone || 'Driver'}</option>)}
-                          </select>
+                          {order.driver_id ? (
+                            <span className="admin-status success">
+                              {customerById[order.driver_id]?.full_name || 'Driver assigned automatically'}
+                            </span>
+                          ) : (
+                            <span className="admin-status muted">Waiting for available driver</span>
+                          )}
                         </td>
                         <td><span className={`admin-status ${order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : 'warning'}`}>{order.status.replace('_', ' ')}</span></td>
                         <td>
