@@ -49,6 +49,44 @@ export default function HelpPage() {
     return () => { active = false; };
   }, []);
 
+  useEffect(() => {
+    if (!supabase || !user?.id) return undefined;
+
+    const channel = supabase
+      .channel('customer-support-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'support_requests',
+          filter: 'customer_id=eq.' + user.id,
+        },
+        (payload) => {
+          const row = payload.new || payload.old;
+          if (!row?.id) return;
+
+          setRequests((currentRequests) => {
+            if (payload.eventType === 'DELETE') {
+              return currentRequests.filter((request) => request.id !== row.id);
+            }
+
+            const exists = currentRequests.some((request) => request.id === row.id);
+            const nextRequests = exists
+              ? currentRequests.map((request) => request.id === row.id ? { ...request, ...payload.new } : request)
+              : [payload.new, ...currentRequests];
+
+            return nextRequests.slice(0, 10);
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
+
   const selectedCategory = useMemo(() => categories.find((item) => item.value === category), [category]);
 
   async function submit(event) {
