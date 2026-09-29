@@ -134,11 +134,24 @@ export default function Account() {
             <div className="account-section-head"><div><span className="eyebrow">Support</span><h2>Need help?</h2></div></div>
             <div className="account-list">
               {supportLinks.map(({ href, icon: Icon, title, text }) => (
-                <Link className="account-list-row" href={href} key={title}>
-                  <span className="account-link-icon"><Icon size={19} /></span>
-                  <span><strong>{title}</strong><small>{text}</small></span>
-                  <ChevronRight size={18} />
-                </Link>
+                title === 'Help & Support' ? (
+                  <button
+                    className="account-list-row"
+                    type="button"
+                    key={title}
+                    onClick={() => { window.location.assign('/help'); }}
+                  >
+                    <span className="account-link-icon"><Icon size={19} /></span>
+                    <span><strong>{title}</strong><small>{text}</small></span>
+                    <ChevronRight size={18} />
+                  </button>
+                ) : (
+                  <Link className="account-list-row" href={href} key={title}>
+                    <span className="account-link-icon"><Icon size={19} /></span>
+                    <span><strong>{title}</strong><small>{text}</small></span>
+                    <ChevronRight size={18} />
+                  </Link>
+                )
               ))}
             </div>
           </section>
