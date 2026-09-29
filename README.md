@@ -1,12 +1,12 @@
-# BG Smart Services — V1.1 foundation
+# BG Smart Services
 
-A Next.js starter upgraded for the BG Smart Services Eersterust local-commerce platform.
+A Next.js local-commerce platform for shopping and delivery within Eersterust.
 
 ## Included
 - Homepage
 - Marketplace with Supabase product loading + safe demo fallback
 - Local cart using browser storage
-- Checkout foundation with R60 delivery + R45 service fees
+- Checkout with R65 delivery and no service fee
 - Supabase email/password sign-in and registration
 - Account sign-out
 - Responsive styling
@@ -14,8 +14,8 @@ A Next.js starter upgraded for the BG Smart Services Eersterust local-commerce p
 
 ## Launch rules
 - Delivery zone: Eersterust only
-- Delivery fee: R60
-- Service fee: R45
+- Delivery fee: R65
+- Service fee: None
 
 ## Run
 1. `npm install`
@@ -27,4 +27,4 @@ A Next.js starter upgraded for the BG Smart Services Eersterust local-commerce p
 Upload the project to GitHub and connect the repository to Vercel. Set the same two environment variables in Vercel, then deploy.
 
 ## Important
-The database schema exists separately in Supabase. Production checkout and role-based admin permissions should be hardened server-side before accepting real orders or payments.
+The database schema exists separately in Supabase. Production checkout, payments, notifications, automatic driver dispatch, support, and role-based admin permissions are implemented with Supabase controls.
