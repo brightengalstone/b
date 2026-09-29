@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   ChevronRight,
   CircleDollarSign,
+  MessageSquare,
   Clock3,
   LogOut,
   Package,
@@ -32,6 +33,7 @@ const NAV = [
   { id: 'payments', label: 'Payments', icon: CircleDollarSign },
   { id: 'delivery', label: 'Delivery', icon: Truck },
   { id: 'drivers', label: 'Drivers', icon: UserRoundCheck },
+  { id: 'support', label: 'Support', icon: MessageSquare },
 ];
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'assigned', 'picked_up', 'delivered', 'cancelled'];
@@ -66,6 +68,7 @@ export default function AdminPage() {
     customers: [],
     payments: [],
     driverProfiles: [],
+    supportRequests: [],
   });
 
   useEffect(() => {
@@ -121,7 +124,7 @@ export default function AdminPage() {
     if (showSpinner) setRefreshing(true);
     setError('');
 
-    const [orders, shops, products, customers, payments, driverProfiles] = await Promise.all([
+    const [orders, shops, products, customers, payments, driverProfiles, supportRequests] = await Promise.all([
       supabase
         .from('orders')
         .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id, payment_method')
@@ -150,9 +153,14 @@ export default function AdminPage() {
         .from('driver_profiles')
         .select('id, vehicle_type, vehicle_registration, approved, available')
         .order('id'),
+      supabase
+        .from('support_requests')
+        .select('id, customer_id, order_id, category, message, status, admin_reply, created_at, updated_at')
+        .order('created_at', { ascending: false })
+        .limit(100),
     ]);
 
-    const failures = [orders, shops, products, customers, payments, driverProfiles].filter((item) => item.error);
+    const failures = [orders, shops, products, customers, payments, driverProfiles, supportRequests].filter((item) => item.error);
     if (failures.length) {
       setError(failures.map((item) => item.error.message).join(' | '));
     }
@@ -164,6 +172,7 @@ export default function AdminPage() {
       customers: customers.data || [],
       payments: payments.data || [],
       driverProfiles: driverProfiles.data || [],
+      supportRequests: supportRequests.data || [],
     });
 
     if (showSpinner) setRefreshing(false);
@@ -197,7 +206,6 @@ export default function AdminPage() {
       .from('payments')
       .update(patch)
       .eq('id', paymentId);
-
     if (updateError) {
       setError(updateError.message);
       return;
@@ -250,6 +258,27 @@ export default function AdminPage() {
     setDriverForm({ email: '', password: '', full_name: '', phone: '', vehicle_type: '', vehicle_registration: '' });
     await loadDashboard(false);
     setCreatingDriver(false);
+  }
+
+  async function updateSupportRequest(requestId, patch) {
+    if (!supabase) return;
+    setError('');
+    const { error: updateError } = await supabase
+      .from('support_requests')
+      .update({ ...patch, updated_at: new Date().toISOString() })
+      .eq('id', requestId);
+
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+
+    setData((currentData) => ({
+      ...currentData,
+      supportRequests: currentData.supportRequests.map((request) =>
+        request.id === requestId ? { ...request, ...patch } : request
+      ),
+    }));
   }
 
   async function updateDriver(driverId, patch) {
@@ -397,7 +426,6 @@ export default function AdminPage() {
             </div>
           </>
         )}
-
         {active === 'orders' && (
           <Panel title="All orders" subtitle="Monitor and manage every BG Smart Services order.">
             <OrderTable orders={data.orders} shopById={shopById} customerById={customerById} updateOrder={updateOrder} detailed />
@@ -597,9 +625,55 @@ export default function AdminPage() {
                       <td><span className="admin-status success">Customer</span></td>
                     </tr>
                   ))}
-                  {!customers.length && <EmptyRow label="No customer accounts yet." />}
-                </tbody>
+                  {!customers.length && <EmptyRow label="No customer accounts yet." />}                </tbody>
               </table>
+            </div>
+          </Panel>
+        )}
+
+        {active === 'support' && (
+          <Panel title="Support Management" subtitle="Review customer support requests and reply to customers.">
+            <div className="admin-stat-grid">
+              <Stat icon={Clock3} label="Open" value={data.supportRequests.filter((request) => request.status === 'open').length} />
+              <Stat icon={MessageSquare} label="In progress" value={data.supportRequests.filter((request) => request.status === 'in_progress').length} />
+              <Stat icon={CheckCircle2} label="Resolved" value={data.supportRequests.filter((request) => request.status === 'resolved').length} />
+              <Stat icon={XCircle} label="Closed" value={data.supportRequests.filter((request) => request.status === 'closed').length} />
+            </div>
+            <div className="admin-support-list">
+              {data.supportRequests.map((request) => {
+                const customer = customerById[request.customer_id];
+                const order = request.order_id ? data.orders.find((item) => item.id === request.order_id) : null;
+                return (
+                  <article className="admin-support-card" key={request.id}>
+                    <div className="admin-support-head">
+                      <div>
+                        <strong>{customer?.full_name || 'Customer'}</strong>
+                        <span>{customer?.phone || 'No phone'} · {request.category.replace('_', ' ')}</span>
+                      </div>
+                      <span className="admin-status warning">{request.status.replace('_', ' ')}</span>
+                    </div>
+                    {order && <div className="admin-support-order">Order #{order.id.slice(0, 8).toUpperCase()} · {order.status.replace('_', ' ')}</div>}
+                    <p className="admin-support-message">{request.message}</p>
+                    <div className="admin-support-controls">
+                      <select className="admin-select" value={request.status} onChange={(event) => updateSupportRequest(request.id, { status: event.target.value })}>
+                        {['open', 'in_progress', 'resolved', 'closed'].map((status) => <option key={status} value={status}>{status.replace('_', ' ')}</option>)}
+                      </select>
+                      <textarea
+                        className="admin-support-reply"
+                        rows={3}
+                        placeholder="Write a reply to the customer..."
+                        defaultValue={request.admin_reply || ''}
+                        onBlur={(event) => {
+                          const next = event.target.value.trim();
+                          if (next !== (request.admin_reply || '')) updateSupportRequest(request.id, { admin_reply: next || null });
+                        }}
+                      />
+                    </div>
+                    <small className="admin-support-date">{formatDate(request.created_at)}</small>
+                  </article>
+                );
+              })}
+              {!data.supportRequests.length && <div className="admin-empty">No customer support requests yet.</div>}
             </div>
           </Panel>
         )}
