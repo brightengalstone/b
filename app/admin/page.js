@@ -18,6 +18,7 @@ import {
   Store,
   Truck,
   Users,
+  UserRoundCheck,
   XCircle,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -30,6 +31,7 @@ const NAV = [
   { id: 'customers', label: 'Customers', icon: Users },
   { id: 'payments', label: 'Payments', icon: CircleDollarSign },
   { id: 'delivery', label: 'Delivery', icon: Truck },
+  { id: 'drivers', label: 'Drivers', icon: UserRoundCheck },
 ];
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'assigned', 'picked_up', 'delivered', 'cancelled'];
@@ -61,6 +63,7 @@ export default function AdminPage() {
     products: [],
     customers: [],
     payments: [],
+    driverProfiles: [],
   });
 
   useEffect(() => {
@@ -116,7 +119,7 @@ export default function AdminPage() {
     if (showSpinner) setRefreshing(true);
     setError('');
 
-    const [orders, shops, products, customers, payments] = await Promise.all([
+    const [orders, shops, products, customers, payments, driverProfiles] = await Promise.all([
       supabase
         .from('orders')
         .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id, payment_method')
@@ -141,9 +144,13 @@ export default function AdminPage() {
         .select('id, order_id, amount, status, provider, provider_reference, created_at, updated_at')
         .order('created_at', { ascending: false })
         .limit(100),
+      supabase
+        .from('driver_profiles')
+        .select('id, vehicle_type, vehicle_registration, approved, available')
+        .order('id'),
     ]);
 
-    const failures = [orders, shops, products, customers, payments].filter((item) => item.error);
+    const failures = [orders, shops, products, customers, payments, driverProfiles].filter((item) => item.error);
     if (failures.length) {
       setError(failures.map((item) => item.error.message).join(' | '));
     }
@@ -154,6 +161,7 @@ export default function AdminPage() {
       products: products.data || [],
       customers: customers.data || [],
       payments: payments.data || [],
+      driverProfiles: driverProfiles.data || [],
     });
 
     if (showSpinner) setRefreshing(false);
@@ -197,6 +205,27 @@ export default function AdminPage() {
       ...currentData,
       payments: currentData.payments.map((payment) =>
         payment.id === paymentId ? { ...payment, ...patch } : payment
+      ),
+    }));
+  }
+
+  async function updateDriver(driverId, patch) {
+    if (!supabase) return;
+    setError('');
+    const { error: updateError } = await supabase
+      .from('driver_profiles')
+      .update(patch)
+      .eq('id', driverId);
+
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+
+    setData((currentData) => ({
+      ...currentData,
+      driverProfiles: currentData.driverProfiles.map((driver) =>
+        driver.id === driverId ? { ...driver, ...patch } : driver
       ),
     }));
   }
@@ -364,6 +393,44 @@ export default function AdminPage() {
                     );
                   })}
                   {!data.payments.length && <EmptyRow label="No payment records yet." colSpan={7} />}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+        )}
+
+        {active === 'drivers' && (
+          <Panel title="Drivers" subtitle="Drivers are created and controlled by administrators. No public driver deployment is enabled.">
+            <div className="admin-stat-grid">
+              <Stat icon={Users} label="Driver accounts" value={data.driverProfiles.length} />
+              <Stat icon={CheckCircle2} label="Approved" value={data.driverProfiles.filter((driver) => driver.approved).length} />
+              <Stat icon={Truck} label="Available" value={data.driverProfiles.filter((driver) => driver.approved && driver.available).length} />
+              <Stat icon={Clock3} label="Pending approval" value={data.driverProfiles.filter((driver) => !driver.approved).length} />
+            </div>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead><tr><th>Driver</th><th>Phone</th><th>Vehicle</th><th>Registration</th><th>Status</th><th>Controls</th></tr></thead>
+                <tbody>
+                  {data.driverProfiles.map((driver) => {
+                    const account = customerById[driver.id];
+                    const status = !driver.approved ? 'Pending approval' : driver.available ? 'Available' : 'Busy / Offline';
+                    return (
+                      <tr key={driver.id}>
+                        <td><strong>{account?.full_name || 'Driver account'}</strong><small className="admin-order-address">{driver.id.slice(0, 8).toUpperCase()}</small></td>
+                        <td>{account?.phone || '—'}</td>
+                        <td>{driver.vehicle_type || '—'}</td>
+                        <td>{driver.vehicle_registration || '—'}</td>
+                        <td><span className={driver.approved && driver.available ? 'admin-status success' : driver.approved ? 'admin-status warning' : 'admin-status muted'}>{status}</span></td>
+                        <td>
+                          <div className="admin-inline-actions">
+                            <button className="admin-secondary compact" onClick={() => updateDriver(driver.id, { approved: !driver.approved, available: !driver.approved ? driver.available : false })}>{driver.approved ? 'Revoke approval' : 'Approve'}</button>
+                            {driver.approved && <button className="admin-secondary compact" onClick={() => updateDriver(driver.id, { available: !driver.available })}>{driver.available ? 'Set offline' : 'Set available'}</button>}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {!data.driverProfiles.length && <EmptyRow label="No driver accounts have been created yet. Create the driver account in Supabase Auth, assign the driver role in profiles, then add their driver profile here." colSpan={6} />}
                 </tbody>
               </table>
             </div>
