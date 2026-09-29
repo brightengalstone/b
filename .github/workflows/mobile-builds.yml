@@ -23,6 +23,9 @@ jobs:
       - name: Generate Android project
         run: npx cap add android
 
+      - name: Prepare Capacitor web directory
+        run: mkdir -p out
+
       - name: Sync Capacitor
         run: npx cap sync android
 
@@ -54,6 +57,9 @@ jobs:
 
       - name: Generate iOS project
         run: npx cap add ios
+
+      - name: Prepare Capacitor web directory
+        run: mkdir -p out
 
       - name: Sync Capacitor
         run: npx cap sync ios
