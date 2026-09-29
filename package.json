@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "latest",
-    "@capacitor/assets": "latest"
+    "@capacitor/assets": "latest",
+    "typescript": "latest"
   }
 }
