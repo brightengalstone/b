@@ -121,6 +121,42 @@ export default function AdminPage() {
     return () => { mounted = false; };
   }, []);
 
+  useEffect(() => {
+    if (!supabase || profile?.role !== 'admin') return undefined;
+
+    const channel = supabase
+      .channel('admin-support-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'support_requests' },
+        (payload) => {
+          const row = payload.new || payload.old;
+          if (!row?.id) return;
+
+          setData((currentData) => {
+            if (payload.eventType === 'DELETE') {
+              return {
+                ...currentData,
+                supportRequests: currentData.supportRequests.filter((request) => request.id !== row.id),
+              };
+            }
+
+            const exists = currentData.supportRequests.some((request) => request.id === row.id);
+            const nextRequests = exists
+              ? currentData.supportRequests.map((request) => request.id === row.id ? { ...request, ...payload.new } : request)
+              : [payload.new, ...currentData.supportRequests];
+
+            return { ...currentData, supportRequests: nextRequests.slice(0, 100) };
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.role]);
+
   async function loadDashboard(showSpinner = true) {
     if (!supabase) return;
     if (showSpinner) setRefreshing(true);
