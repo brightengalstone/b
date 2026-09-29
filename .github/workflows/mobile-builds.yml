@@ -64,6 +64,10 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync ios
 
+      - name: Install iOS CocoaPods dependencies
+        working-directory: ios/App
+        run: pod install
+
       - name: Archive iOS app
         run: |
           xcodebuild -workspace ios/App/App.xcworkspace \
