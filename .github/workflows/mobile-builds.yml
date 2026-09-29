@@ -1,0 +1,76 @@
+name: BG Smart Services mobile builds
+
+on:
+  workflow_dispatch:
+
+jobs:
+  android:
+    name: Android release build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate Android project
+        run: npx cap add android
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Build Android App Bundle
+        working-directory: android
+        run: ./gradlew bundleRelease
+
+      - name: Upload Android bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: bg-smart-services-android
+          path: android/app/build/outputs/bundle/release/app-release.aab
+
+  ios:
+    name: iOS project build
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate iOS project
+        run: npx cap add ios
+
+      - name: Sync Capacitor
+        run: npx cap sync ios
+
+      - name: Archive iOS app
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath "$RUNNER_TEMP/BGSmartServices.xcarchive" \
+            archive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Upload iOS archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: bg-smart-services-ios
+          path: ${{ runner.temp }}/BGSmartServices.xcarchive
