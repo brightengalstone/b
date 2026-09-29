@@ -27,6 +27,7 @@ const NAV = [
   { id: 'shops', label: 'Shops', icon: Store },
   { id: 'products', label: 'Products', icon: ShoppingBag },
   { id: 'customers', label: 'Customers', icon: Users },
+  { id: 'payments', label: 'Payments', icon: CircleDollarSign },
 ];
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'assigned', 'picked_up', 'delivered', 'cancelled'];
@@ -116,7 +117,7 @@ export default function AdminPage() {
     const [orders, shops, products, customers, payments] = await Promise.all([
       supabase
         .from('orders')
-        .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id')
+        .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id, payment_method')
         .order('created_at', { ascending: false })
         .limit(100),
       supabase
@@ -135,7 +136,7 @@ export default function AdminPage() {
         .limit(100),
       supabase
         .from('payments')
-        .select('id, order_id, amount, status, provider, created_at')
+        .select('id, order_id, amount, status, provider, provider_reference, created_at, updated_at')
         .order('created_at', { ascending: false })
         .limit(100),
     ]);
@@ -173,6 +174,27 @@ export default function AdminPage() {
       ...currentData,
       orders: currentData.orders.map((order) =>
         order.id === orderId ? { ...order, ...patch } : order
+      ),
+    }));
+  }
+
+  async function updatePayment(paymentId, patch) {
+    if (!supabase) return;
+    setError('');
+    const { error: updateError } = await supabase
+      .from('payments')
+      .update(patch)
+      .eq('id', paymentId);
+
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+
+    setData((currentData) => ({
+      ...currentData,
+      payments: currentData.payments.map((payment) =>
+        payment.id === paymentId ? { ...payment, ...patch } : payment
       ),
     }));
   }
@@ -305,6 +327,44 @@ export default function AdminPage() {
         {active === 'orders' && (
           <Panel title="All orders" subtitle="Monitor and manage every BG Smart Services order.">
             <OrderTable orders={data.orders} shopById={shopById} customerById={customerById} updateOrder={updateOrder} detailed />
+          </Panel>
+        )}
+
+        {active === 'payments' && (
+          <Panel title="Payment Management" subtitle="Review payment records and update payment status for customer orders.">
+            <div className="admin-payment-summary">
+              <div className="admin-payment-card"><span>Paid</span><strong>{data.payments.filter((payment) => payment.status === 'paid').length}</strong></div>
+              <div className="admin-payment-card"><span>Pending</span><strong>{data.payments.filter((payment) => payment.status === 'pending').length}</strong></div>
+              <div className="admin-payment-card"><span>Failed</span><strong>{data.payments.filter((payment) => payment.status === 'failed').length}</strong></div>
+              <div className="admin-payment-card"><span>Refunded</span><strong>{data.payments.filter((payment) => payment.status === 'refunded').length}</strong></div>
+            </div>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead><tr><th>Order</th><th>Customer</th><th>Method</th><th>Provider</th><th>Amount</th><th>Status</th><th>Created</th></tr></thead>
+                <tbody>
+                  {data.payments.map((payment) => {
+                    const order = data.orders.find((item) => item.id === payment.order_id);
+                    const customer = order ? customerById[order.customer_id] : null;
+                    return (
+                      <tr key={payment.id}>
+                        <td><strong>#{payment.order_id.slice(0, 8).toUpperCase()}</strong>{payment.provider_reference && <small className="admin-order-address">{payment.provider_reference}</small>}</td>
+                        <td>{customer?.full_name || 'Customer'}</td>
+                        <td>{order?.payment_method?.replace('_', ' ') || '—'}</td>
+                        <td>{payment.provider || '—'}</td>
+                        <td>{money(payment.amount)}</td>
+                        <td>
+                          <select className="admin-select" value={payment.status} onChange={(event) => updatePayment(payment.id, { status: event.target.value })} aria-label={`Update payment status for order ${payment.order_id.slice(0, 8)}`}>
+                            {['pending', 'paid', 'failed', 'refunded'].map((status) => <option key={status} value={status}>{status}</option>)}
+                          </select>
+                        </td>
+                        <td>{formatDate(payment.created_at)}</td>
+                      </tr>
+                    );
+                  })}
+                  {!data.payments.length && <EmptyRow label="No payment records yet." colSpan={7} />}
+                </tbody>
+              </table>
+            </div>
           </Panel>
         )}
 
