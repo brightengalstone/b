@@ -5,6 +5,7 @@ import {useSearchParams} from 'next/navigation';
 import {supabase} from '../../lib/supabase';
 import Link from 'next/link';
 import {CheckCircle2,Clock3,PackageCheck,ChefHat,Truck,MapPin,ArrowLeft} from 'lucide-react';
+import NotificationBell from '../../components/NotificationBell';
 
 const steps=[
   ['Order placed',CheckCircle2,'Your order has been received.'],
@@ -60,7 +61,7 @@ function TrackingContent(){
 
   return <main className="tracking-page">
     <div className="tracking-shell">
-      <div className="tracking-top"><Link href="/home" className="back-link"><ArrowLeft size={17}/> Back to Home</Link><span className="eyebrow">BG Smart Services</span></div>
+      <div className="tracking-top"><Link href="/home" className="back-link"><ArrowLeft size={17}/> Back to Home</Link><div className="tracking-top-actions"><NotificationBell /><span className="eyebrow">BG Smart Services</span></div></div>
       <section className="tracking-hero"><div><div className="eyebrow">Delivery tracking</div><h1>Follow your order.</h1><p>See the current order stage from confirmation through delivery.</p></div><div className="tracking-status"><Clock3 size={18}/><span>{loading?'Loading status':steps[current][0]}</span></div></section>
       {loading?<div className="card">Loading order details…</div>:<div className="tracking-grid">
         <section className="card tracking-card"><div className="tracking-order-head"><div><span className="eyebrow">Order number</span><h2>{id||'No order selected'}</h2></div><span className="tracking-pill">R65 delivery</span></div>
