@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useTheme } from '../../components/theme-provider';
 import Link from 'next/link';
 import {
   UserRound, MapPin, CreditCard, ShoppingBag, Heart, PackageCheck,
   Bell, HelpCircle, FileText, ShieldCheck, LockKeyhole, LogOut,
-  ChevronRight, Pencil, ArrowLeft
+  ChevronRight, Pencil, ArrowLeft, Sun, Moon, Monitor
 } from 'lucide-react';
 
 const accountLinks = [
@@ -31,6 +32,7 @@ const supportLinks = [
 export default function Account() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { preference, changeTheme } = useTheme();
 
   useEffect(() => {
     let active = true;
@@ -156,6 +158,25 @@ export default function Account() {
             </div>
           </section>
         </div>
+
+        <section className="account-appearance-card">
+          <div className="account-appearance-head">
+            <div className="account-link-icon"><Monitor size={20} /></div>
+            <div><strong>Appearance</strong><p>Choose how BG Smart Services looks on this device.</p></div>
+          </div>
+          <div className="theme-choice-grid" role="group" aria-label="Theme preference">
+            {[
+              ['system', Monitor, 'System', 'Follow device settings'],
+              ['light', Sun, 'Light', 'Always use light mode'],
+              ['dark', Moon, 'Dark', 'Always use dark mode']
+            ].map(([value, Icon, label, description]) => (
+              <button key={value} type="button" className={`theme-choice ${preference === value ? 'selected' : ''}`} onClick={() => changeTheme(value)} aria-pressed={preference === value}>
+                <Icon size={19} />
+                <span><strong>{label}</strong><small>{description}</small></span>
+              </button>
+            ))}
+          </div>
+        </section>
 
         <section className="account-security-card">
           <div className="account-security-icon"><LockKeyhole size={20} /></div>
