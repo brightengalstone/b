@@ -8,3 +8,6 @@
 .admin-payroll-week .admin-table-wrap{border:0;border-radius:0}
 .admin-payroll-week .admin-primary.compact,.admin-payroll-week .admin-secondary.compact{white-space:nowrap}
 @media (max-width:720px){.admin-payroll-toolbar,.admin-payroll-week-head{align-items:flex-start;flex-direction:column}.admin-payroll-toolbar .admin-primary{width:100%}}
+
+
+.admin-login-form{display:grid;gap:12px;margin:22px 0 14px}.admin-login-form .admin-primary{width:100%;justify-content:center}.admin-gate-card>.admin-secondary{display:flex;width:100%;justify-content:center;box-sizing:border-box}.admin-gate-card .admin-alert{margin-top:12px}
