@@ -1,5 +1,6 @@
 import './globals.css';
 import 'leaflet/dist/leaflet.css';
+import { ThemeProvider } from '../components/theme-provider';
 
 export const metadata = {
   title: 'BG Smart Services',
@@ -15,5 +16,5 @@ export const viewport = {
 };
 
 export default function Layout({ children }) {
-  return <>{children}</>;
+  return <ThemeProvider>{children}</ThemeProvider>;
 }
