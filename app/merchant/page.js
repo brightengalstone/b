@@ -6,7 +6,8 @@ import { Activity, Bell, CheckCircle2, Clock3, PackageCheck, RefreshCw, Store, X
 import { supabase } from '../../lib/supabase';
 
 const NEXT = { pending:['Confirm order','confirmed'], confirmed:['Start preparing','preparing'], preparing:['Mark ready for collection','ready'] };
-const label = s => String(s||'').replaceAll('_',' ');\nconst money = n => 'R' + Number(n||0).toFixed(2);
+const label = s => String(s||'').replaceAll('_',' ');
+const money = n => 'R' + Number(n||0).toFixed(2);
 
 export default function MerchantPage(){
   const [user,setUser]=useState(null),[merchant,setMerchant]=useState(null),[retailer,setRetailer]=useState(null),[orders,setOrders]=useState([]),[items,setItems]=useState({}),[loading,setLoading]=useState(true),[busy,setBusy]=useState(''),[message,setMessage]=useState(''),[lastUpdate,setLastUpdate]=useState(new Date()),[tick,setTick]=useState(Date.now());
@@ -35,8 +36,10 @@ export default function MerchantPage(){
     setBusy('');
   }
   useEffect(()=>{(async()=>{if(!supabase){setMessage('Supabase is not configured.');setLoading(false);return;}const {data}=await supabase.auth.getUser();if(!data?.user){location.href='/signin';return;}setUser(data.user);await load(data.user);})();},[]);
-  useEffect(()=>{if(!supabase||!user?.id)return;const ch=supabase.channel('merchant-orders-'+user.id).on('postgres_changes',{event:'*',schema:'public',table:'orders'},()=>load()).subscribe();const timer=setInterval(()=>load(),15000);return()=>{supabase.removeChannel(ch);clearInterval(timer)}},[user?.id]);\nuseEffect(()=>{const t=setInterval(()=>setTick(Date.now()),1000);return()=>clearInterval(t)},[]);
-  const active=useMemo(()=>orders.filter(o=>!['delivered','cancelled'].includes(o.status)),[orders]);\nconst counts=useMemo(()=>({pending:active.filter(o=>o.status==='pending').length,preparing:active.filter(o=>['confirmed','preparing'].includes(o.status)).length,ready:active.filter(o=>['ready','assigned','picked_up'].includes(o.status)).length}),[active]);
+  useEffect(()=>{if(!supabase||!user?.id)return;const ch=supabase.channel('merchant-orders-'+user.id).on('postgres_changes',{event:'*',schema:'public',table:'orders'},()=>load()).subscribe();const timer=setInterval(()=>load(),15000);return()=>{supabase.removeChannel(ch);clearInterval(timer)}},[user?.id]);
+useEffect(()=>{const t=setInterval(()=>setTick(Date.now()),1000);return()=>clearInterval(t)},[]);
+  const active=useMemo(()=>orders.filter(o=>!['delivered','cancelled'].includes(o.status)),[orders]);
+const counts=useMemo(()=>({pending:active.filter(o=>o.status==='pending').length,preparing:active.filter(o=>['confirmed','preparing'].includes(o.status)).length,ready:active.filter(o=>['ready','assigned','picked_up'].includes(o.status)).length}),[active]);
   if(loading)return <main className="merchant-page"><div className="merchant-shell merchant-center"><RefreshCw className="merchant-spin"/> Loading shop dashboard…</div></main>;
   if(!merchant?.approved||!retailer)return <main className="merchant-page"><div className="merchant-shell merchant-center"><Store size={32}/><h1>Shop dashboard not configured</h1><p>An approved merchant account must be linked to a BG retailer before orders can be managed.</p><Link href="/home" className="merchant-button secondary">Back to home</Link></div></main>;
   return <main className="merchant-page"><div className="merchant-shell">
