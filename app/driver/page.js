@@ -230,7 +230,13 @@ export default function DriverPage() {
             .limit(1)
             .maybeSingle();
 
-          if (!activeOrder) await claimNext();
+          if (!activeOrder) {
+            const { data: orderId, error: claimError } = await supabase.rpc('claim_next_delivery');
+            if (!claimError && orderId) {
+              await loadOrder(currentUser.id);
+              if (mounted) setMessage('A delivery has been assigned to you.');
+            }
+          }
         }
       }, 5000);
 
