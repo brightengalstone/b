@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   ChevronRight,
   CircleDollarSign,
+  FileText,
   MessageSquare,
   Clock3,
   LogOut,
@@ -34,6 +35,7 @@ const NAV = [
   { id: 'payments', label: 'Payments', icon: CircleDollarSign },
   { id: 'delivery', label: 'Delivery', icon: Truck },
   { id: 'drivers', label: 'Drivers', icon: UserRoundCheck },
+  { id: 'payroll', label: 'Driver Payroll', icon: FileText },
   { id: 'support', label: 'Support', icon: MessageSquare },
 ];
 
@@ -61,6 +63,8 @@ export default function AdminPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [creatingDriver, setCreatingDriver] = useState(false);
   const [sendingSupportReply, setSendingSupportReply] = useState(null);
+  const [generatingPayroll, setGeneratingPayroll] = useState(false);
+  const [payingPayrollItem, setPayingPayrollItem] = useState(null);
   const [driverForm, setDriverForm] = useState({ email: '', password: '', full_name: '', phone: '', vehicle_type: '', vehicle_registration: '' });
   const [error, setError] = useState('');
   const [data, setData] = useState({
@@ -71,6 +75,8 @@ export default function AdminPage() {
     payments: [],
     driverProfiles: [],
     supportRequests: [],
+    payrollWeeks: [],
+    payrollItems: [],
   });
 
   useEffect(() => {
@@ -162,7 +168,7 @@ export default function AdminPage() {
     if (showSpinner) setRefreshing(true);
     setError('');
 
-    const [orders, shops, products, customers, payments, driverProfiles, supportRequests] = await Promise.all([
+    const [orders, shops, products, customers, payments, driverProfiles, supportRequests, payrollWeeks, payrollItems] = await Promise.all([
       supabase
         .from('orders')
         .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id, payment_method')
@@ -196,9 +202,11 @@ export default function AdminPage() {
         .select('id, customer_id, order_id, category, message, status, admin_reply, created_at, updated_at')
         .order('created_at', { ascending: false })
         .limit(100),
+      supabase.from('driver_payroll_weeks').select('id, week_start, week_end, driver_rate_percent, delivery_fee, status, total_deliveries, total_driver_gross, total_deductions, total_net, created_at, approved_at, paid_at').order('week_start', { ascending: false }).limit(12),
+      supabase.from('driver_payroll_items').select('id, payroll_week_id, driver_id, completed_deliveries, delivery_fee, driver_rate_percent, gross_amount, uif_deduction, paye_deduction, other_deductions, net_amount, payslip_number, payment_status, payment_reference, paid_at, created_at').order('created_at', { ascending: false }).limit(1000),
     ]);
 
-    const failures = [orders, shops, products, customers, payments, driverProfiles, supportRequests].filter((item) => item.error);
+    const failures = [orders, shops, products, customers, payments, driverProfiles, supportRequests, payrollWeeks, payrollItems].filter((item) => item.error);
     if (failures.length) {
       setError(failures.map((item) => item.error.message).join(' | '));
     }
@@ -211,6 +219,8 @@ export default function AdminPage() {
       payments: payments.data || [],
       driverProfiles: driverProfiles.data || [],
       supportRequests: supportRequests.data || [],
+      payrollWeeks: payrollWeeks.data || [],
+      payrollItems: payrollItems.data || [],
     });
 
     if (showSpinner) setRefreshing(false);
@@ -375,6 +385,111 @@ export default function AdminPage() {
         driver.id === driverId ? { ...driver, ...patch } : driver
       ),
     }));
+  }
+
+  function getLastCompletedWeek() {
+    const today = new Date();
+    const day = today.getDay();
+    const end = new Date(today);
+    end.setDate(today.getDate() - day);
+    end.setHours(0, 0, 0, 0);
+    const start = new Date(end);
+    start.setDate(end.getDate() - 6);
+    const iso = (value) => value.toISOString().slice(0, 10);
+    return { start: iso(start), end: iso(end) };
+  }
+
+  async function generatePayroll() {
+    if (!supabase) return;
+    setGeneratingPayroll(true);
+    setError('');
+    const { start, end } = getLastCompletedWeek();
+    if (data.payrollWeeks.some((week) => week.week_start === start && week.week_end === end)) {
+      setActive('payroll');
+      setGeneratingPayroll(false);
+      return;
+    }
+    const startIso = new Date(start + 'T00:00:00.000Z').toISOString();
+    const endDate = new Date(end + 'T00:00:00.000Z');
+    endDate.setUTCDate(endDate.getUTCDate() + 1);
+    const { data: deliveredOrders, error: orderError } = await supabase.from('orders')
+      .select('id, driver_id, delivery_fee, status, updated_at')
+      .eq('status', 'delivered').gte('updated_at', startIso).lt('updated_at', endDate.toISOString()).not('driver_id', 'is', null);
+    if (orderError) { setError(orderError.message); setGeneratingPayroll(false); return; }
+
+    const { data: week, error: weekError } = await supabase.from('driver_payroll_weeks')
+      .insert({ week_start: start, week_end: end, driver_rate_percent: 15, delivery_fee: 65, status: 'draft' }).select().single();
+    if (weekError) { setError(weekError.message); setGeneratingPayroll(false); return; }
+
+    const approvedDrivers = data.driverProfiles.filter((driver) => driver.approved);
+    const counts = {};
+    const fees = {};
+    (deliveredOrders || []).forEach((order) => {
+      if (!order.driver_id) return;
+      counts[order.driver_id] = (counts[order.driver_id] || 0) + 1;
+      fees[order.driver_id] = (fees[order.driver_id] || 0) + Number(order.delivery_fee || 65);
+    });
+
+    const items = approvedDrivers.map((driver) => {
+      const deliveries = counts[driver.id] || 0;
+      const gross = Number(((fees[driver.id] || deliveries * 65) * 0.15).toFixed(2));
+      return {
+        payroll_week_id: week.id, driver_id: driver.id, completed_deliveries: deliveries,
+        delivery_fee: 65, driver_rate_percent: 15, gross_amount: gross,
+        uif_deduction: 0, paye_deduction: 0, other_deductions: 0, net_amount: gross,
+        payslip_number: 'BG-PS-' + end.replaceAll('-', '') + '-' + driver.id.slice(0, 8).toUpperCase(),
+        payment_status: 'pending'
+      };
+    });
+    if (items.length) {
+      const { error: itemError } = await supabase.from('driver_payroll_items').insert(items);
+      if (itemError) {
+        await supabase.from('driver_payroll_weeks').delete().eq('id', week.id);
+        setError(itemError.message); setGeneratingPayroll(false); return;
+      }
+    }
+    const totalDeliveries = items.reduce((sum, item) => sum + item.completed_deliveries, 0);
+    const totalGross = items.reduce((sum, item) => sum + item.gross_amount, 0);
+    await supabase.from('driver_payroll_weeks').update({ total_deliveries: totalDeliveries, total_driver_gross: totalGross, total_net: totalGross }).eq('id', week.id);
+    await loadDashboard(false);
+    setActive('payroll');
+    setGeneratingPayroll(false);
+  }
+
+  async function markPayrollPaid(itemId) {
+    if (!supabase) return;
+    const reference = window.prompt('Enter the bank/payment reference for this driver payment:');
+    if (!reference?.trim()) return;
+    setPayingPayrollItem(itemId);
+    setError('');
+    const { error: paymentError } = await supabase.from('driver_payroll_items')
+      .update({ payment_status: 'paid', payment_reference: reference.trim(), paid_at: new Date().toISOString() }).eq('id', itemId);
+    if (paymentError) { setError(paymentError.message); setPayingPayrollItem(null); return; }
+    await loadDashboard(false);
+    setPayingPayrollItem(null);
+  }
+
+  function printPayslip(item) {
+    const driver = customerById[item.driver_id];
+    const week = data.payrollWeeks.find((row) => row.id === item.payroll_week_id);
+    const popup = window.open('', '_blank', 'width=760,height=900');
+    if (!popup) return;
+    popup.document.write('<html><head><title>' + item.payslip_number + '</title><style>body{font-family:Arial,sans-serif;padding:40px;color:#111}h1{margin-bottom:4px}.muted{color:#666}.row{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:12px 0}.total{font-size:22px;font-weight:700}.brand{font-weight:800;letter-spacing:.04em}</style></head><body>');
+    popup.document.write('<div class="brand">BG SMART SERVICES</div><h1>Driver Weekly Payslip</h1><p class="muted">Payslip ' + item.payslip_number + '</p>');
+    popup.document.write('<div class="row"><span>Driver</span><strong>' + (driver?.full_name || 'Driver') + '</strong></div>');
+    popup.document.write('<div class="row"><span>Payroll week</span><strong>' + (week?.week_start || '') + ' to ' + (week?.week_end || '') + '</strong></div>');
+    popup.document.write('<div class="row"><span>Completed deliveries</span><strong>' + item.completed_deliveries + '</strong></div>');
+    popup.document.write('<div class="row"><span>Delivery fee</span><strong>R' + Number(item.delivery_fee).toFixed(2) + '</strong></div>');
+    popup.document.write('<div class="row"><span>Driver share</span><strong>' + Number(item.driver_rate_percent).toFixed(2) + '%</strong></div>');
+    popup.document.write('<div class="row"><span>Gross earnings</span><strong>R' + Number(item.gross_amount).toFixed(2) + '</strong></div>');
+    popup.document.write('<div class="row"><span>UIF deduction</span><strong>R' + Number(item.uif_deduction).toFixed(2) + '</strong></div>');
+    popup.document.write('<div class="row"><span>PAYE deduction</span><strong>R' + Number(item.paye_deduction).toFixed(2) + '</strong></div>');
+    popup.document.write('<div class="row"><span>Other deductions</span><strong>R' + Number(item.other_deductions).toFixed(2) + '</strong></div>');
+    popup.document.write('<div class="row total"><span>Net payment</span><strong>R' + Number(item.net_amount).toFixed(2) + '</strong></div>');
+    popup.document.write('<p class="muted">Payment status: ' + item.payment_status + (item.payment_reference ? ' · Reference: ' + item.payment_reference : '') + '</p>');
+    popup.document.write('<p class="muted">Statutory deductions are only applied when confirmed by BG Smart Services payroll administration.</p>');
+    popup.document.write('</body></html>');
+    popup.document.close(); popup.focus(); popup.print();
   }
 
   async function signOut() {
@@ -595,6 +710,49 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
+          </Panel>
+        )}
+
+        {active === 'payroll' && (
+          <Panel title="Driver Payroll" subtitle="Weekly Sunday payroll based on verified completed deliveries. Driver share is 15% of the R65 delivery fee.">
+            <div className="admin-stat-grid">
+              <Stat icon={Truck} label="Driver rate" value="15%" />
+              <Stat icon={CircleDollarSign} label="Per completed delivery" value="R9.75" />
+              <Stat icon={Users} label="Approved drivers" value={data.driverProfiles.filter((driver) => driver.approved).length} />
+              <Stat icon={FileText} label="Payroll weeks" value={data.payrollWeeks.length} />
+            </div>
+            <div className="admin-payroll-toolbar">
+              <div><strong>Weekly payroll</strong><p>Generate the most recently completed Monday–Sunday period. Marking paid records the payment; the actual bank transfer remains with your banking/payment process.</p></div>
+              <button className="admin-primary" onClick={generatePayroll} disabled={generatingPayroll}>{generatingPayroll ? 'Generating...' : 'Generate last completed week'}</button>
+            </div>
+            {data.payrollWeeks.map((week) => {
+              const items = data.payrollItems.filter((item) => item.payroll_week_id === week.id);
+              return (
+                <section className="admin-payroll-week" key={week.id}>
+                  <div className="admin-payroll-week-head">
+                    <div><h3>{week.week_start} to {week.week_end}</h3><p>{week.total_deliveries} completed deliveries · Gross driver pool {money(week.total_driver_gross)}</p></div>
+                    <span className={week.status === 'paid' ? 'admin-status success' : 'admin-status muted'}>{week.status}</span>
+                  </div>
+                  <div className="admin-table-wrap"><table className="admin-table">
+                    <thead><tr><th>Driver</th><th>Deliveries</th><th>Gross</th><th>Deductions</th><th>Net</th><th>Payslip</th><th>Payment</th></tr></thead>
+                    <tbody>
+                      {items.map((item) => {
+                        const driver = customerById[item.driver_id];
+                        const deductions = Number(item.uif_deduction || 0) + Number(item.paye_deduction || 0) + Number(item.other_deductions || 0);
+                        return <tr key={item.id}>
+                          <td><strong>{driver?.full_name || 'Driver'}</strong><small className="admin-order-address">{driver?.phone || ''}</small></td>
+                          <td>{item.completed_deliveries}</td><td>{money(item.gross_amount)}</td><td>{money(deductions)}</td><td><strong>{money(item.net_amount)}</strong></td>
+                          <td><button className="admin-secondary compact" onClick={() => printPayslip(item)}>Print payslip</button></td>
+                          <td>{item.payment_status === 'paid' ? <span className="admin-status success">Paid{item.payment_reference ? ' · ' + item.payment_reference : ''}</span> : <button className="admin-primary compact" onClick={() => markPayrollPaid(item.id)} disabled={payingPayrollItem === item.id}>{payingPayrollItem === item.id ? 'Saving...' : 'Mark paid'}</button>}</td>
+                        </tr>;
+                      })}
+                      {!items.length && <EmptyRow label="No payroll items for this week." colSpan={7} />}
+                    </tbody>
+                  </table></div>
+                </section>
+              );
+            })}
+            {!data.payrollWeeks.length && <div className="admin-empty">No payroll has been generated yet. Generate the last completed week to create payroll records.</div>}
           </Panel>
         )}
 
