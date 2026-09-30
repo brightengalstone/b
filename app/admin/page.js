@@ -67,6 +67,9 @@ export default function AdminPage() {
   const [payingPayrollItem, setPayingPayrollItem] = useState(null);
   const [driverForm, setDriverForm] = useState({ email: '', password: '', full_name: '', phone: '', vehicle_type: '', vehicle_registration: '' });
   const [error, setError] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminSigningIn, setAdminSigningIn] = useState(false);
   const [data, setData] = useState({
     orders: [],
     shops: [],
@@ -492,6 +495,54 @@ export default function AdminPage() {
     popup.document.close(); popup.focus(); popup.print();
   }
 
+  async function adminSignIn(event) {
+    event.preventDefault();
+    if (!supabase) return;
+    setAdminSigningIn(true);
+    setError('');
+
+    const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+      email: adminEmail.trim(),
+      password: adminPassword,
+    });
+
+    if (signInError) {
+      setError(signInError.message);
+      setAdminSigningIn(false);
+      return;
+    }
+
+    const currentUser = authData?.user;
+    const { data: currentProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, full_name, phone, role')
+      .eq('id', currentUser.id)
+      .maybeSingle();
+
+    if (profileError) {
+      await supabase.auth.signOut();
+      setError(profileError.message);
+      setAdminSigningIn(false);
+      return;
+    }
+
+    if (currentProfile?.role !== 'admin') {
+      await supabase.auth.signOut();
+      setUser(null);
+      setProfile(null);
+      setError('This account does not have administrator access.');
+      setAdminSigningIn(false);
+      return;
+    }
+
+    setUser(currentUser);
+    setProfile(currentProfile);
+    setAdminPassword('');
+    await loadDashboard(false);
+    setLoading(false);
+    setAdminSigningIn(false);
+  }
+
   async function signOut() {
     if (supabase) await supabase.auth.signOut();
     window.location.href = '/signin';
@@ -525,9 +576,15 @@ export default function AdminPage() {
         <div className="admin-gate-card">
           <div className="admin-brand-mark">BG</div>
           <p className="admin-kicker">BG Smart Services</p>
-          <h1>Admin sign in required</h1>
-          <p>Sign in with an administrator account to access this dashboard.</p>
-          <Link className="admin-primary" href="/signin">Go to sign in</Link>
+          <h1>Admin Sign In</h1>
+          <p>Sign in with your administrator email and password to continue.</p>
+          <form onSubmit={adminSignIn} className="admin-login-form">
+            <input className="admin-input" type="email" placeholder="Admin email address" value={adminEmail} onChange={(event) => setAdminEmail(event.target.value)} autoComplete="email" required />
+            <input className="admin-input" type="password" placeholder="Admin password" value={adminPassword} onChange={(event) => setAdminPassword(event.target.value)} autoComplete="current-password" required />
+            <button className="admin-primary" type="submit" disabled={adminSigningIn}>{adminSigningIn ? 'Signing in...' : 'Sign in to Admin'}</button>
+          </form>
+          {error && <div className="admin-alert"><XCircle size={18} /><span>{error}</span></div>}
+          <Link className="admin-secondary" href="/signin">Customer sign in</Link>
         </div>
       </main>
     );
