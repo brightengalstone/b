@@ -317,3 +317,41 @@ button,input,select,textarea{font:inherit}
   .market-shell,.checkout-shell,.orders-shell,.account-shell,.settings-shell,.favorites-shell,.legal-shell,.payment-shell,.success-shell,.tracking-shell{width:calc(100% - 30px);padding-left:0;padding-right:0}
   .cart-shell{width:calc(100% - 30px)}
 }
+
+
+/* BG Smart Services unified theme system */
+:root{
+  --bg:#f4f7f5;--surface:#ffffff;--surface-2:#eef3ef;--text:#102018;--muted:#637268;
+  --line:#dfe8e1;--brand:#12bd60;--brand-strong:#079b4a;--brand-soft:#e5f8ed;--shadow:0 18px 50px rgba(16,32,24,.09);
+}
+html[data-theme="dark"]{
+  --bg:#07120c;--surface:#0d1c14;--surface-2:#12261a;--text:#f1faf4;--muted:#9ab0a2;
+  --line:#20372a;--brand:#19cf67;--brand-strong:#10b958;--brand-soft:#123b25;--shadow:0 22px 60px rgba(0,0,0,.32);
+}
+html,body{background:var(--bg);color:var(--text);transition:background-color .22s ease,color .22s ease}
+.account-page,.account-shell,.account-section,.account-profile-card,.account-quick-card,.account-list,.account-security-card,.account-signin-card,.account-appearance-card{color:var(--text)}
+.account-quick-card,.account-list,.account-profile-card,.account-security-card,.account-appearance-card,.account-signin-card{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+.account-quick-card:hover,.account-list-row:hover{background:var(--surface-2)}
+.account-profile-copy p,.account-quick-card small,.account-list-row small,.account-security-card p,.account-appearance-head p{color:var(--muted)}
+.account-link-icon,.account-profile-icon{background:var(--brand-soft);color:var(--brand-strong)}
+.account-appearance-card{border:1px solid var(--line);border-radius:24px;padding:22px;margin:24px 0;box-shadow:var(--shadow)}
+.account-appearance-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.account-appearance-head>div:last-child{display:grid;gap:3px}
+.account-appearance-head strong{font-size:16px}.account-appearance-head p{margin:0;font-size:13px}
+.theme-choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.theme-choice{appearance:none;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:16px;padding:15px;text-align:left;display:flex;align-items:flex-start;gap:11px;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease}
+.theme-choice:hover{transform:translateY(-1px)}
+.theme-choice.selected{border-color:var(--brand);background:var(--brand-soft);box-shadow:0 0 0 2px color-mix(in srgb,var(--brand) 18%,transparent)}
+.theme-choice svg{color:var(--brand);flex:none}.theme-choice span{display:grid;gap:3px}.theme-choice strong{font-size:13px}.theme-choice small{font-size:11px;color:var(--muted);line-height:1.35}
+@media(max-width:700px){.theme-choice-grid{grid-template-columns:1fr}.account-appearance-card{padding:18px;border-radius:20px}}
+
+/* Unified BG customer chrome: adaptive, touch-friendly and consistent */
+.mobile-app-shell,.app-shell,.market-shell,.cart-shell,.checkout-shell,.orders-shell,.tracking-shell{background:var(--bg);color:var(--text)}
+.mobile-home-header,.mobile-home-search,.home-location,.home-store-card,.home-delivery-strip{color:var(--text)}
+.mobile-home-search,.home-store-card,.home-delivery-strip{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+.home-location,.mobile-section-title p,.home-store-info span{color:var(--muted)}
+.home-promo{background:linear-gradient(135deg,#0a2517,#0b3b22 60%,#0b2417);border-color:rgba(25,207,103,.25)}
+.mobile-bottom-nav{background:color-mix(in srgb,var(--surface) 94%,transparent);border-color:var(--line)}
+.mobile-bottom-nav a,.mobile-bottom-nav button{color:var(--muted)}
+.mobile-bottom-nav .active{color:var(--brand)}
+@media(min-width:768px){.mobile-app-shell{min-height:100svh}.mobile-home-header,.home-location,.mobile-home-search,.home-promo,.home-categories,.home-order-again,.home-nearby,.home-delivery-strip{margin-left:auto;margin-right:auto}.mobile-bottom-nav{max-width:720px;left:50%;right:auto;transform:translateX(-50%);border:1px solid var(--line);border-radius:22px;bottom:18px}}
