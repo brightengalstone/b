@@ -236,3 +236,84 @@
 .notification-bell-dot{position:absolute;right:8px;top:7px;width:8px;height:8px;border-radius:50%;background:#19cf67;border:2px solid #06130d;box-sizing:content-box}
 .market-top-actions,.cart-top-actions,.orders-top-actions,.tracking-top-actions,.checkout-top-actions{display:flex;align-items:center;gap:10px}
 @media(max-width:560px){.notification-bell{width:40px;height:40px}.market-top-actions,.cart-top-actions,.orders-top-actions,.tracking-top-actions,.checkout-top-actions{gap:7px}}
+
+
+/* BG Smart Services — automatic phone / tablet / laptop responsive system */
+html{overflow-x:hidden}
+*,*::before,*::after{box-sizing:border-box}
+img,svg{max-width:100%}
+button,input,select,textarea{font:inherit}
+
+.mobile-app-shell{width:100%;max-width:none;margin:0;box-shadow:none;padding-bottom:90px}
+.mobile-home-header,.home-location,.mobile-home-search,.home-promo,.home-categories,.mobile-section-title,.order-again-row,.home-nearby,.home-delivery-strip{width:min(1180px,calc(100% - 40px));margin-left:auto;margin-right:auto}
+.mobile-home-header{padding:22px 0 14px}
+.home-location{height:38px;padding:0}
+.mobile-home-search{margin-top:18px;margin-bottom:18px}
+.home-promo{min-height:190px;border-radius:24px;padding:28px}
+.home-categories{border-radius:20px;padding:20px;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.mobile-section-title{margin-top:30px}
+.order-again-row{grid-auto-columns:minmax(180px,1fr);grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:initial;overflow:visible}
+.nearby-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:0}
+.home-delivery-strip{margin-top:24px;margin-bottom:24px}
+.mobile-bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(760px,calc(100% - 40px));bottom:14px;height:66px;border:1px solid var(--bg-line);border-radius:20px;box-shadow:0 16px 45px rgba(8,123,64,.14);overflow:hidden}
+
+@media(min-width:768px) and (max-width:1199px){
+  .mobile-home-header,.home-location,.mobile-home-search,.home-promo,.home-categories,.mobile-section-title,.order-again-row,.home-nearby,.home-delivery-strip{width:min(920px,calc(100% - 48px))}
+  .mobile-home-header{padding-top:24px}
+  .home-promo{min-height:205px}
+  .home-categories{grid-template-columns:repeat(4,1fr)}
+  .order-again-row{grid-template-columns:repeat(3,1fr)}
+  .nearby-grid{grid-template-columns:repeat(3,1fr)}
+  .mobile-bottom-nav{width:min(620px,calc(100% - 80px))}
+}
+
+@media(min-width:1200px){
+  .mobile-home-header{padding-top:26px}
+  .mobile-home-header h1{font-size:24px}
+  .mobile-home-header p{font-size:12px}
+  .round-icon{width:42px;height:42px}
+  .home-location{font-size:11px}
+  .mobile-home-search{height:54px;font-size:13px;border-radius:17px}
+  .home-promo{min-height:220px}
+  .home-promo strong{font-size:30px;max-width:360px}
+  .home-promo p{font-size:12px;max-width:430px}
+  .promo-art{width:150px;height:150px}
+  .home-categories{grid-template-columns:repeat(8,1fr)}
+  .home-categories a span{width:58px;height:58px}
+  .home-categories small{font-size:11px}
+  .mobile-section-title h2{font-size:22px}
+  .order-again-row{grid-template-columns:repeat(4,1fr);gap:14px}
+  .home-store-card{min-height:155px;padding:14px}
+  .home-store-image{height:82px}
+  .home-store-info strong{font-size:13px}
+  .home-store-info span{font-size:10px}
+  .nearby-grid{grid-template-columns:repeat(4,1fr)}
+  .nearby-grid .home-store-card{min-height:145px}
+}
+
+@media(max-width:767px){
+  .mobile-app-shell{padding-bottom:86px}
+  .mobile-home-header,.home-location,.mobile-home-search,.home-promo,.home-categories,.mobile-section-title,.order-again-row,.home-nearby,.home-delivery-strip{width:100%;max-width:none}
+  .mobile-home-header{padding-left:16px;padding-right:16px}
+  .home-location{padding-left:16px;padding-right:16px}
+  .mobile-home-search{margin-left:14px;margin-right:14px;width:calc(100% - 28px)}
+  .home-promo{margin-left:14px;margin-right:14px;width:calc(100% - 28px)}
+  .home-categories{border-radius:0}
+  .mobile-section-title{padding-left:14px;padding-right:14px}
+  .order-again-row{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:125px;overflow-x:auto}
+  .nearby-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:0 14px}
+  .home-delivery-strip{width:calc(100% - 28px)}
+  .mobile-bottom-nav{width:calc(100% - 20px);bottom:8px;height:68px;border-radius:18px}
+}
+
+@media(min-width:1200px){
+  .auth-layout{max-width:1180px}
+  .market-shell,.checkout-shell,.orders-shell,.account-shell,.settings-shell,.favorites-shell,.legal-shell{width:min(1180px,calc(100% - 64px))}
+  .cart-shell{width:min(1180px,calc(100% - 64px))}
+  .payment-shell,.success-shell,.tracking-shell{width:min(1100px,calc(100% - 64px))}
+}
+@media(max-width:767px){
+  .auth-layout{border-radius:20px}
+  .market-shell,.checkout-shell,.orders-shell,.account-shell,.settings-shell,.favorites-shell,.legal-shell,.payment-shell,.success-shell,.tracking-shell{width:calc(100% - 30px);padding-left:0;padding-right:0}
+  .cart-shell{width:calc(100% - 30px)}
+}
