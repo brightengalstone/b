@@ -612,3 +612,73 @@ a{color:inherit}
 .retail-market.fast-food .delivery-note{background:#111;color:#fff;border:0;border-radius:999px;padding:11px 16px;margin-top:25px}
 @media(max-width:760px){.retail-market.fast-food .market-shell{padding:12px 14px 75px}.retail-market.fast-food .fastfood-hero{padding:30px 23px;min-height:350px;display:block}.retail-market.fast-food .fastfood-hero h1{font-size:37px}.retail-market.fast-food .fastfood-hero-badge{width:135px;height:135px;margin:25px 0 0 auto}.retail-market.fast-food .fastfood-hero-badge strong{font-size:28px}.retail-market.fast-food .restaurant-grid{grid-template-columns:1fr}.retail-market.fast-food .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.retail-market.fast-food .product-image{height:145px}.retail-market.fast-food .product-card>.product-store,.retail-market.fast-food .product-card>h3,.retail-market.fast-food .product-card>.product-size,.retail-market.fast-food .product-card>.product-price-row,.retail-market.fast-food .product-card>.verified-price{margin-left:12px;margin-right:12px}.retail-market.fast-food .product-card>h3{font-size:14px}.retail-market.fast-food .market-top{padding-bottom:12px}}
 @media(max-width:420px){.retail-market.fast-food .product-grid{grid-template-columns:1fr}.retail-market.fast-food .product-image{height:190px}}
+
+
+/* Modern food cart */
+.food-cart-page{background:#f7f7f5!important;color:#171717!important;padding-bottom:40px}
+.food-cart-page .cart-shell{max-width:1180px;margin:auto;padding:18px 28px 70px}
+.food-cart-page .cart-topbar{display:flex;align-items:center;justify-content:space-between;padding-bottom:18px}
+.food-cart-page .cart-brand{display:flex;align-items:center;gap:10px;font-weight:900}
+.food-cart-page .cart-brand .brand-mark{width:40px;height:40px;border-radius:12px;background:#06c167;color:#07170f}
+.food-cart-page .cart-top-actions{display:flex;align-items:center;gap:10px}
+.food-cart-page .cart-back{background:#fff;border:1px solid #e3e3df;border-radius:999px;padding:10px 15px;font-size:12px;font-weight:800}
+.food-cart-page .food-cart-hero{background:#111;color:#fff;border-radius:24px;padding:32px 38px;margin:8px 0 22px;display:flex;align-items:center;justify-content:space-between}
+.food-cart-page .food-cart-hero .eyebrow{color:#70e3a6}
+.food-cart-page .food-cart-hero h1{font-size:42px;letter-spacing:-2px;margin:8px 0 5px}
+.food-cart-page .food-cart-hero p{color:#bdbdbd;margin:0;font-size:13px}
+.food-cart-page .cart-hero-icon{width:68px;height:68px;border-radius:20px;background:#06c167;color:#07170f;display:grid;place-items:center}
+.food-cart-page .cart-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+.food-cart-page .cart-store-card,.food-cart-page .food-cart-summary{background:#fff;border:1px solid #e5e5e1;border-radius:20px;box-shadow:0 8px 26px #00000008}
+.food-cart-page .cart-store-card{overflow:hidden;margin-bottom:16px}
+.food-cart-page .cart-store-header{padding:18px;display:flex;align-items:center;gap:12px;background:#fafaf8;border-bottom:1px solid #ededE9}
+.food-cart-page .cart-store-icon{width:44px;height:44px;border-radius:13px;background:#e9f8f0;color:#06a958;display:grid;place-items:center;flex:none}
+.food-cart-page .cart-store-header h2{font-size:17px;margin:3px 0}
+.food-cart-page .cart-store-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:#06a958;font-weight:900}
+.food-cart-page .cart-store-location{font-size:11px;color:#777;margin:0}
+.food-cart-page .cart-store-count{margin-left:auto;font-size:10px;font-weight:800;color:#777;white-space:nowrap}
+.food-cart-page .cart-product-list{padding:0 18px}
+.food-cart-page .cart-product-row{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:15px;align-items:center;padding:17px 0;border-bottom:1px solid #eee}
+.food-cart-page .cart-product-row:last-child{border-bottom:0}
+.food-cart-page .cart-product-visual{width:76px;height:76px;border-radius:14px;overflow:hidden;background:#f0f0ed}
+.food-cart-page .cart-product-image{width:100%;height:100%;object-fit:cover;display:block}
+.food-cart-page .cart-product-placeholder{height:100%;display:grid;place-items:center;color:#06a958}
+.food-cart-page .cart-product-copy h3{font-size:15px;margin:0 0 4px}
+.food-cart-page .cart-product-copy p{font-size:11px;color:#777;margin:0}
+.food-cart-page .cart-product-controls{display:flex;align-items:center;gap:14px;margin-top:11px}
+.food-cart-page .cart-quantity{display:flex;align-items:center;border:1px solid #deded9;border-radius:999px;overflow:hidden}
+.food-cart-page .cart-quantity button{width:31px;height:30px;color:#111;font-size:18px}
+.food-cart-page .cart-quantity span{min-width:28px;text-align:center;font-size:12px;font-weight:800}
+.food-cart-page .cart-remove{display:flex;align-items:center;gap:5px;color:#777;font-size:11px}
+.food-cart-page .cart-line-total{font-size:14px;white-space:nowrap}
+.food-cart-page .cart-store-switch{display:flex;justify-content:space-between;gap:12px;padding:11px 18px;background:#fff7e8;color:#795400;font-size:11px}
+.food-cart-page .cart-store-switch .text-button{color:#795400}
+.food-cart-page .cart-actions{display:flex;justify-content:space-between;padding:4px 2px}
+.food-cart-page .text-link,.food-cart-page .cart-actions .text-button{font-size:12px;font-weight:800}
+.food-cart-page .text-link{color:#06a958}
+.food-cart-page .food-cart-summary{position:sticky;top:20px;padding:22px}
+.food-cart-page .cart-summary-heading{display:flex;justify-content:space-between;align-items:start}
+.food-cart-page .cart-summary-heading h2{font-size:21px;letter-spacing:-.7px;margin:5px 0 0}
+.food-cart-page .cart-summary-count{width:34px;height:34px;border-radius:50%;background:#e9f8f0;color:#08713d;display:grid;place-items:center;font-size:11px;font-weight:900}
+.food-cart-page .cart-summary-lines{margin-top:20px;display:grid;gap:12px}
+.food-cart-page .cart-summary-lines div,.food-cart-page .cart-summary-total{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.food-cart-page .cart-summary-lines span{color:#777}
+.food-cart-page .cart-summary-total{border-top:1px solid #e8e8e5;margin-top:18px;padding-top:17px;font-size:14px}
+.food-cart-page .cart-summary-total strong{font-size:24px;letter-spacing:-.7px}
+.food-cart-page .cart-delivery-note{display:flex;gap:10px;margin-top:18px;padding:13px;background:#f4fbf7;border-radius:13px}
+.food-cart-page .cart-note-icon{width:34px;height:34px;border-radius:10px;background:#06c167;color:#07170f;display:grid;place-items:center;flex:none}
+.food-cart-page .cart-delivery-note strong{font-size:11px}.food-cart-page .cart-delivery-note p{font-size:10px;color:#777;margin:3px 0 0}
+.food-cart-page .cart-hours{margin-top:12px!important;border-radius:12px!important;font-size:11px}
+.food-cart-page .cart-checkout{width:100%;margin-top:14px;background:#06c167!important;color:#07170f!important;border-color:#06c167!important;border-radius:999px!important;font-weight:900}
+.food-cart-page .cart-secure-note{text-align:center;color:#999;font-size:10px;margin:10px 0 0}
+.food-cart-page .food-cart-empty{max-width:650px;margin:45px auto;background:#fff;border:1px solid #e5e5e1;border-radius:22px;padding:50px 25px;text-align:center;box-shadow:0 10px 30px #00000008}
+.food-cart-page .cart-empty-icon{width:72px;height:72px;border-radius:22px;background:#e9f8f0;color:#06a958;display:grid;place-items:center;margin:0 auto 20px}
+.food-cart-page .food-cart-empty h2{font-size:30px;letter-spacing:-1.2px;margin:8px 0}
+.food-cart-page .food-cart-empty p{color:#777;line-height:1.55;font-size:13px;max-width:450px;margin:0 auto 22px}
+@media(max-width:800px){
+ .food-cart-page .cart-shell{padding:12px 14px 80px}.food-cart-page .cart-topbar{padding-bottom:12px}.food-cart-page .cart-back{display:none}
+ .food-cart-page .food-cart-hero{padding:25px 22px;border-radius:20px}.food-cart-page .food-cart-hero h1{font-size:34px}.food-cart-page .cart-hero-icon{width:54px;height:54px}
+ .food-cart-page .cart-layout{grid-template-columns:1fr}.food-cart-page .food-cart-summary{position:static}
+ .food-cart-page .cart-product-row{grid-template-columns:62px minmax(0,1fr);gap:12px}.food-cart-page .cart-product-visual{width:62px;height:62px}.food-cart-page .cart-line-total{grid-column:2;justify-self:end;margin-top:-45px}
+ .food-cart-page .cart-product-controls{gap:10px}.food-cart-page .cart-remove span{display:none}
+ .food-cart-page .cart-store-header{padding:15px}.food-cart-page .cart-product-list{padding:0 15px}
+}
