@@ -80,7 +80,7 @@ export default function Cart() {
   const canCheckout = items.length > 0 && stores.length === 1 && status.open;
 
   return (
-    <main className="cart-page">
+    <main className="cart-page food-cart-page">
       <div className="cart-shell">
         <div className="cart-topbar">
           <Link className="cart-brand" href="/marketplace" aria-label="Back to marketplace">
@@ -89,7 +89,7 @@ export default function Cart() {
           <div className="cart-top-actions"><NotificationBell /><Link className="cart-back" href="/marketplace">Continue shopping</Link></div>
         </div>
 
-        <header className="cart-hero">
+        <header className="cart-hero food-cart-hero">
           <div>
             <div className="eyebrow">Shopping cart</div>
             <h1>Your cart</h1>
@@ -100,7 +100,7 @@ export default function Cart() {
         </header>
 
         {!items.length ? (
-          <section className="cart-empty">
+          <section className="cart-empty food-cart-empty">
             <div className="cart-empty-icon"><CartIcon /></div>
             <h2>Your cart is empty</h2>
             <p>Browse groceries, meals and products from approved local businesses and add what you need.</p>
@@ -158,7 +158,7 @@ export default function Cart() {
               </div>
             </section>
 
-            <aside className="cart-summary-card" aria-label="Order summary">
+            <aside className="cart-summary-card food-cart-summary" aria-label="Order summary">
               <div className="cart-summary-heading">
                 <div><span className="eyebrow">Order summary</span><h2>Checkout total</h2></div>
                 <span className="cart-summary-count">{itemCount}</span>
