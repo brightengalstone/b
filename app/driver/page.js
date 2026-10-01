@@ -318,7 +318,7 @@ export default function DriverPage() {
 
               <div className="driver-shop">
                 <div className="driver-icon-box"><Store size={21} /></div>
-                <div><span>Shop here</span><strong>{retailer?.name || 'Selected shop'}</strong><small>{retailer?.shopping_location || retailer?.pickup_address || 'Pickup address not set'}</small></div>
+                <div><span>COLLECT FROM</span><strong>{retailer?.name || 'Selected shop'}</strong><small>{retailer?.pickup_address || retailer?.shopping_location || 'Pickup address not set'}</small></div>
                 {retailer?.directions_url && <a href={retailer.directions_url} target="_blank" rel="noreferrer" className="driver-map-link"><MapPin size={16} /> Directions</a>}
               </div>
 
