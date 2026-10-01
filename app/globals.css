@@ -728,3 +728,19 @@ a{color:inherit}
  .checkout-heading{padding-top:20px!important}.account-hero{padding:27px 22px!important;border-radius:20px}
  .account-hero h1{font-size:36px!important}
 }
+
+
+/* Welcome + authentication polish */
+.mobile-auth-screen{min-height:100svh;background:#f7f7f5!important}
+.mobile-auth-brand{padding:28px 24px!important;background:#111!important}
+.mobile-auth-brand a{max-width:1180px;margin:auto;color:#fff!important}
+.mobile-auth-brand .bg-logo-word{color:#06c167!important}
+.mobile-auth-card{border-radius:24px!important;border:1px solid #e5e5e1!important;box-shadow:0 14px 40px #0000000d!important}
+.mobile-auth-title h1{letter-spacing:-1.5px!important}
+.mobile-auth-form input{border-radius:12px!important;border-color:#deded9!important;background:#fff!important}
+.mobile-auth-form input:focus{border-color:#06c167!important;box-shadow:0 0 0 3px #06c16718!important}
+.mobile-green-button{background:#06c167!important;border-color:#06c167!important;color:#07170f!important;border-radius:999px!important;font-weight:900}
+.mobile-text-button{color:#08713d!important}
+.terms-check a{color:#08713d!important;font-weight:800}
+.landing-primary{background:#06c167!important;color:#07170f!important}
+@media(max-width:560px){.mobile-auth-card{margin:0 14px 24px!important;border-radius:20px!important}.mobile-auth-brand{padding:22px 18px!important}}
