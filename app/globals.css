@@ -524,3 +524,57 @@ a{color:inherit}
   .auth-card{padding:32px 22px}
   .btn{min-height:46px}
 }
+
+
+/* BG Smart Services — food delivery UI rebuild */
+.delivery-home{min-height:100vh;background:#f7f7f5;color:#171717;padding-bottom:92px}
+.delivery-header{max-width:1180px;margin:auto;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.delivery-header-left,.delivery-header-actions{display:flex;align-items:center;gap:22px}
+.delivery-logo{display:flex;align-items:center;gap:10px;color:#111;text-decoration:none;font-size:18px}
+.delivery-logo span{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#06c167;color:#fff;font-weight:900}
+.delivery-logo strong{font-size:17px;letter-spacing:-.5px}
+.delivery-address{display:flex;align-items:center;gap:9px;padding-left:22px;border-left:1px solid #ddd;color:#111}
+.delivery-address small{display:block;font-size:9px;letter-spacing:1.2px;color:#777;font-weight:800}
+.delivery-address strong{font-size:13px}
+.delivery-header-actions{gap:9px}
+.delivery-header-actions .round-icon{display:grid;place-items:center;width:42px;height:42px;border:1px solid #e1e1df;border-radius:50%;background:#fff;color:#111;text-decoration:none;position:relative}
+.delivery-header-actions .round-icon i{position:absolute;right:8px;top:7px;width:7px;height:7px;border-radius:50%;background:#06c167}
+.desktop-more{border:1px solid #e1e1df;cursor:pointer}
+.delivery-hero{max-width:1180px;min-height:410px;margin:12px auto 0;border-radius:28px;background:#111;overflow:hidden;display:grid;grid-template-columns:1.1fr .9fr;position:relative;color:#fff}
+.delivery-hero-copy{padding:62px 64px;position:relative;z-index:2}
+.hero-label{font-size:11px;letter-spacing:2px;color:#70e3a6;font-weight:800}
+.delivery-hero h1{font-size:58px;line-height:.98;letter-spacing:-3px;margin:18px 0 18px}
+.delivery-hero h1 em{color:#06c167;font-style:normal}
+.delivery-hero p{max-width:510px;color:#c8c8c8;line-height:1.65;font-size:16px}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:#06c167;color:#07170f;text-decoration:none;font-weight:800;padding:14px 19px;border-radius:999px;margin-top:12px}
+.delivery-hero-art{position:relative;min-height:410px}
+.hero-ring{position:absolute;width:390px;height:390px;border-radius:50%;background:#06c167;right:-30px;top:10px;opacity:.95}
+.hero-food-card{position:absolute;right:65px;top:62px;width:190px;padding:22px;border-radius:20px;background:#fff;color:#111;box-shadow:0 25px 60px #0007;display:grid;gap:7px}
+.hero-food-card svg{color:#06c167}.hero-food-card strong{font-size:20px}.hero-food-card span{font-size:12px;color:#777}
+.hero-tuktuk{position:absolute;right:70px;bottom:48px;color:#111;transform:rotate(-5deg)}
+.delivery-search{max-width:760px;margin:26px auto 0;background:#fff;border:1px solid #e5e5e2;border-radius:999px;height:58px;display:flex;align-items:center;gap:13px;padding:0 21px;box-shadow:0 8px 30px #00000008}
+.delivery-search svg{color:#06c167}.delivery-search a{color:#777;text-decoration:none;font-size:14px;width:100%}
+.food-categories,.restaurant-discovery,.delivery-promise{max-width:1180px;margin:42px auto 0;padding:0 28px}
+.section-heading{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:17px}
+.section-heading h2{margin:0;font-size:25px;letter-spacing:-1px}.section-heading a{font-size:13px;color:#06a958;text-decoration:none;font-weight:800}
+.section-eyebrow{font-size:10px;letter-spacing:1.7px;font-weight:900;color:#06a958}
+.category-scroller{display:flex;gap:12px;overflow:auto;padding-bottom:5px}
+.food-category{min-width:145px;background:#fff;border:1px solid #e8e8e5;border-radius:17px;padding:18px;text-decoration:none;color:#111;display:flex;align-items:center;gap:12px}
+.food-category span{width:46px;height:46px;border-radius:14px;background:#e9f8f0;color:#06a958;display:grid;place-items:center}.food-category strong{font-size:13px}
+.food-card-scroller{display:flex;gap:17px;overflow:auto;padding:3px 0 12px}
+.food-discovery-card{min-width:250px;max-width:250px;text-decoration:none;color:#111;background:#fff;border-radius:19px;overflow:hidden;border:1px solid #e8e8e5;box-shadow:0 8px 24px #00000009}
+.food-discovery-image{height:170px;background:#eceeea;position:relative;overflow:hidden}
+.food-discovery-image img{width:100%;height:100%;object-fit:cover;display:block}.food-image-fallback{height:100%;display:grid;place-items:center;color:#06a958}
+.food-time,.food-rating{position:absolute;bottom:10px;padding:6px 9px;border-radius:999px;background:#fff;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:800;box-shadow:0 3px 10px #0002}.food-time{left:10px}.food-rating{right:10px;color:#111}.food-rating svg{color:#f0a400}
+.food-discovery-info{padding:15px;display:flex;align-items:center;justify-content:space-between}.food-discovery-info h3{margin:0 0 4px;font-size:17px}.food-discovery-info p{margin:0;color:#777;font-size:11px}
+.empty-discovery{background:#fff;border:1px dashed #ddd;border-radius:18px;padding:30px;text-align:center;color:#777}
+.delivery-promise{background:#111;color:#fff;border-radius:19px;padding:17px 20px;display:flex;align-items:center;gap:13px}
+.promise-icon{width:48px;height:48px;border-radius:14px;background:#06c167;color:#111;display:grid;place-items:center}.delivery-promise div:nth-child(2){display:grid;gap:3px}.delivery-promise span{font-size:12px;color:#aaa}.delivery-promise b{margin-left:auto;color:#70e3a6;font-size:12px}
+.delivery-bottom-nav{display:none}
+
+@media(max-width:760px){
+ .delivery-home{padding-bottom:78px}.delivery-header{padding:15px 16px}.delivery-header-left{gap:12px}.delivery-address{display:none}.delivery-logo strong{font-size:15px}.desktop-more{display:none}
+ .delivery-hero{margin:0 12px;border-radius:23px;display:block;min-height:490px}.delivery-hero-copy{padding:34px 25px}.delivery-hero h1{font-size:43px;letter-spacing:-2px}.delivery-hero p{font-size:14px}.delivery-hero-art{min-height:190px}.hero-ring{width:240px;height:240px;right:50%;transform:translateX(50%);top:-10px}.hero-food-card{right:22px;top:12px;width:145px;padding:14px}.hero-food-card strong{font-size:16px}.hero-tuktuk{right:calc(50% - 55px);bottom:20px}.delivery-search{margin:18px 16px 0;height:54px}
+ .food-categories,.restaurant-discovery,.delivery-promise{margin-top:30px;padding:0 16px}.section-heading h2{font-size:20px}.food-category{min-width:132px;padding:13px}.food-category span{width:40px;height:40px}.food-discovery-card{min-width:230px;max-width:230px}.food-discovery-image{height:150px}.delivery-promise{margin-left:16px;margin-right:16px}.delivery-promise b{display:none}
+ .delivery-bottom-nav{display:flex;position:fixed;z-index:40;bottom:0;left:0;right:0;height:67px;background:#fff;border-top:1px solid #e6e6e3;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom)}.delivery-bottom-nav a,.delivery-bottom-nav button{border:0;background:none;text-decoration:none;color:#777;display:grid;place-items:center;gap:3px;font-size:10px;flex:1}.delivery-bottom-nav .active{color:#06a958}.delivery-bottom-nav small{font-size:10px}.delivery-bottom-nav button{cursor:pointer}
+}
