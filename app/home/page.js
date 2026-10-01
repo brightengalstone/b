@@ -30,11 +30,12 @@ export default function Home(){
           <div className="eersterust-route"><span className="route-dot"></span><strong>Restaurant</strong><ArrowRight size={15}/><span className="route-dot destination"></span><strong>Your door</strong></div>
         </div>
         <div className="eersterust-map-visual">
-          <div className="map-glow"></div>
-          <div className="map-road road-one"></div><div className="map-road road-two"></div><div className="map-road road-three"></div>
+          <img className="eersterust-real-map" src="https://map.myroof.co.za/staticmap.php?center=-25.706347133697147%2C28.313819326812563&key=AIzaSyBR4f2QxIVcBwshTH7iKgSJydNc1-cB-jI&markers=size%3Atiny%7Ccolor%3Ared%7C-25.706347133697147%2C28.313819326812563&size=715x500&zoom=13" alt="Eersterust Pretoria map" />
+          <div className="map-overlay"></div>
           <div className="map-pin restaurant-pin"><Store size={17}/></div>
           <div className="map-pin home-pin"><House size={17}/></div>
-          <div className="map-tuktuk"><TukTuk size={48}/></div>
+          <div className="map-tuktuk-photo"><img src="https://supremetuktuks.co.za/assets/images/Tuk-Tuks-2.jpg" alt="Real delivery tuk-tuk" /></div>
+          <span className="map-label">EERSTERUST DELIVERY AREA</span>
         </div>
       </div>
       <div className="eersterust-delivery-details">
@@ -47,35 +48,6 @@ export default function Home(){
 
     <nav className="delivery-bottom-nav"><Link href="/home" className="active"><House size={19}/><small>Home</small></Link><Link href="/marketplace"><Store size={19}/><small>Browse</small></Link><Link href="/cart"><ShoppingCart size={19}/><small>Cart</small></Link><Link href="/orders"><Package size={19}/><small>Orders</small></Link><button onClick={()=>setOpen(true)}><MoreHorizontal size={19}/><small>More</small></button></nav>
     {open&&<div className="menu-overlay" onClick={()=>setOpen(false)}><aside className="app-menu" onClick={e=>e.stopPropagation()}><div className="menu-head"><div><span className="brand-mark">BG</span><strong>Smart Services</strong></div><button className="icon-button" aria-label="Close menu" onClick={()=>setOpen(false)}><X size={20}/></button></div><nav className="menu-list">{menuItems.map(([Icon,label,href])=><Link href={href} key={label} onClick={()=>setOpen(false)}><Icon size={19}/><span>{label}</span></Link>)}<button className="menu-signout" onClick={async()=>{await supabase.auth.signOut();window.location.href='/'}}><LogOut size={19}/><span>Sign Out</span></button></nav></aside></div>}
-    <style>{`
-      .eersterust-delivery-card{max-width:1180px;margin:26px auto 44px;background:#111;color:#fff;border-radius:28px;overflow:hidden;box-shadow:0 20px 55px rgba(16,24,40,.12)}
-      .eersterust-delivery-main{display:grid;grid-template-columns:1.05fr .95fr;min-height:300px}
-      .eersterust-delivery-copy{padding:38px 42px;display:flex;flex-direction:column;justify-content:center}
-      .eersterust-kicker{display:flex;align-items:center;gap:7px;color:#70e3a6;font-size:10px;font-weight:900;letter-spacing:1.6px}
-      .eersterust-delivery-copy h2{font-size:clamp(32px,4vw,48px);letter-spacing:-2px;line-height:1;margin:14px 0 12px}
-      .eersterust-delivery-copy h2 em{font-style:normal;color:#70e3a6}
-      .eersterust-delivery-copy p{max-width:520px;color:#bdbdbd;line-height:1.6;font-size:13px;margin:0}
-      .eersterust-route{display:flex;align-items:center;gap:9px;margin-top:25px;font-size:11px;color:#e5e5e5}
-      .route-dot{width:9px;height:9px;border:2px solid #70e3a6;border-radius:50%}.route-dot.destination{background:#70e3a6}
-      .eersterust-map-visual{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 50%,#26372d,#171b19 64%);min-height:300px}
-      .map-road{position:absolute;height:1px;background:rgba(255,255,255,.12);transform:rotate(-22deg);width:120%;left:-10%}
-      .road-one{top:30%}.road-two{top:58%;transform:rotate(28deg)}.road-three{top:76%;transform:rotate(-8deg)}
-      .map-glow{position:absolute;width:240px;height:240px;border-radius:50%;background:rgba(6,193,103,.09);filter:blur(5px);left:50%;top:50%;transform:translate(-50%,-50%)}
-      .map-pin{position:absolute;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;box-shadow:0 10px 25px rgba(0,0,0,.3);z-index:2}
-      .restaurant-pin{left:22%;top:24%;background:#fff;color:#111}.home-pin{right:18%;bottom:20%;background:#06c167;color:#07170f}
-      .map-tuktuk{position:absolute;left:51%;top:48%;color:#70e3a6;filter:drop-shadow(0 8px 15px rgba(0,0,0,.4));animation:eersterustRide 3.5s ease-in-out infinite}
-      @keyframes eersterustRide{50%{transform:translate(18px,-10px) rotate(2deg)}}
-      .eersterust-delivery-details{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;color:#111;border-top:1px solid #2b2b2b}
-      .eersterust-delivery-details>div{min-height:82px;padding:16px 18px;display:flex;align-items:center;gap:10px;border-right:1px solid #e8e8e5}
-      .eersterust-delivery-details>div:last-child{border-right:0}
-      .detail-icon{width:36px;height:36px;border-radius:11px;background:#e9f8f0;color:#08713d;display:grid;place-items:center;flex:none}
-      .eersterust-delivery-details span:last-child{display:grid;gap:3px}
-      .eersterust-delivery-details small{font-size:8px;letter-spacing:1px;color:#777;font-weight:900}
-      .eersterust-delivery-details strong{font-size:11px}
-      .eersterust-delivery-details .no-service-fee{background:#f4fbf7}
-      .no-service-fee span{gap:4px!important}.no-service-fee strong{font-size:12px!important;color:#08713d}
-      @media(max-width:900px){.eersterust-delivery-card{margin:22px 20px 36px}.eersterust-delivery-main{grid-template-columns:1fr}.eersterust-map-visual{min-height:250px}.eersterust-delivery-details{grid-template-columns:1fr 1fr}}
-      @media(max-width:560px){.eersterust-delivery-card{margin:20px 16px 32px;border-radius:22px}.eersterust-delivery-copy{padding:29px 24px}.eersterust-delivery-copy h2{font-size:34px}.eersterust-map-visual{min-height:220px}.eersterust-delivery-details{grid-template-columns:1fr}.eersterust-delivery-details>div{border-right:0;border-bottom:1px solid #e8e8e5}.eersterust-delivery-details>div:last-child{border-bottom:0}.restaurant-pin{left:18%;top:20%}.home-pin{right:15%;bottom:18%}}
-    `}</style>
+    <style>{`\n      .eersterust-delivery-card{max-width:1180px;margin:26px auto 44px;background:#111;color:#fff;border-radius:28px;overflow:hidden;box-shadow:0 20px 55px rgba(16,24,40,.12)}\n      .eersterust-delivery-main{display:grid;grid-template-columns:1.05fr .95fr;min-height:320px}\n      .eersterust-delivery-copy{padding:38px 42px;display:flex;flex-direction:column;justify-content:center}\n      .eersterust-kicker{display:flex;align-items:center;gap:7px;color:#70e3a6;font-size:10px;font-weight:900;letter-spacing:1.6px}\n      .eersterust-delivery-copy h2{font-size:clamp(32px,4vw,48px);letter-spacing:-2px;line-height:1;margin:14px 0 12px}\n      .eersterust-delivery-copy h2 em{font-style:normal;color:#70e3a6}\n      .eersterust-delivery-copy p{max-width:520px;color:#bdbdbd;line-height:1.6;font-size:13px;margin:0}\n      .eersterust-route{display:flex;align-items:center;gap:9px;margin-top:25px;font-size:11px;color:#e5e5e5}\n      .route-dot{width:9px;height:9px;border:2px solid #70e3a6;border-radius:50%}.route-dot.destination{background:#70e3a6}\n      .eersterust-map-visual{position:relative;overflow:hidden;min-height:320px;background:#dfe5dc}\n      .eersterust-real-map{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.9) contrast(1.02)}\n      .map-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(17,17,17,.1),rgba(17,17,17,.02) 45%,rgba(6,193,103,.12))}\n      .map-pin{position:absolute;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;box-shadow:0 10px 25px rgba(0,0,0,.3);z-index:3}\n      .restaurant-pin{left:20%;top:24%;background:#fff;color:#111}.home-pin{right:18%;bottom:18%;background:#06c167;color:#07170f}\n      .map-tuktuk-photo{position:absolute;left:50%;top:51%;width:112px;height:82px;border-radius:18px;overflow:hidden;z-index:4;border:3px solid #fff;box-shadow:0 12px 28px rgba(0,0,0,.32);transform:translate(-50%,-50%) rotate(-3deg);animation:eersterustRide 3.5s ease-in-out infinite}\n      .map-tuktuk-photo img{width:100%;height:100%;object-fit:cover;display:block}\n      .map-label{position:absolute;left:18px;top:18px;z-index:5;background:#111;color:#fff;border-radius:999px;padding:8px 11px;font-size:9px;font-weight:900;letter-spacing:1px;box-shadow:0 8px 20px rgba(0,0,0,.2)}\n      @keyframes eersterustRide{50%{transform:translate(-32px,-42px) rotate(2deg)}}\n      .eersterust-delivery-details{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;color:#111;border-top:1px solid #2b2b2b}\n      .eersterust-delivery-details>div{min-height:82px;padding:16px 18px;display:flex;align-items:center;gap:10px;border-right:1px solid #e8e8e5}\n      .eersterust-delivery-details>div:last-child{border-right:0}\n      .detail-icon{width:36px;height:36px;border-radius:11px;background:#e9f8f0;color:#08713d;display:grid;place-items:center;flex:none}\n      .eersterust-delivery-details span:last-child{display:grid;gap:3px}\n      .eersterust-delivery-details small{font-size:8px;letter-spacing:1px;color:#777;font-weight:900}\n      .eersterust-delivery-details strong{font-size:11px}\n      .eersterust-delivery-details .no-service-fee{background:#f4fbf7}\n      .no-service-fee span{gap:4px!important}.no-service-fee strong{font-size:12px!important;color:#08713d}\n      @media(max-width:900px){.eersterust-delivery-card{margin:22px 20px 36px}.eersterust-delivery-main{grid-template-columns:1fr}.eersterust-map-visual{min-height:270px}.eersterust-delivery-details{grid-template-columns:1fr 1fr}}\n      @media(max-width:560px){.eersterust-delivery-card{margin:20px 16px 32px;border-radius:22px}.eersterust-delivery-copy{padding:29px 24px}.eersterust-delivery-copy h2{font-size:34px}.eersterust-map-visual{min-height:230px}.eersterust-delivery-details{grid-template-columns:1fr}.eersterust-delivery-details>div{border-right:0;border-bottom:1px solid #e8e8e5}.eersterust-delivery-details>div:last-child{border-bottom:0}.restaurant-pin{left:18%;top:20%}.home-pin{right:15%;bottom:18%}.map-tuktuk-photo{width:96px;height:70px}}\n    `}</style>
   </main>
 }
