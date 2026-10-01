@@ -744,3 +744,44 @@ a{color:inherit}
 .terms-check a{color:#08713d!important;font-weight:800}
 .landing-primary{background:#06c167!important;color:#07170f!important}
 @media(max-width:560px){.mobile-auth-card{margin:0 14px 24px!important;border-radius:20px!important}.mobile-auth-brand{padding:22px 18px!important}}
+
+
+/* Restaurant discovery cards — premium food delivery look */
+.restaurant-discovery{max-width:1180px;margin:0 auto;padding:34px 28px 18px}
+.restaurant-discovery .section-heading{display:flex;align-items:end;justify-content:space-between;margin-bottom:18px}
+.restaurant-discovery .section-eyebrow{font-size:10px;letter-spacing:1.8px;font-weight:900;color:#06a958}
+.restaurant-discovery .section-heading h2{font-size:30px;letter-spacing:-1.4px;margin:5px 0 0;color:#111}
+.restaurant-discovery .section-heading a{font-size:12px;font-weight:850;color:#08713d}
+.food-card-scroller{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.food-discovery-card{min-width:0;max-width:none;background:#fff;border:1px solid #e7e7e3;border-radius:22px;overflow:hidden;box-shadow:0 8px 28px #00000008;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.food-discovery-card:hover{transform:translateY(-5px);box-shadow:0 18px 42px #00000012;border-color:#cfeedd}
+.food-discovery-image{height:210px!important;background:#e9ebe7;position:relative;overflow:hidden}
+.food-discovery-image img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .5s ease}
+.food-discovery-card:hover .food-discovery-image img{transform:scale(1.04)}
+.food-image-fallback{height:100%;display:grid;place-items:center;background:linear-gradient(135deg,#111,#24342a);color:#06c167}
+.food-time,.food-rating{position:absolute!important;bottom:12px!important;top:auto!important;border-radius:999px!important;padding:7px 10px!important;background:rgba(255,255,255,.94)!important;color:#111!important;box-shadow:0 5px 15px #0002;font-size:10px!important;font-weight:850!important;display:flex!important;align-items:center;gap:5px}
+.food-time{left:12px!important}
+.food-rating{right:12px!important}
+.food-rating svg{color:#111}
+.food-discovery-info{min-height:92px;padding:17px 17px 16px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important}
+.food-discovery-info h3{font-size:18px!important;letter-spacing:-.4px;margin:0 0 5px!important;color:#111}
+.food-discovery-info p{font-size:11px!important;color:#777;margin:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.food-discovery-info>svg{width:34px;height:34px;padding:8px;border-radius:50%;background:#e9f8f0;color:#08713d;flex:none}
+.delivery-home .delivery-promise{max-width:1180px;margin:26px auto 35px}
+
+@media(max-width:900px){
+ .restaurant-discovery{padding:28px 20px 15px}
+ .food-card-scroller{display:flex;overflow-x:auto;gap:14px;padding:2px 2px 10px;scroll-snap-type:x mandatory;scrollbar-width:none}
+ .food-card-scroller::-webkit-scrollbar{display:none}
+ .food-discovery-card{min-width:285px;max-width:285px;scroll-snap-align:start}
+ .food-discovery-image{height:185px!important}
+}
+@media(max-width:560px){
+ .restaurant-discovery{padding:25px 16px 12px}
+ .restaurant-discovery .section-heading h2{font-size:25px}
+ .food-discovery-card{min-width:280px;max-width:280px;border-radius:20px}
+ .food-discovery-image{height:178px!important}
+ .food-discovery-info{min-height:82px;padding:14px!important}
+ .food-discovery-info h3{font-size:16px!important}
+ .food-discovery-info p{max-width:185px}
+}
