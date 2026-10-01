@@ -17,16 +17,16 @@ export default function Welcome() {
           </div>
 
           <div className="landing-kicker">
-            SHOP LOCAL <b>•</b> DELIVER LOCAL <b>•</b> EERSTERUST ONLY
+            ORDER LOCAL <b>•</b> DELIVER LOCAL <b>•</b> EERSTERUST ONLY
           </div>
 
           <h1>
-            <span>Your local shopping</span>
+            <span>Your local food</span>
             delivery partner.
           </h1>
 
           <p className="landing-lead">
-            Shop from local stores and restaurants, then let BG Smart Services bring your order to your door in Eersterust.
+            Order from local restaurants and fast-food favourites, then let BG Smart Services bring your meal to your door anywhere in Eersterust.
           </p>
 
           <div className="landing-actions">
@@ -55,7 +55,7 @@ export default function Welcome() {
           </div>
           <div className="landing-delivery-card landing-delivery-card-bottom">
             <ShoppingCart size={18} />
-            <span><strong>Shop local</strong><small>Groceries & restaurants</small></span>
+            <span><strong>Shop local</strong><small>Restaurants & fast food</small></span>
           </div>
           <div className="landing-circle landing-circle-one" />
           <div className="landing-circle landing-circle-two" />
