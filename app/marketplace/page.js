@@ -6,7 +6,7 @@ const BRAND_DOMAINS={
  'pick-n-pay':'pnp.co.za','checkers':'checkers.co.za','shoprite':'shoprite.co.za','woolworths':'woolworths.co.za',
  'boxer-denlyn':'boxer.co.za','superspar-denlyn':'spar.co.za','kfc-denlyn':'kfc.co.za','kfc-tshwane-regional-mall':'kfc.co.za',
  'chicken-licken-denlyn':'chickenlicken.co.za','chicken-licken-tshwane-regional-mall':'chickenlicken.co.za',
- 'nandos-denlyn':'nandos.co.za','mcdonalds-denlyn':'mcdonalds.co.za','steers-tshwane-regional-mall':'steers.co.za',
+ 'nandos-denlyn':'nandos.co.za','mcdonalds-denlyn':'mcdonalds.co.za','mcdonalds-silverwater-crossing':'mcdonalds.co.za','mcdonalds-mamelodi-mall':'mcdonalds.co.za','steers-tshwane-regional-mall':'steers.co.za',
  'debonairs-pizza-tshwane-regional-mall':'debonairspizza.co.za','hungry-lion-tshwane-regional-mall':'hungrylion.co.za',
  'king-pie-tshwane-regional-mall':'kingpie.co.za','zebros-tshwane-regional-mall':'zebros.co.za'
 };
