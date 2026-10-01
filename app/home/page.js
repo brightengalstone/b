@@ -35,7 +35,8 @@ export default function Home(){
     return()=>{mounted=false;if(channel)supabase.removeChannel(channel)};
   },[]);
 
-  const foodStores=stores.filter(s=>s.marketplace_category==='fast-food');
+  // Local delivery on Home is restaurant-only. Supermarkets/grocery retailers are excluded.
+  const foodStores=stores.filter(s=>String(s.marketplace_category||'').toLowerCase()==='fast-food');
   const popular=foodStores.slice(0,4);
 
   return <main className="mobile-app-shell">
@@ -45,7 +46,7 @@ export default function Home(){
     <section className="home-promo"><div><span>Fast &amp; Reliable</span><strong>Local Delivery</strong><p>Eersterust Only<br/>R65 delivery · No service fee</p></div><div className="promo-art"><TukTuk size={78}/></div></section>
     <section className="home-categories">{categories.map(([Icon,label,href])=><Link href={href} key={label}><span><Icon size={21}/></span><small>{label}</small></Link>)}</section>
     <section className="home-nearby"><div className="mobile-section-title"><h2>Popular Stores</h2><Link href="/marketplace">View all</Link></div><div className="nearby-grid">{popular.length?popular.map(store=><StoreCard key={store.id} store={store} />):<div className="order-placeholder"><Store size={20}/><span>Popular stores will appear here.</span></div>}</div></section>
-    <section className="home-order-again"><div className="mobile-section-title"><h2>Shop Local</h2><Link href="/marketplace">Marketplace</Link></div><div className="order-again-row">{foodStores.slice(0,4).map(store=><StoreCard key={store.id} store={store}/>)}</div></section>
+    <section className="home-order-again"><div className="mobile-section-title"><h2>Shop Local Restaurants</h2><Link href="/marketplace">Marketplace</Link></div><div className="order-again-row">{foodStores.slice(0,4).map(store=><StoreCard key={store.id} store={store}/>)}</div></section>
     <section className="home-delivery-strip"><div><TukTuk size={25}/></div><span><strong>Delivery across Eersterust</strong><small>R65 delivery · No service fee</small></span><b>Available</b></section>
     <nav className="mobile-bottom-nav"><Link href="/home" className="active"><House size={20}/><small>Home</small></Link><Link href="/marketplace"><Store size={20}/><small>Marketplace</small></Link><Link href="/cart"><ShoppingCart size={20}/><small>Cart</small></Link><Link href="/orders"><Package size={20}/><small>My Orders</small></Link><button onClick={()=>setOpen(true)}><MoreHorizontal size={20}/><small>More</small></button></nav>
     {open&&<div className="menu-overlay" onClick={()=>setOpen(false)}><aside className="app-menu" onClick={e=>e.stopPropagation()}><div className="menu-head"><div><span className="brand-mark">BG</span><strong>Smart Services</strong></div><button className="icon-button" aria-label="Close menu" onClick={()=>setOpen(false)}><X size={20}/></button></div><nav className="menu-list">{menuItems.map(([Icon,label,href])=><Link href={href} key={label} onClick={()=>setOpen(false)}><Icon size={19}/><span>{label}</span></Link>)}<button className="menu-signout" onClick={async()=>{await supabase.auth.signOut();window.location.href='/'}}><LogOut size={19}/><span>Sign Out</span></button></nav></aside></div>}
