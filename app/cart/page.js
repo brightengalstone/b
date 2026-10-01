@@ -115,8 +115,9 @@ export default function Cart() {
                   <div className="cart-store-header">
                     <div className="cart-store-icon"><StoreIcon /></div>
                     <div>
-                      <span className="cart-store-label">Store</span>
+                      <span className="cart-store-label">Collection branch</span>
                       <h2>{storeName}</h2>
+                      <p className="cart-store-location">{storeItems[0]?.pickup_address || storeItems[0]?.shopping_location || 'Branch location on file'}</p>
                     </div>
                     <span className="cart-store-count">{storeItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0)} items</span>
                   </div>
