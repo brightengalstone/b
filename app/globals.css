@@ -399,3 +399,128 @@ html[data-theme="light"] .mobile-app-shell{background:var(--bg)}
 .fastfood-hero-copy{position:relative;z-index:1;max-width:690px}.fastfood-kicker{font-size:10px;letter-spacing:1.8px;font-weight:900;color:#27d878}.fastfood-hero h1{font-size:clamp(38px,6vw,66px);letter-spacing:-3.4px;line-height:.98;margin:13px 0 12px}.fastfood-hero p{margin:0;color:#b8c6be;font-size:15px;line-height:1.55;max-width:600px}.fastfood-hero-badge{position:relative;z-index:1;width:145px;min-width:145px;height:145px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}.fastfood-hero-badge span{font-size:11px;letter-spacing:2px;color:#8fe7b5;font-weight:900}.fastfood-hero-badge strong{font-size:32px;letter-spacing:-1.5px;margin:5px 0}.fastfood-hero-badge small{font-size:9px;color:#b8c6be;text-align:center;max-width:95px;line-height:1.3}
 .restaurant-search{height:58px;background:#fff;border:1px solid var(--line);border-radius:17px;display:flex;align-items:center;gap:12px;padding:0 18px;box-shadow:0 10px 30px rgba(16,24,40,.05);margin-bottom:28px}.restaurant-search svg{color:#667085;flex:0 0 auto}.restaurant-search input{border:0;outline:0;width:100%;font-size:14px;background:transparent;color:#101828}.restaurant-section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:16px}.restaurant-section-head h2{font-size:30px;letter-spacing:-1.5px;margin:6px 0 0}.restaurant-section-head>span{font-size:11px;color:#667085;font-weight:800}.restaurant-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.restaurant-card{background:#fff;border:1px solid var(--line);border-radius:25px;padding:20px;box-shadow:0 10px 32px rgba(16,24,40,.045);transition:transform .2s ease,box-shadow .2s ease}.restaurant-card:hover{transform:translateY(-3px);box-shadow:0 18px 42px rgba(16,24,40,.09)}.restaurant-card-top{display:flex;align-items:center;gap:15px;padding-bottom:17px;border-bottom:1px solid #edf0f2}.restaurant-card-top .retailer-logo{width:68px;height:68px;flex-basis:68px;border-radius:19px}.restaurant-card-top h3{font-size:21px;letter-spacing:-.6px;margin:0 0 4px}.restaurant-card-top p{font-size:11px;color:#667085;margin:0}.branch-list{display:grid;gap:9px;padding-top:15px}.branch-choice{width:100%;border:1px solid #e7eaed;background:#f8faf9;border-radius:15px;padding:12px 13px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;color:#101828;cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}.branch-choice:hover{background:#eef8f2;border-color:#b7e4c9;transform:translateX(2px)}.branch-choice>span{min-width:0;display:grid;gap:4px}.branch-choice strong{font-size:12px}.branch-choice small{font-size:10px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.branch-choice svg{color:#159447;flex:0 0 auto}
 @media(max-width:680px){.market-shell{padding:18px 18px 55px}.market-top{margin-bottom:2px}.market-brand{font-size:16px}.market-cart{padding:10px 11px}.fastfood-hero{margin:28px 0 15px;padding:25px 21px;min-height:270px;align-items:flex-start}.fastfood-hero-badge{position:absolute;right:-28px;bottom:-32px;width:145px;height:145px}.fastfood-hero-copy{max-width:90%}.fastfood-hero h1{font-size:43px;letter-spacing:-2.5px}.fastfood-hero p{font-size:13px}.restaurant-search{margin-bottom:22px}.restaurant-grid{grid-template-columns:1fr;gap:12px}.restaurant-card{padding:16px;border-radius:21px}.restaurant-card-top h3{font-size:19px}.restaurant-section-head h2{font-size:25px}.restaurant-section-head{align-items:center}.restaurant-section-head>span{font-size:10px}}
+
+
+/* BG Smart Services — unified food-delivery marketplace theme */
+:root{
+  --ink:#111111;
+  --muted:#6b6b6b;
+  --line:#e7e7e7;
+  --bg:#f7f7f5;
+  --surface:#ffffff;
+  --brand:#06c167;
+  --brand-dark:#048f4b;
+  --brand-soft:#e8f8ef;
+  --shadow:0 8px 28px rgba(0,0,0,.07);
+}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+a{color:inherit}
+.brand-mark{background:var(--ink);border-radius:10px;width:40px;height:40px}
+.btn{border-radius:999px;min-height:48px;padding:13px 22px;border-color:#dedede;background:#fff;color:#111;box-shadow:none;font-weight:750}
+.btn:hover{transform:none;box-shadow:0 5px 16px rgba(0,0,0,.08)}
+.btn-primary{background:var(--brand);border-color:var(--brand);color:#071b10;box-shadow:none}
+.btn-primary:hover{background:#05b65e;border-color:#05b65e}
+.btn:focus-visible,.icon-button:focus-visible,.menu-button:focus-visible,.text-button:focus-visible{outline:3px solid rgba(6,193,103,.25)}
+.eyebrow{color:#707070;letter-spacing:1px}
+
+.app-shell,.orders-page,.tracking-page,.success-page,.retail-market,.checkout-page{background:var(--bg)}
+.app-header{
+  height:72px;background:rgba(255,255,255,.96);border-bottom:1px solid #ececec;
+  padding:0 max(4vw,20px);box-shadow:0 1px 8px rgba(0,0,0,.03)
+}
+.app-brand{font-size:17px}
+.icon-button,.menu-button{width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid #e1e1e1;color:#111}
+.menu-button{gap:3px}
+.menu-button span{background:#111;width:17px}
+
+.home-content,.market-shell,.orders-shell,.tracking-shell,.success-shell,.checkout-shell{max-width:1240px}
+.home-content{padding:36px max(4vw,20px) 80px}
+.home-intro h1,.market-hero h1,.orders-hero h1,.tracking-hero h1{letter-spacing:-2px}
+.home-search,.market-search{
+  height:58px;border-radius:999px;background:#fff;border:1px solid #e1e1e1;
+  box-shadow:0 2px 10px rgba(0,0,0,.04)
+}
+.home-category-grid{grid-template-columns:repeat(3,1fr);gap:18px}
+.home-category-card{
+  min-height:220px;border-radius:18px;border:1px solid #e5e5e5;background:#fff;
+  box-shadow:var(--shadow);padding:22px
+}
+.home-category-card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(0,0,0,.1)}
+.category-art{width:56px;height:56px;border-radius:14px;background:var(--brand-soft);color:var(--brand-dark)}
+.home-category-card h3{font-size:21px;margin:26px 0 6px}
+.card-arrow{font-size:18px}
+.delivery-banner{
+  margin-top:22px;background:var(--ink);border-radius:18px;padding:18px 20px
+}
+.banner-icon{background:rgba(255,255,255,.12);border-radius:12px}
+.banner-status{color:#8ce5b6;border-color:rgba(140,229,182,.3)}
+
+.menu-overlay{background:rgba(0,0,0,.45)}
+.app-menu{width:min(360px,92vw);background:#fff;padding:18px;box-shadow:20px 0 60px rgba(0,0,0,.2)}
+.menu-head{padding-bottom:18px}
+.menu-list a,.menu-signout{border-radius:12px;color:#222;padding:13px 12px}
+.menu-list a:hover,.menu-signout:hover{background:#f2f2f2;transform:none}
+
+.auth-screen{background:var(--bg)}
+.auth-layout{border-radius:20px;border:1px solid #e5e5e5;box-shadow:var(--shadow)}
+.auth-visual{background:var(--ink)}
+.auth-card{padding:44px}
+.auth-card h2{letter-spacing:-1.5px}
+.auth-form input{border-radius:10px;border-color:#d9d9d9}
+.auth-form input:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(6,193,103,.12)}
+
+.card,.tracking-page .card,.checkout-card,.checkout-summary-card,.order-card,.orders-empty,.orders-message,.success-card{
+  background:#fff;border:1px solid #e5e5e5;border-radius:18px;box-shadow:var(--shadow)
+}
+.order-card:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.09)}
+.order-status{background:var(--brand-soft);color:#08713d}
+.tracking-step.is-active .step-icon{background:var(--brand);color:#06170e;border-color:var(--brand)}
+.tracking-step.is-current .step-icon{box-shadow:0 0 0 5px rgba(6,193,103,.13)}
+.success-icon{background:var(--brand-soft);color:var(--brand-dark)}
+.success-orders{color:#222}
+
+.market-shell{padding-top:24px}
+.market-top,.orders-top,.tracking-top{min-height:48px}
+.market-cart{border-radius:999px;border-color:#dedede;box-shadow:none}
+.retailer-tabs button{border-radius:999px}
+.retailer-tabs button.active{background:var(--ink);border-color:var(--ink)}
+.market-search input{font-size:15px}
+.market-heading h2{letter-spacing:-.7px}
+
+.checkout-shell{padding-top:20px}
+.checkout-topbar{padding-bottom:8px}
+.checkout-brand{font-weight:800}
+.checkout-back{border:1px solid #dedede;border-radius:999px;padding:10px 15px;background:#fff}
+.checkout-heading{margin-top:30px}
+.checkout-zone{background:var(--brand-soft);color:#08713d;border:1px solid #c9ecd9;border-radius:999px;padding:10px 14px}
+.checkout-card,.checkout-summary-card{border-radius:18px}
+.checkout-section-head{border-bottom:1px solid #eee}
+.checkout-store{background:#f5fbf7;border:1px solid #dcefe4;border-radius:12px}
+.checkout-field input,.checkout-field select,.checkout-field textarea{
+  border:1px solid #d9d9d9;border-radius:10px;background:#fff
+}
+.payment-method{border:1px solid #e2e2e2;border-radius:14px;background:#fff}
+.payment-method.active{border-color:#08b85f;background:#f2fbf6;box-shadow:0 0 0 1px #08b85f}
+.payment-icon{background:var(--brand-soft);color:var(--brand-dark)}
+.payment-radio{border-color:#bdbdbd}
+.payment-method.active .payment-radio{background:var(--brand);border-color:var(--brand)}
+.checkout-protection{background:var(--brand-soft);color:#08713d;border-radius:12px}
+
+.welcome-screen{background:#fff}
+.welcome-visual{background:var(--ink)}
+.welcome-content h1{letter-spacing:-3px}
+.welcome-content h1 span{color:var(--brand)}
+.welcome-content p{color:#666}
+.trust-mark{background:var(--brand-soft);color:var(--brand-dark)}
+
+@media(max-width:850px){
+  .home-category-grid{grid-template-columns:1fr}
+  .app-header{height:66px}
+}
+@media(max-width:560px){
+  .home-content{padding-top:26px}
+  .home-intro h1{font-size:38px;letter-spacing:-1.7px}
+  .auth-card{padding:32px 22px}
+  .btn{min-height:46px}
+}
