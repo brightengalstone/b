@@ -23,29 +23,7 @@ export default function Home(){
     <section className="food-categories"><div className="section-heading"><h2>What are you in the mood for?</h2><Link href="/marketplace">See all</Link></div><div className="category-scroller">{categories.map(([Icon,label,href])=><Link href={href} key={label} className="food-category"><span><Icon size={25}/></span><strong>{label}</strong></Link>)}</div></section>
     <section className="restaurant-discovery"><div className="section-heading"><div><span className="section-eyebrow">LOCAL RESTAURANTS</span><h2>Popular near you</h2></div><Link href="/marketplace">View all</Link></div><div className="food-card-scroller">{stores.slice(0,6).map(store=><StoreCard key={store.id} store={store} image={foodImages[store.id]}/>)}</div>{!stores.length&&<div className="empty-discovery">Restaurants will appear here when the catalogue is loaded.</div>}</section>
 
-    <section className="eersterust-delivery-card">
-      <div className="eersterust-delivery-main">
-        <div className="eersterust-delivery-copy">
-          <span className="eersterust-kicker"><TukTuk size={15}/> BG DELIVERY AREA</span>
-          <h2>Delivered across <em>Eersterust.</em></h2>
-          <p>Your meal is collected from the restaurant you choose and brought directly to your address within Eersterust.</p>
-          <div className="eersterust-route"><span className="route-dot"></span><strong>Restaurant</strong><ArrowRight size={15}/><span className="route-dot destination"></span><strong>Your door</strong></div>
-        </div>
-        <div className="eersterust-map-visual">
-          <img className="eersterust-real-map" src="https://map.myroof.co.za/staticmap.php?center=-25.706347133697147%2C28.313819326812563&key=AIzaSyBR4f2QxIVcBwshTH7iKgSJydNc1-cB-jI&markers=size%3Atiny%7Ccolor%3Ared%7C-25.706347133697147%2C28.313819326812563&size=715x500&zoom=13" alt="Eersterust Pretoria map" />
-          <div className="map-overlay"></div>
-          <div className="map-pin restaurant-pin"><Store size={17}/></div>
-          <div className="map-pin home-pin"><House size={17}/></div>
-          <div className="map-tuktuk-photo"><TukTukMockup/></div>
-          <span className="map-label">EERSTERUST DELIVERY AREA</span>
-        </div>
-      </div>
-      <div className="eersterust-delivery-details">
-        <div><span className="detail-icon"><MapPin size={17}/></span><span><small>DELIVERY AREA</small><strong>Eersterust only</strong></span></div>
-        <div><span className="detail-icon"><TukTuk size={17}/></span><span><small>DELIVERY FEE</small><strong>R65</strong></span></div>
-        
-      </div>
-    </section>
+
 
     <nav className="delivery-bottom-nav"><Link href="/home" className="active"><House size={19}/><small>Home</small></Link><Link href="/marketplace"><Store size={19}/><small>Browse</small></Link><Link href="/cart"><ShoppingCart size={19}/><small>Cart</small></Link><Link href="/orders"><Package size={19}/><small>Orders</small></Link><button onClick={()=>setOpen(true)}><MoreHorizontal size={19}/><small>More</small></button></nav>
     {open&&<div className="menu-overlay" onClick={()=>setOpen(false)}><aside className="app-menu" onClick={e=>e.stopPropagation()}><div className="menu-head"><div><span className="brand-mark">BG</span><strong>Smart Services</strong></div><button className="icon-button" aria-label="Close menu" onClick={()=>setOpen(false)}><X size={20}/></button></div><nav className="menu-list">{menuItems.map(([Icon,label,href])=><Link href={href} key={label} onClick={()=>setOpen(false)}><Icon size={19}/><span>{label}</span></Link>)}<button className="menu-signout" onClick={async()=>{await supabase.auth.signOut();window.location.href='/'}}><LogOut size={19}/><span>Sign Out</span></button></nav></aside></div>}
