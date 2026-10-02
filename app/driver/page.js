@@ -27,6 +27,7 @@ export default function DriverPage() {
   const [message, setMessage] = useState('');
   const [lastRefresh, setLastRefresh] = useState(null);
   const [weeklyDeliveries, setWeeklyDeliveries] = useState(0);
+  const [dailyDeliveries, setDailyDeliveries] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
   const [deliveryHistory, setDeliveryHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
@@ -50,6 +51,18 @@ export default function DriverPage() {
       .lte('updated_at', now.toISOString());
 
     if (!error) setWeeklyDeliveries(count || 0);
+
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    const { count: todayCount, error: todayError } = await supabase
+      .from('orders')
+      .select('id', { count: 'exact', head: true })
+      .eq('driver_id', driverId)
+      .eq('status', 'delivered')
+      .gte('updated_at', todayStart.toISOString())
+      .lte('updated_at', now.toISOString());
+
+    if (!todayError) setDailyDeliveries(todayCount || 0);
   }
 
   async function loadDeliveryHistory(driverId) {
@@ -348,17 +361,33 @@ export default function DriverPage() {
           </div>
         </header>
 
-        <button type="button" onClick={openHistory} style={{width:'100%',display:'flex',alignItems:'center',gap:16,margin:'18px 0',padding:'18px 20px',border:'1px solid rgba(15,23,42,.08)',borderRadius:18,background:'#fff',boxShadow:'0 8px 24px rgba(15,23,42,.06)',textAlign:'left',cursor:'pointer'}} aria-label="View delivery history">
-          <div style={{width:44,height:44,borderRadius:14,display:'grid',placeItems:'center',background:'#eef8f1',color:'#16834a',flex:'0 0 auto'}}>
-            <CheckCircle2 size={22} />
+        <section style={{display:'grid',gap:14,margin:'18px 0'}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(2,minmax(0,1fr))',gap:14}}>
+            <div style={{padding:'20px',border:'1px solid rgba(15,23,42,.08)',borderRadius:18,background:'#fff',boxShadow:'0 8px 24px rgba(15,23,42,.06)'}}>
+              <span className="driver-eyebrow">Today</span>
+              <div style={{display:'flex',alignItems:'baseline',gap:6,marginTop:5}}>
+                <strong style={{fontSize:30}}>{dailyDeliveries}</strong><span style={{color:'#64748b'}}>/ 29</span>
+              </div>
+              <small style={{color:'#64748b'}}>Daily delivery target</small>
+              <div style={{height:7,marginTop:12,borderRadius:99,background:'#e2e8f0',overflow:'hidden'}}><div style={{height:'100%',width:`${Math.min(100,(dailyDeliveries / 29) * 100)}%`,background:'#16834a',borderRadius:99}} /></div>
+            </div>
+            <div style={{padding:'20px',border:'1px solid rgba(15,23,42,.08)',borderRadius:18,background:'#fff',boxShadow:'0 8px 24px rgba(15,23,42,.06)'}}>
+              <span className="driver-eyebrow">This week</span>
+              <div style={{display:'flex',alignItems:'baseline',gap:6,marginTop:5}}>
+                <strong style={{fontSize:30}}>{weeklyDeliveries}</strong><span style={{color:'#64748b'}}>/ 200</span>
+              </div>
+              <small style={{color:'#64748b'}}>Weekly delivery target</small>
+              <div style={{height:7,marginTop:12,borderRadius:99,background:'#e2e8f0',overflow:'hidden'}}><div style={{height:'100%',width:`${Math.min(100,(weeklyDeliveries / 200) * 100)}%`,background:'#16834a',borderRadius:99}} /></div>
+            </div>
           </div>
-          <div style={{display:'flex',flexDirection:'column',gap:3,minWidth:0}}>
-            <span className="driver-eyebrow">This week</span>
-            <strong style={{fontSize:18}}>{weeklyDeliveries} {weeklyDeliveries === 1 ? 'delivery' : 'deliveries'} completed</strong>
-            <small style={{color:'#64748b'}}>Tap to view your delivery history</small>
-          </div>
-          <div style={{marginLeft:'auto',fontSize:30,fontWeight:800,lineHeight:1}}>{weeklyDeliveries}</div>
-        </button>
+          <button type="button" onClick={openHistory} style={{width:'100%',display:'flex',alignItems:'center',gap:16,padding:'16px 20px',border:'1px solid rgba(15,23,42,.08)',borderRadius:18,background:'#fff',boxShadow:'0 8px 24px rgba(15,23,42,.06)',textAlign:'left',cursor:'pointer'}} aria-label="View delivery history">
+            <CheckCircle2 size={21} />
+            <div style={{display:'flex',flexDirection:'column',gap:3,minWidth:0}}>
+              <strong>Delivery history</strong>
+              <small style={{color:'#64748b'}}>View your completed deliveries</small>
+            </div>
+          </button>
+        </section>
 
         {showHistory && (
           <section style={{margin:'18px 0',padding:20,border:'1px solid rgba(15,23,42,.08)',borderRadius:18,background:'#fff',boxShadow:'0 8px 24px rgba(15,23,42,.06)'}}>
