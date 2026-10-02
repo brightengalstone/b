@@ -26,11 +26,11 @@ const RESTAURANT_IMAGES={
 const RESTAURANT_FALLBACKS={...RESTAURANT_IMAGES};
 
 const SUPERMARKETS=[
-{name:'Pick n Pay',image:'https://logo.clearbit.com/pnp.co.za',accent:'Everyday essentials'},
-{name:'Shoprite',image:'https://logo.clearbit.com/shoprite.co.za',accent:'Low-price shopping'},
-{name:'Checkers',image:'https://logo.clearbit.com/checkers.co.za',accent:'Fresh food & groceries'},
-{name:'SPAR',image:'https://logo.clearbit.com/spar.co.za',accent:'Your local supermarket'},
-{name:'Woolworths',image:'https://logo.clearbit.com/woolworths.co.za',accent:'Quality food & groceries'}
+{name:'Pick n Pay',image:'https://www.thefrontline.co.za/logos-branding/picknpay-logo-001/'},
+{name:'Shoprite',image:'https://brandfetch.com/shoprite.co.za'},
+{name:'Checkers',image:'https://brandfetch.com/checkers.co.za'},
+{name:'SPAR',image:'https://www.spar.co.za/'},
+{name:'Woolworths',image:'https://www.woolworthsholdings.co.za/woolworths/'}
 ];
 
 function SupermarketComingSoon(){
@@ -39,7 +39,7 @@ useEffect(()=>{const timer=setInterval(()=>setSlide(s=>(s+1)%SUPERMARKETS.length
 const shop=SUPERMARKETS[slide];
 return <section className="supermarket-coming-soon" aria-label="Supermarkets coming soon">
 <div className="supermarket-section-head"><div><span className="section-eyebrow">COMING SOON</span><h2>Supermarkets</h2><p>More everyday shopping is coming to BG Smart Services.</p></div><div className="supermarket-dots">{SUPERMARKETS.map((s,i)=><button key={s.name} className={i===slide?'is-active':''} onClick={()=>setSlide(i)} aria-label={`Show ${s.name}`}/>)}</div></div>
-<div className="supermarket-carousel"><div className="supermarket-card"><div className="supermarket-card-art"><div className="supermarket-glow"></div><img src={shop.image} alt={shop.name} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.nextElementSibling.style.display='grid'}}/><div className="supermarket-logo-fallback">{shop.name.split(' ').map(w=>w[0]).join('').slice(0,3)}</div><span className="supermarket-badge">COMING SOON</span></div><div className="supermarket-card-copy"><span>SUPERMARKET {String(slide+1).padStart(2,'0')}</span><h3>{shop.name}</h3><p>{shop.accent} will be available here in a future BG Smart Services update.</p><div className="supermarket-progress"><i style={{width:`${((slide+1)/5)*100}%`}}></i></div></div></div><div className="supermarket-side-label"><span>EXPANDING BEYOND FAST FOOD</span><strong>More local shopping.<br/>One delivery platform.</strong></div></div>
+<div className="supermarket-carousel"><div className="supermarket-card"><div className="supermarket-card-art"><div className="supermarket-brand-visual"><div className="supermarket-brand-word">{shop.name}</div></div><span className="supermarket-badge">COMING SOON</span></div></div><div className="supermarket-card-copy"><span>SUPERMARKET {String(slide+1).padStart(2,'0')}</span><h3>{shop.name}</h3><p>{shop.accent} will be available here in a future BG Smart Services update.</p><div className="supermarket-progress"><i style={{width:`${((slide+1)/5)*100}%`}}></i></div></div></div><div className="supermarket-side-label"><span>EXPANDING BEYOND FAST FOOD</span><strong>More local shopping.<br/>One delivery platform.</strong></div></div>
 </section>
 }
 
