@@ -27,6 +27,9 @@ export default function DriverPage() {
   const [message, setMessage] = useState('');
   const [lastRefresh, setLastRefresh] = useState(null);
   const [weeklyDeliveries, setWeeklyDeliveries] = useState(0);
+  const [showHistory, setShowHistory] = useState(false);
+  const [deliveryHistory, setDeliveryHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const isBusy = Boolean(order && ACTIVE_STATUSES.includes(order.status));
 
@@ -47,6 +50,24 @@ export default function DriverPage() {
       .lte('updated_at', now.toISOString());
 
     if (!error) setWeeklyDeliveries(count || 0);
+  }
+
+  async function loadDeliveryHistory(driverId) {
+    if (!supabase || !driverId) return;
+    setHistoryLoading(true);
+    const { data, error } = await supabase
+      .from('orders')
+      .select('id, status, subtotal, delivery_fee, total, delivery_address, created_at, updated_at, retailer_id, payment_method')
+      .eq('driver_id', driverId)
+      .order('updated_at', { ascending: false })
+      .limit(500);
+    if (!error) setDeliveryHistory(data || []);
+    setHistoryLoading(false);
+  }
+
+  async function openHistory() {
+    setShowHistory(true);
+    await loadDeliveryHistory(user?.id);
   }
 
   async function loadOrder(driverId) {
@@ -327,17 +348,47 @@ export default function DriverPage() {
           </div>
         </header>
 
-        <section style={{display:'flex',alignItems:'center',gap:16,margin:'18px 0',padding:'18px 20px',border:'1px solid rgba(15,23,42,.08)',borderRadius:18,background:'#fff',boxShadow:'0 8px 24px rgba(15,23,42,.06)'}}>
+        <button type="button" onClick={openHistory} style={{width:'100%',display:'flex',alignItems:'center',gap:16,margin:'18px 0',padding:'18px 20px',border:'1px solid rgba(15,23,42,.08)',borderRadius:18,background:'#fff',boxShadow:'0 8px 24px rgba(15,23,42,.06)',textAlign:'left',cursor:'pointer'}} aria-label="View delivery history">
           <div style={{width:44,height:44,borderRadius:14,display:'grid',placeItems:'center',background:'#eef8f1',color:'#16834a',flex:'0 0 auto'}}>
             <CheckCircle2 size={22} />
           </div>
           <div style={{display:'flex',flexDirection:'column',gap:3,minWidth:0}}>
             <span className="driver-eyebrow">This week</span>
             <strong style={{fontSize:18}}>{weeklyDeliveries} {weeklyDeliveries === 1 ? 'delivery' : 'deliveries'} completed</strong>
-            <small style={{color:'#64748b'}}>Completed deliveries from Monday to today</small>
+            <small style={{color:'#64748b'}}>Tap to view your delivery history</small>
           </div>
           <div style={{marginLeft:'auto',fontSize:30,fontWeight:800,lineHeight:1}}>{weeklyDeliveries}</div>
-        </section>
+        </button>
+
+        {showHistory && (
+          <section style={{margin:'18px 0',padding:20,border:'1px solid rgba(15,23,42,.08)',borderRadius:18,background:'#fff',boxShadow:'0 8px 24px rgba(15,23,42,.06)'}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,marginBottom:16}}>
+              <div><span className="driver-eyebrow">Your deliveries</span><h2 style={{margin:'4px 0 0'}}>Delivery history</h2></div>
+              <button type="button" className="driver-button secondary" onClick={() => setShowHistory(false)}>Close</button>
+            </div>
+            {historyLoading ? (
+              <div style={{padding:24,textAlign:'center',color:'#64748b'}}>Loading your delivery history…</div>
+            ) : deliveryHistory.length === 0 ? (
+              <div style={{padding:24,textAlign:'center',color:'#64748b'}}>No deliveries found yet.</div>
+            ) : (
+              <div style={{display:'grid',gap:10}}>
+                {deliveryHistory.map((delivery) => (
+                  <div key={delivery.id} style={{display:'grid',gridTemplateColumns:'1fr auto',gap:10,padding:14,border:'1px solid #e2e8f0',borderRadius:14}}>
+                    <div style={{minWidth:0}}>
+                      <strong>#{String(delivery.id).slice(0,8).toUpperCase()}</strong>
+                      <div style={{fontSize:13,color:'#64748b',marginTop:4}}>{new Date(delivery.updated_at || delivery.created_at).toLocaleString('en-ZA')}</div>
+                      <div style={{fontSize:13,marginTop:6,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{delivery.delivery_address || 'Address not available'}</div>
+                    </div>
+                    <div style={{textAlign:'right'}}>
+                      <strong style={{textTransform:'capitalize'}}>{formatStatus(delivery.status)}</strong>
+                      <div style={{fontSize:13,color:'#64748b',marginTop:4}}>Delivery fee {money(delivery.delivery_fee)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         <section className="driver-welcome">
           <div><span className="driver-eyebrow">Driver</span><h1>Hi {profile.full_name || 'Driver'}.</h1><p>When you are available, BG Smart Services automatically gives you the next delivery.</p></div>
