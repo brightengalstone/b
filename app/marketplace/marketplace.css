@@ -616,3 +616,54 @@
   .sticky-cart-button{padding:0 11px}
   .selected-store-meta{gap:7px}
 }
+
+/* Mobile restaurant header: keep every detail inside the phone viewport. */
+.retailer-hero,
+.retailer-hero-brand,
+.store-location-card{min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden}
+.retailer-hero-brand>div:last-child{min-width:0;max-width:100%}
+.retailer-hero-brand h1,
+.retailer-hero-brand p,
+.store-location-card strong,
+.store-location-card span{overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:620px){
+  .retailer-hero{
+    margin-top:18px;
+    padding:16px;
+    border-radius:22px;
+  }
+  .retailer-hero-brand{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  .retailer-hero-brand>button{
+    grid-column:1/-1;
+    width:max-content;
+    max-width:100%;
+  }
+  .retailer-hero-brand .retailer-logo.large{
+    width:58px!important;
+    height:58px!important;
+    border-radius:17px!important;
+  }
+  .retailer-hero-brand .eyebrow{font-size:8px;letter-spacing:.7px}
+  .retailer-hero-brand h1{font-size:28px;line-height:1.05;letter-spacing:-1.3px;margin:5px 0 4px}
+  .retailer-hero-brand p{font-size:9px;line-height:1.4;margin:3px 0 0}
+  .selected-store-meta{gap:5px;margin:4px 0 1px}
+  .selected-store-meta span{font-size:9px;gap:3px}
+  .selected-store-meta svg{width:12px;height:12px}
+  .store-location-card{
+    margin-top:12px;
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr);
+    gap:8px;
+    align-items:start;
+    padding:11px!important;
+  }
+  .store-location-card>div:nth-child(2){min-width:0}
+  .store-location-card strong{font-size:10px}
+  .store-location-card span{font-size:9px;line-height:1.4}
+  .store-location-card>a{grid-column:2;width:max-content;max-width:100%;font-size:9px}
+}
