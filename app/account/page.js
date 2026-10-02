@@ -28,6 +28,25 @@ const supportLinks = [
   { href: '/privacy', icon: ShieldCheck, title: 'Privacy Policy', text: 'Learn how your information is handled' },
 ];
 
+function AdminAccess({ userId }) {
+  const [role, setRole] = useState(null);
+  useEffect(() => {
+    if (!supabase || !userId) return;
+    supabase.from('profiles').select('role').eq('id', userId).maybeSingle()
+      .then(({ data }) => setRole(data?.role || null));
+  }, [userId]);
+  if (role !== 'admin') return null;
+  return (
+    <section className="account-section" style={{ marginBottom: 18 }}>
+      <Link className="account-quick-card" href="/admin">
+        <span className="account-link-icon"><ShieldCheck size={21} /></span>
+        <span><strong>Admin Dashboard</strong><small>Manage BG Smart Services</small></span>
+        <ChevronRight size={18} />
+      </Link>
+    </section>
+  );
+}
+
 export default function Account() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -102,6 +121,10 @@ export default function Account() {
           </div>
           <Link className="account-edit" href="/account/personal" aria-label="Edit profile"><Pencil size={17} /><span>Edit Profile</span></Link>
         </section>
+
+        {user && (
+          <AdminAccess userId={user.id} />
+        )}
 
         <section className="account-section">
           <div className="account-section-head"><div><span className="eyebrow">Quick access</span><h2>Your activity</h2></div></div>
