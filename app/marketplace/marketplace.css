@@ -1,0 +1,171 @@
+/* Modern restaurant-first Marketplace */
+.marketplace-hero-new{
+  margin:30px 0 22px;
+  min-height:250px;
+  padding:42px 44px;
+  border-radius:30px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:30px;
+  overflow:hidden;
+  position:relative;
+  background:linear-gradient(135deg,#111827 0%,#182235 55%,#26384e 100%);
+  color:#fff;
+  box-shadow:0 24px 55px rgba(16,24,40,.16);
+}
+.marketplace-hero-new:before{
+  content:"";
+  position:absolute;
+  width:360px;height:360px;
+  border-radius:50%;
+  right:-100px;top:-150px;
+  background:rgba(255,255,255,.07);
+}
+.marketplace-hero-new:after{
+  content:"";
+  position:absolute;
+  width:220px;height:220px;
+  border-radius:50%;
+  left:45%;bottom:-170px;
+  background:rgba(255,255,255,.05);
+}
+.marketplace-hero-new .fastfood-hero-copy{position:relative;z-index:2;max-width:690px}
+.marketplace-hero-new .fastfood-kicker{font-size:10px;letter-spacing:1.8px;font-weight:900;color:#aeb8c7}
+.marketplace-hero-new h1{
+  margin:12px 0 9px;
+  font-size:clamp(38px,5vw,62px);
+  line-height:1;
+  letter-spacing:-3px;
+  color:#fff;
+}
+.marketplace-hero-new p{margin:0;max-width:590px;color:#c4ccd7;line-height:1.55;font-size:14px}
+.marketplace-hero-new .fastfood-hero-badge{
+  position:relative;z-index:2;
+  width:145px;height:145px;flex:none;
+  border-radius:38px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(14px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 18px 40px rgba(0,0,0,.18);
+  transform:rotate(3deg);
+}
+.marketplace-hero-new .fastfood-hero-badge span{font-size:10px;letter-spacing:2px;color:#aeb8c7;font-weight:900}
+.marketplace-hero-new .fastfood-hero-badge strong{font-size:32px;letter-spacing:-1.5px}
+.marketplace-hero-new .fastfood-hero-badge small{font-size:9px;color:#c4ccd7;margin-top:5px}
+
+.retail-market .restaurant-search{
+  height:60px;
+  background:#fff;
+  border:1px solid #e3e7ed;
+  border-radius:18px;
+  display:flex;align-items:center;gap:12px;
+  padding:0 18px;
+  color:#98a2b3;
+  box-shadow:0 10px 28px rgba(16,24,40,.05);
+}
+.retail-market .restaurant-search input{border:0;outline:0;flex:1;background:transparent;color:#101828;font-size:14px}
+.restaurant-section-head{
+  margin:38px 0 17px;
+  display:flex;align-items:end;justify-content:space-between;gap:20px;
+}
+.restaurant-section-head h2{margin:6px 0 0;font-size:30px;letter-spacing:-1.2px}
+.restaurant-section-head>span{font-size:12px;color:#667085;font-weight:750}
+
+.restaurant-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:18px;
+}
+.restaurant-card-new{
+  background:#fff!important;
+  border:1px solid #e4e7ec!important;
+  border-radius:24px!important;
+  padding:0!important;
+  overflow:hidden;
+  box-shadow:0 10px 30px rgba(16,24,40,.055)!important;
+  transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+}
+.restaurant-card-new:hover{
+  transform:translateY(-5px);
+  box-shadow:0 20px 45px rgba(16,24,40,.11)!important;
+  border-color:#cfd5df!important;
+}
+.restaurant-card-new .restaurant-card-top{
+  min-height:150px;
+  padding:25px;
+  display:flex;align-items:center;gap:17px;
+  background:linear-gradient(145deg,#fafbfc,#f3f5f7);
+}
+.restaurant-card-new .retailer-logo.large{
+  width:82px!important;height:82px!important;
+  border-radius:24px!important;
+  background:#fff!important;
+  border:1px solid #e4e7ec!important;
+  box-shadow:0 10px 22px rgba(16,24,40,.09)!important;
+  display:grid;place-items:center;overflow:hidden;
+  flex:none;
+}
+.restaurant-card-new .retailer-logo img{
+  width:70%;height:70%;object-fit:contain;
+}
+.restaurant-card-new .restaurant-card-top h3{font-size:21px;margin:0 0 5px;letter-spacing:-.6px}
+.restaurant-card-new .restaurant-card-top p{margin:0;color:#7b8494;font-size:12px;font-weight:700}
+.restaurant-card-new .branch-list{padding:12px;background:#fff;display:grid;gap:7px}
+.restaurant-card-new .branch-choice{
+  width:100%;padding:12px 13px;
+  border:1px solid #edf0f3;
+  border-radius:14px;
+  background:#fff;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  text-align:left;color:#101828;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease;
+}
+.restaurant-card-new .branch-choice:hover{
+  background:#f7f8fa;border-color:#d8dde5;transform:translateX(2px);
+}
+.restaurant-card-new .branch-choice span{min-width:0;display:grid;gap:4px}
+.restaurant-card-new .branch-choice strong{font-size:12px}
+.restaurant-card-new .branch-choice small{font-size:10px;color:#7b8494;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.restaurant-card-new .branch-choice>svg{color:#667085;flex:none}
+
+.retail-market .retailer-hero{
+  margin-top:30px;
+  border-radius:28px;
+  padding:25px;
+  background:#fff;
+  border:1px solid #e3e7ed;
+  box-shadow:0 12px 35px rgba(16,24,40,.06);
+}
+.retail-market .product-card{
+  background:#fff;
+  border:1px solid #e4e7ec;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(16,24,40,.045);
+}
+.retail-market .product-image{background:#f1f3f5;min-height:190px}
+.retail-market .product-image img{width:100%;height:190px;object-fit:cover;display:block}
+.retail-market .product-card h3{letter-spacing:-.3px}
+
+@media(max-width:900px){
+  .restaurant-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .marketplace-hero-new{padding:34px 30px}
+}
+@media(max-width:620px){
+  .marketplace-hero-new{
+    min-height:230px;
+    margin:20px 0 16px;
+    padding:28px 22px;
+    border-radius:24px;
+  }
+  .marketplace-hero-new h1{font-size:38px;letter-spacing:-2px}
+  .marketplace-hero-new p{font-size:12px}
+  .marketplace-hero-new .fastfood-hero-badge{display:none}
+  .restaurant-section-head{margin-top:30px}
+  .restaurant-section-head h2{font-size:25px}
+  .restaurant-grid{grid-template-columns:1fr;gap:13px}
+  .restaurant-card-new .restaurant-card-top{min-height:125px;padding:20px}
+  .restaurant-card-new .retailer-logo.large{width:68px!important;height:68px!important;border-radius:20px!important}
+}
