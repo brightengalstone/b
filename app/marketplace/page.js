@@ -8,6 +8,8 @@ import { supabase } from '../../lib/supabase';
 import NotificationBell from '../../components/NotificationBell';
 import './marketplace.css';
 
+const CRAVINGS = ['All','Burgers','Chicken','Pizza','Meals & Combos','Sides','Drinks'];
+
 const FAST_FOOD_SLUGS = new Set([
   'mcdonalds-denlyn',
   'mcdonalds-silverwater-crossing',
@@ -109,6 +111,15 @@ function MarketplaceContent() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantityPrompt, setQuantityPrompt] = useState(null);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
+
+  function selectCraving(value) {
+    const next = value === 'All' ? '' : value.toLowerCase();
+    const params = new URLSearchParams(window.location.search);
+    if (next) params.set('craving', next);
+    else params.delete('craving');
+    window.history.replaceState(null, '', '/marketplace' + (params.toString() ? '?' + params.toString() : ''));
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }
 
   async function load() {
     setLoading(true);
@@ -336,10 +347,23 @@ function MarketplaceContent() {
               <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search restaurants or branches"/>
             </div>
 
+            <section className="craving-panel">
+              <div className="craving-heading">
+                <div><span className="eyebrow">Browse by craving</span><h2>What are you in the mood for?</h2></div>
+                {requestedCraving && <button type="button" className="clear-craving" onClick={() => selectCraving('All')}>Clear</button>}
+              </div>
+              <div className="craving-row">
+                {CRAVINGS.map(item => {
+                  const active = (item === 'All' && !requestedCraving) || item.toLowerCase() === requestedCraving;
+                  return <button type="button" key={item} className={'craving-chip ' + (active ? 'active' : '')} onClick={() => selectCraving(item)}>{item}</button>;
+                })}
+              </div>
+            </section>
+
             {msg && <div className="notice">{msg}</div>}
 
             <div className="restaurant-section-head">
-              <div><span className="eyebrow">Restaurants</span><h2>Choose where to order</h2></div>
+              <div><span className="eyebrow">Restaurants</span><h2>{requestedCraving ? 'Restaurants serving ' + requestedCraving : 'Choose where to order'}</h2></div>
               <span>{groups.length} restaurants</span>
             </div>
 
