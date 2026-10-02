@@ -82,17 +82,6 @@ export default function Signin(){
           <p>{forgot?'Enter your email to reset your password.':signup?'Fill in your details to get started':'Sign in to continue shopping.'}</p>
         </div>
 
-        {!forgot&&!signup&&<div className="social-login">
-          <button type="button" className="social-login-button" disabled={loading} onClick={()=>socialSignIn('google')}>
-            <span className="google-mark" aria-hidden="true">G</span>
-            <span>Continue with Google</span>
-          </button>
-          <button type="button" className="social-login-button" disabled={loading} onClick={()=>socialSignIn('apple')}>
-            <span className="apple-mark" aria-hidden="true">●</span>
-            <span>Continue with Apple</span>
-          </button>
-          <div className="auth-divider"><span>or continue with email</span></div>
-        </div>}
 
         <form className="mobile-auth-form" onSubmit={submit}>
           {forgot?<label><span>Email Address</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter your email" required/></label>:signup?<><label><span>First Name</span><input value={name} onChange={e=>setName(e.target.value)} placeholder="Enter your first name" required/></label><label><span>Surname</span><input value={surname} onChange={e=>setSurname(e.target.value)} placeholder="Enter your surname" required/></label><label><span>Mobile Number</span><input type="tel" value={cellphone} onChange={e=>setCellphone(e.target.value)} placeholder="Enter your mobile number" required/></label><label><span>Email Address</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter your email address" autoComplete="email" required/></label><label><span>Delivery Address</span><input placeholder="Search or select your address"/></label><label><span>Create Password</span><span className="mobile-password"><input type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your password" minLength={6} required/><button type="button" onClick={()=>setShowPassword(!showPassword)}>{showPassword?<EyeOff size={17}/>:<Eye size={17}/>}</button></span></label><label><span>Retype Password</span><span className="mobile-password"><input type={showRetype?'text':'password'} value={retype} onChange={e=>setRetype(e.target.value)} placeholder="Retype your password" minLength={6} required/><button type="button" onClick={()=>setShowRetype(!showRetype)}>{showRetype?<EyeOff size={17}/>:<Eye size={17}/>}</button></span></label><label className="terms-check"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)}/><span className="fake-check">{accepted&&<Check size={13}/>}</span><span>I agree to the BG Smart Services <Link href="/terms">Terms & Conditions</Link> and <Link href="/privacy">Privacy Policy</Link></span></label></>:<><label><span>Email Address</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter your email" required/></label><label><span>Password</span><span className="mobile-password"><input type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your password" required/><button type="button" onClick={()=>setShowPassword(!showPassword)}>{showPassword?<EyeOff size={17}/>:<Eye size={17}/>}</button></span></label></>}
