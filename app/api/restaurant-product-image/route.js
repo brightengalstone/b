@@ -5,10 +5,16 @@ const SOURCES = {
   'kfc': ['https://order.kfc.co.za/menu'],
   'chicken licken': ['https://chickenlicken.co.za/menu/soulicious-specials','https://chickenlicken.co.za/products?cId=6','https://chickenlicken.co.za/products?cId=9','https://chickenlicken.co.za/products?cId=12','https://chickenlicken.co.za/products?cId=18','https://chickenlicken.co.za/products?cId=8','https://chickenlicken.co.za/products?cId=15'],
   'debonairs pizza': ['https://debonairspizza.co.za/menus/standard-menu/?custom=False','https://debonairspizza.co.za/menus/halaal-menu/'],
-  "nando's": ['https://www.nandos.co.za/eat/order'],
+  "nando's": [
+    'https://www.nandos.co.za/eat/order',
+    'https://www.nandos.co.za/downloads/standard-delivery-menu.pdf'
+  ],
   "roman's pizza": ['https://www.romanspizza.co.za/menus'],
   'steers': ['https://steers.co.za/menu/sit-down-menu/','https://steers.co.za/'],
-  'hungry lion': ['https://www.hungrylion.co.za/menu-for-one/'],
+  'hungry lion': [
+    'https://www.hungrylion.co.za/menu-for-one/',
+    'https://www.hungrylion.co.za/'
+  ],
 };
 
 const normalize = value => String(value || '')
