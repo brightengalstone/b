@@ -20,29 +20,27 @@ const normalize = value => String(value || '')
   .trim()
   .toLowerCase();
 
-function findImage(html, productName) {
+function findImage(html, productName, page) {
   const target = normalize(productName);
   if (!target) return null;
-  const tags = html.match(/<img\\b[^>]*>/gi) || [];
+  const tags = html.match(/<img\b[^>]*>/gi) || [];
   for (const tag of tags) {
-    const alt = tag.match(/\\balt=["']([^"']+)["']/i);
+    const alt = tag.match(/\balt=["']([^"']+)["']/i);
     if (!alt) continue;
     const candidate = normalize(alt[1]);
     if (!candidate || (candidate !== target && !candidate.includes(target) && !target.includes(candidate))) continue;
-    const src = tag.match(/\\bsrc=["']([^"']+)["']/i);
+    const src = tag.match(/\bsrc=["']([^"']+)["']/i);
     if (!src) continue;
     let url = src[1];
     if (url.startsWith('//')) url = 'https:' + url;
     if (url.startsWith('/')) {
-      const origin = new URL(pageUrl).origin;
+      const origin = new URL(page).origin;
       url = origin + url;
     }
     if (!url.startsWith('data:')) return url;
   }
   return null;
 }
-
-let pageUrl = '';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -52,7 +50,6 @@ export async function GET(request) {
 
   const pages = SOURCES[brand] || [];
   for (const page of pages) {
-    pageUrl = page;
     try {
       const response = await fetch(page, {
         headers: { 'User-Agent': 'Mozilla/5.0 BG-Smart-Services product catalogue' },
@@ -60,7 +57,7 @@ export async function GET(request) {
       });
       if (!response.ok) continue;
       const html = await response.text();
-      const image = findImage(html, name);
+      const image = findImage(html, name, page);
       if (image) return NextResponse.redirect(image, {
         status: 302,
         headers: { 'Cache-Control': 'public, max-age=21600, s-maxage=21600' },
