@@ -785,3 +785,12 @@ a{color:inherit}
  .food-discovery-info h3{font-size:16px!important}
  .food-discovery-info p{max-width:185px}
 }
+
+/* Sign-in logo header fix */
+.mobile-auth-brand{min-height:88px!important;height:auto!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px 20px!important;box-sizing:border-box!important;overflow:visible!important}
+.mobile-auth-brand>a{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:auto!important}
+.mobile-auth-logo{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;line-height:1!important}
+.mobile-auth-logo-bg{font-size:34px!important;font-weight:950!important;letter-spacing:-3px!important;color:#06c167!important;line-height:1!important}
+.mobile-auth-logo-name{font-size:13px!important;font-weight:900!important;letter-spacing:1.6px!important;color:#fff!important;line-height:1!important;white-space:nowrap!important}
+.mobile-auth-card{margin:24px auto 28px!important;max-width:560px!important}
+@media(max-width:560px){.mobile-auth-brand{min-height:82px!important;padding:17px 18px!important}.mobile-auth-logo-bg{font-size:30px!important}.mobile-auth-logo-name{font-size:11px!important;letter-spacing:1.3px!important}.mobile-auth-card{margin:18px 14px 24px!important}}
