@@ -93,11 +93,11 @@ export default function Signin(){
           {!forgot&&!signup&&<div className="social-login social-login-bottom">
             <div className="auth-divider"><span>or continue with</span></div>
             <button type="button" className="social-login-button" disabled={loading} onClick={()=>socialSignIn('google')}>
-              <span className="google-mark" aria-hidden="true">G</span>
+              <img className="google-mark" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" aria-hidden="true"/>
               <span>Continue with Google</span>
             </button>
             <button type="button" className="social-login-button" disabled={loading} onClick={()=>socialSignIn('apple')}>
-              <span className="apple-mark" aria-hidden="true">●</span>
+              <img className="apple-mark" src="https://appleid.cdn-apple.com/appleid/button/logo?color=white&border=false&border_radius=0&scale=1&size=30" alt="" aria-hidden="true"/>
               <span>Continue with Apple</span>
             </button>
           </div>}
