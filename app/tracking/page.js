@@ -60,6 +60,15 @@ function TrackingContent(){
   const status=String(order?.status||'pending').toLowerCase();
   const current=status==='pending'?0:status.includes('confirm')?1:status.includes('prepar')?2:status.includes('assign')||status==='ready'?3:status.includes('picked')?4:status.includes('deliver')?5:0;
   const progress=Math.round((current/(steps.length-1))*100);
+  const routePositions=[
+    {left:18,top:24,label:'Order'},
+    {left:25,top:30,label:'Confirmed'},
+    {left:34,top:37,label:'Preparing'},
+    {left:45,top:45,label:'Driver assigned'},
+    {left:61,top:52,label:'Out for delivery'},
+    {left:82,top:82,label:'Delivered'}
+  ];
+  const driverPosition=routePositions[current];
   const isLive=current>=3&&current<5;
   const isDelivered=current===5;
   const eta=current>=4?'Arriving soon':current===3?'Driver collecting':'Waiting for merchant';
@@ -112,9 +121,9 @@ function TrackingContent(){
               <div className="map-route-shadow"></div><div className="map-route"></div>
               <div className="route-node route-node-one"></div><div className="route-node route-node-two"></div><div className="route-node route-node-three"></div>
               <div className="map-location restaurant-location"><div className="map-marker store-marker"><PackageCheck size={17}/></div><span>Collection point</span></div>
-              <div className={"map-driver "+(isLive?'moving':'')} style={{left:(18+(current/5)*67)+'%',top:(24+(current/5)*58)+'%'}}>
+              <div className={"map-driver "+(isLive?'moving':'')} style={{left:driverPosition.left+'%',top:driverPosition.top+'%'}}>
                 <div className="driver-pulse"></div><div className="driver-marker"><Truck size={18}/></div>
-                <div className="driver-live-tag"><Radio size={10}/> {isDelivered?'Delivered':isLive?'Driver live':'Order'} </div>
+                <div className="driver-live-tag"><Radio size={10}/> {driverPosition.label}</div>
               </div>
               <div className="map-location home-location"><div className="map-marker home-marker"><MapPin size={17}/></div><span>Your delivery</span></div>
               <div className="map-scale"><span></span><b>Route</b></div>
