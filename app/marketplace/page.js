@@ -350,9 +350,24 @@ function MarketplaceContent() {
                   const first = group.branches[0];
                   return (
                     <article className="restaurant-card restaurant-card-new" key={group.brand}>
+                      <div className="restaurant-cover">
+                        <img
+                          src={restaurantImage(group.brand, first.logo_url)}
+                          alt=""
+                          loading="lazy"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                        <div className="restaurant-cover-shade"/>
+                        <div className="restaurant-cover-logo">
+                          <RetailerLogo slug={first.slug} large logoUrl={first.logo_url} name={group.brand}/>
+                        </div>
+                        <div className="restaurant-cover-badge">FAST FOOD</div>
+                      </div>
                       <div className="restaurant-card-top">
-                        <RetailerLogo slug={first.slug} large logoUrl={first.logo_url} name={group.brand}/>
-                        <div><h3>{group.brand}</h3><p>{group.branches.length} {group.branches.length === 1 ? 'branch' : 'branches'}</p></div>
+                        <div>
+                          <h3>{group.brand}</h3>
+                          <p>{group.branches.length} {group.branches.length === 1 ? 'branch' : 'branches'} · Delivery in Eersterust</p>
+                        </div>
                       </div>
                       <div className="branch-list">
                         {group.branches.map(r => (
