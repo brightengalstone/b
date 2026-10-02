@@ -67,7 +67,17 @@ function TrackingContent(){
 
   return <main className="tracking-page">
     <div className="tracking-shell">
-      <div className="tracking-top"><Link href="/home" className="back-link"><ArrowLeft size={17}/> Back to Home</Link><div className="tracking-top-actions"><NotificationBell/><span className="eyebrow">BG Smart Services</span></div></div>
+      <header className="tracking-nav">
+        <Link href="/home" className="tracking-home-btn"><ArrowLeft size={17}/><span>Back to Home</span></Link>
+        <div className="tracking-nav-title">
+          <span className="tracking-brand-mark">BG</span>
+          <div><strong>Track Delivery</strong><small>Live order tracking</small></div>
+        </div>
+        <div className="tracking-nav-actions">
+          <Link href="/orders" className="tracking-orders-btn">My Orders<ChevronRight size={15}/></Link>
+          <NotificationBell/>
+        </div>
+      </header>
       <section className="tracking-hero"><div><div className="eyebrow">Live delivery tracking</div><h1>{isDelivered?'Your order has arrived.':'Your order is on the move.'}</h1><p>{isDelivered?'Thank you for using BG Smart Services.':'Follow every step from the moment your order is confirmed until it reaches your door.'}</p></div><div className={"tracking-status "+(isLive?'is-live':'')}><span className="live-dot"></span><span>{loading?'Loading status':steps[current][0]}</span></div></section>
       {loading?<div className="card tracking-loading"><div className="tracking-loader"></div><strong>Loading your live delivery…</strong><span>Connecting to your order.</span></div>:
       <div className="tracking-grid">
