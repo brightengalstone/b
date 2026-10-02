@@ -26,8 +26,28 @@ export default function DriverPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [lastRefresh, setLastRefresh] = useState(null);
+  const [weeklyDeliveries, setWeeklyDeliveries] = useState(0);
 
   const isBusy = Boolean(order && ACTIVE_STATUSES.includes(order.status));
+
+  async function loadWeeklyDeliveries(driverId) {
+    if (!supabase || !driverId) return;
+    const now = new Date();
+    const daysSinceMonday = (now.getDay() + 6) % 7;
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - daysSinceMonday);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const { count, error } = await supabase
+      .from('orders')
+      .select('id', { count: 'exact', head: true })
+      .eq('driver_id', driverId)
+      .eq('status', 'delivered')
+      .gte('updated_at', weekStart.toISOString())
+      .lte('updated_at', now.toISOString());
+
+    if (!error) setWeeklyDeliveries(count || 0);
+  }
 
   async function loadOrder(driverId) {
     if (!supabase || !driverId) return;
@@ -103,6 +123,7 @@ export default function DriverPage() {
     setBusy(true);
     setMessage('');
     await loadOrder(user.id);
+    await loadWeeklyDeliveries(user.id);
     const { data } = await supabase
       .from('driver_profiles')
       .select('id, vehicle_type, vehicle_registration, approved, available')
@@ -153,6 +174,7 @@ export default function DriverPage() {
     }
 
     await loadOrder(user.id);
+    await loadWeeklyDeliveries(user.id);
     const { data: updatedDriver } = await supabase
       .from('driver_profiles')
       .select('id, vehicle_type, vehicle_registration, approved, available')
@@ -204,6 +226,7 @@ export default function DriverPage() {
       }
 
       await loadOrder(currentUser.id);
+      await loadWeeklyDeliveries(currentUser.id);
       if (mounted) setLoading(false);
 
       channel = supabase
@@ -228,6 +251,8 @@ export default function DriverPage() {
 
         if (!mounted) return;
         setDriverProfile(latestDriver || null);
+
+        await loadWeeklyDeliveries(currentUser.id);
 
         if (latestDriver?.approved && latestDriver?.available) {
           const { data: activeOrder } = await supabase
@@ -301,6 +326,18 @@ export default function DriverPage() {
             <button className="driver-icon-button" onClick={refresh} disabled={busy} title="Refresh"><RefreshCw size={18} className={busy ? 'driver-spin' : ''} /></button>
           </div>
         </header>
+
+        <section style={{display:'flex',alignItems:'center',gap:16,margin:'18px 0',padding:'18px 20px',border:'1px solid rgba(15,23,42,.08)',borderRadius:18,background:'#fff',boxShadow:'0 8px 24px rgba(15,23,42,.06)'}}>
+          <div style={{width:44,height:44,borderRadius:14,display:'grid',placeItems:'center',background:'#eef8f1',color:'#16834a',flex:'0 0 auto'}}>
+            <CheckCircle2 size={22} />
+          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:3,minWidth:0}}>
+            <span className="driver-eyebrow">This week</span>
+            <strong style={{fontSize:18}}>{weeklyDeliveries} {weeklyDeliveries === 1 ? 'delivery' : 'deliveries'} completed</strong>
+            <small style={{color:'#64748b'}}>Completed deliveries from Monday to today</small>
+          </div>
+          <div style={{marginLeft:'auto',fontSize:30,fontWeight:800,lineHeight:1}}>{weeklyDeliveries}</div>
+        </section>
 
         <section className="driver-welcome">
           <div><span className="driver-eyebrow">Driver</span><h1>Hi {profile.full_name || 'Driver'}.</h1><p>When you are available, BG Smart Services automatically gives you the next delivery.</p></div>
