@@ -31,7 +31,11 @@ export default function Checkout() {
 
   useEffect(() => {
     try {
-      setItems(JSON.parse(localStorage.getItem('bg_cart') || '[]'));
+      const saved = JSON.parse(localStorage.getItem('bg_cart') || '[]');
+      setItems(saved.map(item => ({
+        ...item,
+        image_url: item.image_url || item.image || ''
+      })));
     } catch {
       setItems([]);
     }
@@ -304,7 +308,7 @@ export default function Checkout() {
                   return (
                     <article className="checkout-item" key={item.id}>
                       <div className="checkout-item-image">
-                        {item.image ? <img src={item.image} alt="" /> : <Store size={21} />}
+                        {item.image_url ? <img src={item.image_url} alt={item.name || 'Product'} loading="lazy" /> : <Store size={21} />}
                       </div>
                       <div className="checkout-item-info">
                         <strong>{item.name}</strong>
