@@ -25,7 +25,8 @@ const StoreIcon = () => (
 );
 
 function ProductThumb({ item }) {
-  if (item.image) return <img className="cart-product-image" src={item.image} alt="" />;
+  const image = item.image_url || item.image || '';
+  if (image) return <img className="cart-product-image" src={image} alt={item.name || 'Product'} loading="lazy" />;
   return <div className="cart-product-placeholder" aria-hidden="true"><CartIcon /></div>;
 }
 
