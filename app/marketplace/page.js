@@ -380,14 +380,6 @@ function MarketplaceContent() {
                           </button>
                         ))}
                       </div>
-                      <div className="branch-list">
-                        {group.branches.map(r => (
-                          <button className="branch-choice" key={r.id} onClick={() => chooseBranch(r.id)}>
-                            <span><strong>{r.shopping_location || 'Restaurant branch'}</strong><small>{r.pickup_address || 'Pickup location available'}</small></span>
-                            <Navigation size={16}/>
-                          </button>
-                        ))}
-                      </div>
                     </article>
                   );
                 })}
