@@ -67,7 +67,19 @@ export default function Signin(){
     const{error}=await supabase.auth.signInWithPassword({email:normalizedEmail,password});
     setLoading(false);
     if(error){setMsg(error.message);return}
-    window.location.href='/home'
+    const { data: currentUserData } = await supabase.auth.getUser();
+    const currentUserId = currentUserData?.user?.id;
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', currentUserId)
+      .maybeSingle();
+
+    const role = profile?.role || 'customer';
+    if (role === 'admin') window.location.href = '/admin';
+    else if (role === 'driver') window.location.href = '/driver';
+    else if (role === 'merchant') window.location.href = '/merchant';
+    else window.location.href = '/home'
   }
 
   const back=()=>{if(forgot)setForgot(false);else if(signup)setSignup(false);else window.location.href='/'};
