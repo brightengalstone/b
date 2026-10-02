@@ -845,7 +845,7 @@ a{color:inherit}
 }
 .social-login-button:hover{border-color:#b8d9c5;background:#f9fcfa;transform:translateY(-1px)}
 .social-login-button:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.google-mark{width:22px!important;height:22px!important;display:block!important;object-fit:contain!important;flex:0 0 22px!important}.apple-mark{width:22px!important;height:22px!important;display:block!important;object-fit:contain!important;flex:0 0 22px!important}.auth-divider{display:flex;align-items:center;gap:12px;color:#999;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;margin:4px 0 0}
+.google-mark{width:22px!important;height:22px!important;display:block!important;object-fit:contain!important;flex:0 0 22px!important}.apple-mark{width:27px!important;height:27px!important;display:block!important;object-fit:contain!important;flex:0 0 27px!important}.auth-divider{display:flex;align-items:center;gap:12px;color:#999;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;margin:4px 0 0}
 .auth-divider:before,.auth-divider:after{content:'';height:1px;background:#e5e5e1;flex:1}
 .mobile-auth-form{gap:15px!important}
 .mobile-back{margin-bottom:2px!important}
