@@ -679,7 +679,7 @@ export default function AdminPage() {
         </nav>
 
         <div className="admin-sidebar-bottom">
-          <Link className="admin-nav-item" href="/home"><ArrowLeft size={18} /><span>Customer site</span></Link>
+          <Link className="admin-nav-item admin-customer-experience-link" href="/home"><ArrowLeft size={18} /><span>Customer Experience</span></Link>
           <button className="admin-nav-item" onClick={() => setActive('settings')}><Settings size={18} /><span>Settings</span></button>
           <button className="admin-nav-item danger" onClick={signOut}><LogOut size={18} /><span>Sign out</span></button>
         </div>
