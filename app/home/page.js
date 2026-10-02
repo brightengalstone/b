@@ -35,11 +35,16 @@ const SUPERMARKETS=[
 
 function SupermarketComingSoon(){
 const [slide,setSlide]=useState(0);
-useEffect(()=>{const timer=setInterval(()=>setSlide(s=>(s+1)%SUPERMARKETS.length),4500);return()=>clearInterval(timer)},[]);
-const shop=SUPERMARKETS[slide];
+useEffect(()=>{const timer=setInterval(()=>setSlide(s=>(s+1)%SUPERMARKETS.length),4000);return()=>clearInterval(timer)},[]);
 return <section className="supermarket-coming-soon" aria-label="Supermarkets coming soon">
-<div className="supermarket-section-head"><div><span className="section-eyebrow">COMING SOON</span><h2>Supermarkets</h2><p>More everyday shopping is coming to BG Smart Services.</p></div><div className="supermarket-dots">{SUPERMARKETS.map((s,i)=><button key={s.name} className={i===slide?'is-active':''} onClick={()=>setSlide(i)} aria-label={`Show ${s.name}`}/>)}</div></div>
-<div className="supermarket-carousel"><div className="supermarket-card"><div className="supermarket-card-art"><div className="supermarket-brand-visual"><img src={shop.image} alt={shop.name}/></div><span className="supermarket-badge">COMING SOON</span></div></div><div className="supermarket-card-copy"><span>SUPERMARKET {String(slide+1).padStart(2,'0')}</span><h3>{shop.name}</h3><p>{shop.accent} will be available here in a future BG Smart Services update.</p><div className="supermarket-progress"><i style={{width:`${((slide+1)/5)*100}%`}}></i></div></div></div><div className="supermarket-side-label"><span>EXPANDING BEYOND FAST FOOD</span><strong>More local shopping.<br/>One delivery platform.</strong></div></div>
+<div className="supermarket-section-head"><div><span className="section-eyebrow">COMING SOON</span><h2>Supermarkets</h2><p>More everyday shopping is coming to BG Smart Services.</p></div><div className="supermarket-dots">{SUPERMARKETS.map((s,i)=><button key={s.name} className={i===slide?'is-active':''} onClick={()=>setSlide(i)} aria-label={s.name}/>)}</div></div>
+<div className="supermarket-carousel">
+<div className="supermarket-card">
+<div className="supermarket-card-art"><img className="supermarket-real-image" src={SUPERMARKETS[slide].image} alt={SUPERMARKETS[slide].name}/><span className="supermarket-badge">COMING SOON</span></div>
+<div className="supermarket-card-copy"><span>SUPERMARKET {String(slide+1).padStart(2,'0')} OF 05</span><h3>{SUPERMARKETS[slide].name}</h3><p>{['Everyday essentials','Low-price shopping','Fresh food & groceries','Your local supermarket','Quality food & groceries'][slide]} will be available in a future BG Smart Services update.</p><div className="supermarket-progress"><i style={{width:`${((slide+1)/5)*100}%`}}></i></div></div>
+</div>
+<div className="supermarket-side-label"><span>EXPANDING BEYOND FAST FOOD</span><strong>More local shopping.<br/>One delivery platform.</strong></div>
+</div>
 </section>
 }
 
