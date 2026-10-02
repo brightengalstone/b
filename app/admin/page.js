@@ -39,6 +39,16 @@ const NAV = [
   { id: 'support', label: 'Support', icon: MessageSquare },
 ];
 
+const NAV_GROUPS = [
+  { id: 'main', label: 'Main', items: [{ id: 'overview', label: 'Overview', icon: BarChart3 }] },
+  { id: 'orders', label: 'Orders', items: [{ id: 'orders', label: 'All Orders', icon: Package }, { id: 'delivery', label: 'Delivery', icon: Truck }] },
+  { id: 'marketplace', label: 'Marketplace', items: [{ id: 'shops', label: 'Shops', icon: Store }, { id: 'products', label: 'Products', icon: ShoppingBag }] },
+  { id: 'customers', label: 'Customers', items: [{ id: 'customers', label: 'Customer Management', icon: Users }, { id: 'support', label: 'Support', icon: MessageSquare }] },
+  { id: 'finance', label: 'Finance', items: [{ id: 'payments', label: 'Payments', icon: CircleDollarSign }, { id: 'payroll', label: 'Driver Payroll', icon: FileText }] },
+  { id: 'drivers', label: 'Drivers', items: [{ id: 'drivers', label: 'Driver Management', icon: UserRoundCheck }] },
+];
+
+const NAV = NAV_GROUPS.flatMap((group) => group.items);
 const ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'assigned', 'picked_up', 'delivered', 'cancelled'];
 
 function money(value) {
@@ -59,6 +69,7 @@ export default function AdminPage() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [active, setActive] = useState('overview');
+  const [openNavGroups, setOpenNavGroups] = useState({ main: true, orders: true, marketplace: true, customers: true, finance: false, drivers: false });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [creatingDriver, setCreatingDriver] = useState(false);
@@ -669,18 +680,39 @@ export default function AdminPage() {
           <div><strong>BG Smart</strong><span>Admin Console</span></div>
         </div>
 
-        <nav className="admin-nav">
-          {NAV.map(({ id, label, icon: Icon }) => (
-            <button key={id} className={active === id ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => setActive(id)}>
-              <Icon size={18} />
-              <span>{label}</span>
-            </button>
-          ))}
+        <nav className="admin-nav admin-grouped-nav">
+          {NAV_GROUPS.map((group) => {
+            const groupOpen = openNavGroups[group.id];
+            const groupActive = group.items.some((item) => item.id === active);
+            return (
+              <div className={groupActive ? 'admin-nav-group active-group' : 'admin-nav-group'} key={group.id}>
+                <button
+                  type="button"
+                  className="admin-nav-group-title"
+                  onClick={() => setOpenNavGroups((current) => ({ ...current, [group.id]: !current[group.id] }))}
+                  aria-expanded={groupOpen}
+                >
+                  <span>{group.label}</span>
+                  <ChevronRight size={15} className={groupOpen ? 'admin-nav-chevron open' : 'admin-nav-chevron'} />
+                </button>
+                {groupOpen && (
+                  <div className="admin-nav-submenu">
+                    {group.items.map(({ id, label, icon: Icon }) => (
+                      <button key={id} className={active === id ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => setActive(id)}>
+                        <Icon size={17} />
+                        <span>{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         <div className="admin-sidebar-bottom">
           <Link className="admin-nav-item admin-customer-experience-link" href="/home"><ArrowLeft size={18} /><span>Customer Experience</span></Link>
-          <button className="admin-nav-item" onClick={() => setActive('settings')}><Settings size={18} /><span>Settings</span></button>
+          <button className={active === 'settings' ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => setActive('settings')}><Settings size={18} /><span>Settings</span></button>
           <button className="admin-nav-item danger" onClick={signOut}><LogOut size={18} /><span>Sign out</span></button>
         </div>
       </aside>
