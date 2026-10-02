@@ -1,6 +1,7 @@
 import './globals.css';
 import 'leaflet/dist/leaflet.css';
 import { ThemeProvider } from '../components/theme-provider';
+import CustomerBottomNav from '../components/CustomerBottomNav';
 
 export const metadata = {
   title: 'BG Smart Services',
@@ -16,5 +17,5 @@ export const viewport = {
 };
 
 export default function Layout({ children }) {
-  return <ThemeProvider>{children}</ThemeProvider>;
+  return <ThemeProvider><div className="customer-app-shell">{children}<CustomerBottomNav /></div></ThemeProvider>;
 }
