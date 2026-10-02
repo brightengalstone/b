@@ -103,14 +103,27 @@ export default function Cart() {
           <div className="cart-top-actions"><NotificationBell /><Link className="cart-back" href="/marketplace">Continue shopping</Link></div>
         </div>
 
-        <header className="cart-hero food-cart-hero">
-          <div>
-            <div className="eyebrow">Shopping cart</div>
-            <h1>Your cart</h1>
-            <p>{items.length ? itemCount + ' ' + (itemCount === 1 ? 'item' : 'items') + ' from ' + stores.length + ' ' + (stores.length === 1 ? 'store' : 'stores') : 'Review your items before checkout.'}</p>
-          {storeNotice && <div className="notice cart-store-notice">{storeNotice}</div>}
+        <header className="cart-hero cart-hero-premium food-cart-hero">
+          <div className="cart-hero-glow cart-hero-glow-one"></div>
+          <div className="cart-hero-glow cart-hero-glow-two"></div>
+          <div className="cart-hero-content">
+            <div className="cart-hero-label"><span className="cart-hero-live-dot"></span><span>Your shopping cart</span><span className="cart-hero-label-line"></span><small>{items.length ? 'READY TO REVIEW' : 'READY TO SHOP'}</small></div>
+            <h1>{items.length ? 'Everything you picked.' : 'Your cart is ready.'}<span>{items.length ? 'One simple checkout, all in one place.' : 'Start with something you love.'}</span></h1>
+            <p>{items.length ? 'Review your products, quantities and delivery before placing your order.' : 'Add your favourite meals and products, then we will bring them to your door in Eersterust.'}</p>
+            <div className="cart-hero-metrics">
+              <div><div className="cart-hero-metric-icon"><CartIcon /></div><span><small>Cart items</small><strong>{itemCount}</strong></span></div>
+              <div><div className="cart-hero-metric-icon cart-hero-metric-price">R</div><span><small>Subtotal</small><strong>R{subtotal.toFixed(2)}</strong></span></div>
+              <div><div className="cart-hero-metric-icon"><StoreIcon /></div><span><small>Store limit</small><strong>One store</strong></span></div>
+            </div>
+            {storeNotice && <div className="notice cart-store-notice">{storeNotice}</div>}
           </div>
-          <div className="cart-hero-icon"><CartIcon /></div>
+          <div className="cart-hero-art" aria-hidden="true">
+            <div className="cart-hero-ring cart-hero-ring-one"></div><div className="cart-hero-ring cart-hero-ring-two"></div>
+            <div className="cart-hero-orbit-dot cart-hero-dot-one"></div><div className="cart-hero-orbit-dot cart-hero-dot-two"></div><div className="cart-hero-orbit-dot cart-hero-dot-three"></div>
+            <div className="cart-hero-basket"><CartIcon /><span>BG</span></div>
+            <div className="cart-hero-float-card cart-float-items"><CartIcon /><span><small>Items</small><strong>{itemCount}</strong></span></div>
+            <div className="cart-hero-float-card cart-float-total"><span className="cart-float-check">OK</span><span><small>Total</small><strong>R{total.toFixed(2)}</strong></span></div>
+          </div>
         </header>
 
         {!items.length ? (
