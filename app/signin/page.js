@@ -101,6 +101,17 @@ export default function Signin(){
           <button className="mobile-green-button" disabled={loading}>{loading?'Please wait…':forgot?'Send Reset Link':signup?'Create Account':'Sign In'}</button>
           {!forgot&&!signup&&<button className="mobile-text-button" type="button" onClick={()=>setForgot(true)}>Forgot password?</button>}
           <button className="mobile-text-button" type="button" onClick={()=>{setSignup(!signup);setForgot(false);setMsg('')}}>{signup?'Already have an account? Log In':'Create an account'}</button>
+          {!forgot&&!signup&&<div className="social-login social-login-bottom">
+            <div className="auth-divider"><span>or continue with</span></div>
+            <button type="button" className="social-login-button" disabled={loading} onClick={()=>socialSignIn('google')}>
+              <span className="google-mark" aria-hidden="true">G</span>
+              <span>Continue with Google</span>
+            </button>
+            <button type="button" className="social-login-button" disabled={loading} onClick={()=>socialSignIn('apple')}>
+              <span className="apple-mark" aria-hidden="true">●</span>
+              <span>Continue with Apple</span>
+            </button>
+          </div>}
         </form>
       </section>
     </div>
