@@ -83,6 +83,7 @@ export default function AdminPage() {
     supportRequests: [],
     payrollWeeks: [],
     payrollItems: [],
+    customerOrders: [],
   });
 
   useEffect(() => {
@@ -244,6 +245,7 @@ export default function AdminPage() {
       supportRequests: supportRequests.data || [],
       payrollWeeks: payrollWeeks.data || [],
       payrollItems: payrollItems.data || [],
+      customerOrders: customerManagement.orders || [],
     });
 
     if (showSpinner) setRefreshing(false);
@@ -601,6 +603,9 @@ export default function AdminPage() {
       pending: pending.length,
       revenue,
       customers: data.customers.filter((item) => item.role === 'customer').length,
+      purchasingCustomers: data.customers.filter((item) => item.role === 'customer' && data.customerOrders.some((order) => order.customer_id === item.id && order.status === 'delivered')).length,
+      noPurchaseCustomers: data.customers.filter((item) => item.role === 'customer' && !data.customerOrders.some((order) => order.customer_id === item.id)).length,
+      orderAttemptCustomers: data.customers.filter((item) => item.role === 'customer' && data.customerOrders.some((order) => order.customer_id === item.id) && !data.customerOrders.some((order) => order.customer_id === item.id && order.status === 'delivered')).length,
       shops: data.shops.filter((shop) => shop.active).length,
       products: data.products.filter((product) => product.available).length,
     };
@@ -650,6 +655,9 @@ export default function AdminPage() {
 
   const recentOrders = data.orders.slice(0, 8);
   const customers = data.customers.filter((item) => item.role === 'customer');
+  const successfulCustomerIds = new Set(data.customerOrders.filter((order) => order.status === 'delivered').map((order) => order.customer_id));
+  const customerOrderCount = (customerId) => data.customerOrders.filter((order) => order.customer_id === customerId).length;
+  const customerSpent = (customerId) => data.customerOrders.filter((order) => order.customer_id === customerId && order.status === 'delivered').reduce((sum, order) => sum + Number(order.total || 0), 0);
   const shopById = Object.fromEntries(data.shops.map((shop) => [shop.id, shop]));
   const customerById = Object.fromEntries(data.customers.map((customer) => [customer.id, customer]));
 
@@ -1000,21 +1008,96 @@ export default function AdminPage() {
         )}
 
         {active === 'customers' && (
-          <Panel title="Customers" subtitle="Registered customer accounts.">
-            <div className="admin-table-wrap">
-              <table className="admin-table">
-                <thead><tr><th>Name</th><th>Phone</th><th>Joined</th><th>Role</th></tr></thead>
-                <tbody>
-                  {customers.map((customer) => (
-                    <tr key={customer.id}>
-                      <td><strong>{customer.full_name || 'Unnamed customer'}</strong></td>
-                      <td>{customer.phone || '—'}</td>
-                      <td>{formatDate(customer.created_at)}</td>
-                      <td><span className="admin-status success">Customer</span></td>
-                    </tr>
-                  ))}
-                  {!customers.length && <EmptyRow label="No customer accounts yet." />}                </tbody>
-              </table>
+          <Panel title="Customer Management" subtitle="Registered accounts and purchasing activity are kept clearly separate.">
+            <div className="admin-stat-grid">
+              <Stat icon={Users} label="All registered" value={stats.customers} />
+              <Stat icon={CheckCircle2} label="Customers with purchases" value={stats.purchasingCustomers} />
+              <Stat icon={Clock3} label="No purchase yet" value={stats.noPurchaseCustomers} />
+              <Stat icon={Package} label="Order attempts" value={stats.orderAttemptCustomers} />
+            </div>
+
+            <div className="admin-customer-sections">
+              <section className="admin-customer-section">
+                <div className="admin-customer-section-head">
+                  <div><span className="admin-customer-eyebrow">01</span><h3>All Registered Customers</h3><p>Every customer account, whether they have ordered or not.</p></div>
+                  <strong>{stats.customers}</strong>
+                </div>
+                <div className="admin-table-wrap">
+                  <table className="admin-table">
+                    <thead><tr><th>Customer</th><th>Contact</th><th>Joined</th><th>Orders</th><th>Purchases</th><th>Total spent</th></tr></thead>
+                    <tbody>
+                      {customers.map((customer) => (
+                        <tr key={customer.id}>
+                          <td><strong>{customer.full_name || 'Unnamed customer'}</strong></td>
+                          <td><span>{customer.phone || '—'}</span><small className="admin-order-address">{customer.email || ''}</small></td>
+                          <td>{formatDate(customer.created_at)}</td>
+                          <td>{customerOrderCount(customer.id)}</td>
+                          <td>{successfulCustomerIds.has(customer.id) ? <span className="admin-status success">Successful</span> : <span className="admin-status muted">None</span>}</td>
+                          <td>{money(customerSpent(customer.id))}</td>
+                        </tr>
+                      ))}
+                      {!customers.length && <EmptyRow label="No customer accounts yet." colSpan={6} />}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section className="admin-customer-section">
+                <div className="admin-customer-section-head">
+                  <div><span className="admin-customer-eyebrow">02</span><h3>Customers With Purchases</h3><p>Only customers with a successfully delivered purchase appear here.</p></div>
+                  <strong>{stats.purchasingCustomers}</strong>
+                </div>
+                <div className="admin-table-wrap">
+                  <table className="admin-table">
+                    <thead><tr><th>Customer</th><th>Phone</th><th>Purchases</th><th>Total spent</th><th>Last purchase</th></tr></thead>
+                    <tbody>
+                      {customers.filter((customer) => successfulCustomerIds.has(customer.id)).map((customer) => {
+                        const purchases = data.customerOrders.filter((order) => order.customer_id === customer.id && order.status === 'delivered');
+                        const last = purchases[0];
+                        return <tr key={customer.id}><td><strong>{customer.full_name || 'Unnamed customer'}</strong></td><td>{customer.phone || '—'}</td><td>{purchases.length}</td><td>{money(customerSpent(customer.id))}</td><td>{formatDate(last?.updated_at || last?.created_at)}</td></tr>;
+                      })}
+                      {!stats.purchasingCustomers && <EmptyRow label="No successful purchases yet." colSpan={5} />}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section className="admin-customer-section">
+                <div className="admin-customer-section-head">
+                  <div><span className="admin-customer-eyebrow">03</span><h3>Registered — No Purchase Yet</h3><p>Accounts that have been created but have no order history.</p></div>
+                  <strong>{stats.noPurchaseCustomers}</strong>
+                </div>
+                <div className="admin-table-wrap">
+                  <table className="admin-table">
+                    <thead><tr><th>Customer</th><th>Phone</th><th>Email</th><th>Joined</th></tr></thead>
+                    <tbody>
+                      {customers.filter((customer) => customerOrderCount(customer.id) === 0).map((customer) => (
+                        <tr key={customer.id}><td><strong>{customer.full_name || 'Unnamed customer'}</strong></td><td>{customer.phone || '—'}</td><td>{customer.email || '—'}</td><td>{formatDate(customer.created_at)}</td></tr>
+                      ))}
+                      {!stats.noPurchaseCustomers && <EmptyRow label="Every registered customer has an order record." colSpan={4} />}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section className="admin-customer-section">
+                <div className="admin-customer-section-head">
+                  <div><span className="admin-customer-eyebrow">04</span><h3>Order Attempts — No Successful Purchase</h3><p>Customers who have an order record but none has reached delivered status.</p></div>
+                  <strong>{stats.orderAttemptCustomers}</strong>
+                </div>
+                <div className="admin-table-wrap">
+                  <table className="admin-table">
+                    <thead><tr><th>Customer</th><th>Orders</th><th>Latest status</th><th>Joined</th></tr></thead>
+                    <tbody>
+                      {customers.filter((customer) => customerOrderCount(customer.id) > 0 && !successfulCustomerIds.has(customer.id)).map((customer) => {
+                        const latest = data.customerOrders.find((order) => order.customer_id === customer.id);
+                        return <tr key={customer.id}><td><strong>{customer.full_name || 'Unnamed customer'}</strong></td><td>{customerOrderCount(customer.id)}</td><td><span className="admin-status warning">{latest?.status?.replace('_', ' ') || 'Order recorded'}</span></td><td>{formatDate(customer.created_at)}</td></tr>;
+                      })}
+                      {!stats.orderAttemptCustomers && <EmptyRow label="No unsuccessful order attempts to show." colSpan={4} />}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
             </div>
           </Panel>
         )}
