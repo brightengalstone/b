@@ -26,6 +26,10 @@ const FAST_FOOD_SLUGS = new Set([
   'romans-tshwane',
   'steers-tshwane',
   'uncle-faouzi-eersterust-plaza',
+  'fish-chips-corporation-tshwane',
+  'king-pie-tshwane',
+  'the-real-fish-chips-tshwane',
+  'zebros-tshwane',
 ]);
 
 const BRAND_DOMAINS = {
@@ -43,6 +47,10 @@ const BRAND_DOMAINS = {
   'romans-denlyn': 'romanspizza.co.za',
   'romans-tshwane': 'romanspizza.co.za',
   'steers-tshwane': 'steers.co.za',
+  'fish-chips-corporation-tshwane': 'fishandchips.co.za',
+  'king-pie-tshwane': 'kingpie.co.za',
+  'the-real-fish-chips-tshwane': 'therealfishandchips.co.za',
+  'zebros-tshwane': 'zebros.co.za',
 };
 
 
@@ -59,6 +67,13 @@ const RESTAURANT_IMAGES = {
 };
 function productImage(p, selected) {
   if (p.image_url) return p.image_url;
+  if (selected) {
+    const brand = brandName(selected.name).toLowerCase();
+    if (brand !== 'chicken licken') {
+      const params = new URLSearchParams({ brand, name: p.name, category: p.category || '' });
+      return '/api/restaurant-product-image?' + params.toString();
+    }
+  }
   if (selected && brandName(selected.name).toLowerCase() === 'chicken licken') {
     const params = new URLSearchParams({ name: p.name, category: p.category || '' });
     return '/api/chicken-licken-image?' + params.toString();
