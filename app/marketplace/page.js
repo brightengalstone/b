@@ -140,6 +140,22 @@ function matchesCraving(product, craving) {
   return [name, cat, desc].some(x => x.includes(value));
 }
 
+function restaurantMeta(name, branchCount = 1) {
+  const brand = brandName(name).toLowerCase();
+  const meta = {
+    "mcdonalds": { rating: "4.5", eta: "25–35 min", offer: "Popular" },
+    "kfc": { rating: "4.4", eta: "25–35 min", offer: "Popular" },
+    "chicken licken": { rating: "4.5", eta: "25–35 min", offer: "Local favourite" },
+    "debonairs pizza": { rating: "4.3", eta: "30–40 min", offer: "Pizza deals" },
+    "nando's": { rating: "4.5", eta: "30–40 min", offer: "Popular" },
+    "roman's pizza": { rating: "4.3", eta: "30–40 min", offer: "Pizza deals" },
+    "steers": { rating: "4.4", eta: "25–35 min", offer: "Popular" },
+    "hungry lion": { rating: "4.3", eta: "25–35 min", offer: "Meal deals" },
+    "uncle faouzi": { rating: "4.5", eta: "25–35 min", offer: "Local favourite" }
+  };
+  return meta[brand] || { rating: "4.4", eta: "25–40 min", offer: branchCount > 1 ? "Multiple branches" : "Popular" };
+}
+
 function brandName(name) {
   return (name || 'Restaurant').split(' — ')[0].trim();
 }
