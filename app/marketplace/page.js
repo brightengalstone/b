@@ -57,6 +57,15 @@ const RESTAURANT_IMAGES = {
   "hungry lion": "https://img.mrdfood.com/data/d20b9ea3-a721-4606-b68b-269b24cdd9d4.PNG",
   "uncle faouzi": "https://tb-static.uber.com/prod/image-proc/processed_images/539495ca17684e669c7d1239d1841cb1/c9252e6c6cd289c588c3381bc77b1dfc.jpeg"
 };
+function productImage(p, selected) {
+  if (p.image_url) return p.image_url;
+  if (selected && brandName(selected.name).toLowerCase() === 'chicken licken') {
+    const params = new URLSearchParams({ name: p.name, category: p.category || '' });
+    return '/api/chicken-licken-image?' + params.toString();
+  }
+  return null;
+}
+
 function restaurantImage(name, logoUrl){
   const key=brandName(name).toLowerCase().replace(/[’‘]/g,"'");
   return RESTAURANT_IMAGES[key] || logoUrl || null;
@@ -439,7 +448,7 @@ function MarketplaceContent() {
                   return (
                     <article className="product-card" key={p.id} role="button" tabIndex={0} onClick={() => setSelectedProduct(p)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedProduct(p); }}}>
                       <div className="product-image">
-                        {p.image_url ? <img src={p.image_url} alt="" loading="lazy"/> : <RetailerLogo slug={selected.slug} logoUrl={selected.logo_url} name={brandName(selected.name)}/>}
+                        {productImage(p, selected) ? <img src={productImage(p, selected)} alt={p.name} loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <RetailerLogo slug={selected.slug} logoUrl={selected.logo_url} name={brandName(selected.name)}/>} 
                         <button type="button" className={'favorite-toggle ' + (favoriteIds.has(p.id) ? 'is-favorite' : '')} onClick={e => { e.stopPropagation(); toggleFavorite(p); }} aria-label="Favorite"><Heart size={18} fill={favoriteIds.has(p.id) ? 'currentColor' : 'none'}/></button>
                       </div>
                       <div className="product-store">{selected.shopping_location}</div>
@@ -463,7 +472,7 @@ function MarketplaceContent() {
           <div className="product-modal-backdrop" role="presentation" onClick={() => setSelectedProduct(null)}>
             <section className="product-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
               <button className="product-modal-close" type="button" onClick={() => setSelectedProduct(null)} aria-label="Close"><X size={22}/></button>
-              <div className="product-modal-image">{selectedProduct.image_url ? <img src={selectedProduct.image_url} alt={selectedProduct.name}/> : <RetailerLogo slug={selected?.slug} name={selected ? brandName(selected.name) : 'Restaurant'}/>}</div>
+              <div className="product-modal-image">{productImage(selectedProduct, selected) ? <img src={productImage(selectedProduct, selected)} alt={selectedProduct.name}/> : <RetailerLogo slug={selected?.slug} name={selected ? brandName(selected.name) : 'Restaurant'}/>} </div>
               <div className="product-modal-store">{selected?.name} · {selected?.shopping_location}</div>
               <h2>{selectedProduct.name}</h2>
               {selectedProduct.size && <p className="product-modal-size">{selectedProduct.size}</p>}
