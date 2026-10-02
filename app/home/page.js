@@ -26,11 +26,11 @@ const RESTAURANT_IMAGES={
 const RESTAURANT_FALLBACKS={...RESTAURANT_IMAGES};
 
 const SUPERMARKETS=[
-{name:'Pick n Pay',image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Pick_n_Pay_Stores_Logo.png'},
-{name:'Shoprite',image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/ShopRite_Logo.png'},
-{name:'Checkers',image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Checkers_Entrance_in_Durbanville%2C_Cape_Town.jpg'},
-{name:'SPAR',image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/SUPERSPAR-Logo.png'},
-{name:'Woolworths',image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Woolworths_South_Africa.png'}
+{name:'Pick n Pay',image:'/supermarkets/pick-n-pay.svg'},
+{name:'Shoprite',image:'/supermarkets/shoprite.svg'},
+{name:'Checkers',image:'/supermarkets/checkers.svg'},
+{name:'SPAR',image:'/supermarkets/spar.svg'},
+{name:'Woolworths',image:'/supermarkets/woolworths.svg'}
 ];
 
 function SupermarketComingSoon(){
