@@ -217,6 +217,23 @@ export default function AdminPage() {
       setError(failures.map((item) => item.error.message).join(' | '));
     }
 
+    let customerManagement = { customers: customers.data || [], orders: [] };
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (accessToken) {
+        const response = await fetch('/api/admin/customers', {
+          headers: { Authorization: 'Bearer ' + accessToken },
+          cache: 'no-store',
+        });
+        const result = await response.json();
+        if (response.ok) customerManagement = result;
+        else setError(result?.error || 'Unable to load customer management data.');
+      }
+    } catch (customerError) {
+      setError(customerError?.message || 'Unable to load customer management data.');
+    }
+
     setData({
       orders: orders.data || [],
       shops: shops.data || [],
