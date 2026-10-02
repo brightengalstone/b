@@ -26,19 +26,6 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
-const NAV = [
-  { id: 'overview', label: 'Overview', icon: BarChart3 },
-  { id: 'orders', label: 'Orders', icon: Package },
-  { id: 'shops', label: 'Shops', icon: Store },
-  { id: 'products', label: 'Products', icon: ShoppingBag },
-  { id: 'customers', label: 'Customers', icon: Users },
-  { id: 'payments', label: 'Payments', icon: CircleDollarSign },
-  { id: 'delivery', label: 'Delivery', icon: Truck },
-  { id: 'drivers', label: 'Drivers', icon: UserRoundCheck },
-  { id: 'payroll', label: 'Driver Payroll', icon: FileText },
-  { id: 'support', label: 'Support', icon: MessageSquare },
-];
-
 const NAV_GROUPS = [
   { id: 'main', label: 'Main', items: [{ id: 'overview', label: 'Overview', icon: BarChart3 }] },
   { id: 'orders', label: 'Orders', items: [{ id: 'orders', label: 'All Orders', icon: Package }, { id: 'delivery', label: 'Delivery', icon: Truck }] },
