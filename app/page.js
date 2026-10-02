@@ -21,6 +21,7 @@ export default function Welcome() {
         </header>
 
         <div className="welcome-main">
+          <div className="welcome-drive-layer" aria-hidden="true"><img src="/bg-tuktuk.svg" alt="" className="welcome-drive-tuktuk" /></div>
           <div className="welcome-copy">
             <div className="welcome-eyebrow">
               <span className="welcome-live-dot" />
@@ -115,6 +116,13 @@ export default function Welcome() {
         @keyframes lightPulse{50%{opacity:.8;transform:scaleX(1.15)}}
         @media(max-width:900px){.welcome-visual{height:475px;transform:scale(.82);margin-top:-20px;margin-bottom:-25px}.welcome-tuktuk-scene{height:430px}.tuktuk-message{top:18px}.welcome-float-one{left:-8px}.welcome-float-two{right:-8px}}
         @media(max-width:560px){.welcome-visual{height:410px;transform:scale(.7);margin-top:-35px;margin-bottom:-55px}.welcome-tuktuk-scene{height:370px}.tuktuk-message{font-size:8px}.welcome-float-one{left:-15px}.welcome-float-two{right:-15px}}
+
+        .welcome-drive-layer{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+        .welcome-drive-tuktuk{position:absolute;width:min(590px,52vw);left:-650px;top:61%;filter:drop-shadow(0 25px 24px rgba(0,0,0,.48));animation:driveAcross 9s linear infinite;will-change:transform}
+        @keyframes driveAcross{0%{transform:translate3d(-5vw,-50%,0) scale(.72);opacity:0}8%{opacity:1}28%{transform:translate3d(24vw,-50%,0) scale(.78);opacity:1}50%{transform:translate3d(52vw,-50%,0) scale(.86);opacity:1}72%{transform:translate3d(80vw,-50%,0) scale(.96);opacity:1}92%{transform:translate3d(118vw,-50%,0) scale(1.06);opacity:0}100%{transform:translate3d(125vw,-50%,0) scale(1.08);opacity:0}}
+        .welcome-drive-layer:after{content:"";position:absolute;left:0;right:0;top:61%;height:120px;transform:translateY(-20%);background:radial-gradient(ellipse at center,rgba(27,211,107,.12),transparent 68%);filter:blur(18px)}
+        @media(max-width:900px){.welcome-drive-tuktuk{width:520px;top:58%;animation-duration:8s}}
+        @media(max-width:560px){.welcome-drive-tuktuk{width:430px;top:57%;animation-duration:7s}.welcome-drive-layer{z-index:6}}
         .welcome-page{min-height:100svh;background:#07110c;color:#f6faf7;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;position:relative}
         .welcome-page:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 18%,rgba(24,207,104,.12),transparent 32%),radial-gradient(circle at 82% 70%,rgba(24,207,104,.08),transparent 30%),linear-gradient(135deg,#07110c 0%,#0a1710 52%,#06100b 100%)}
         .welcome-noise{position:absolute;inset:0;opacity:.04;background-image:linear-gradient(rgba(255,255,255,.7) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.7) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(circle at center,#000,transparent 78%)}
