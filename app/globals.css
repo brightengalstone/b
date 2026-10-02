@@ -1359,3 +1359,28 @@ a{color:inherit}
 .supermarket-brand-art .supermarket-real-image,.supermarket-brand-art img{display:none!important}
 .supermarket-brand-art .supermarket-glow{display:none!important}
 @media(max-width:760px){.supermarket-brand-art{min-height:190px!important;padding:14px!important}.supermarket-brand-art:before{width:165px;height:165px}.supermarket-brand-art:after{width:110px;height:110px}.supermarket-brand-lockup{width:90%!important;min-height:88px!important;padding:16px 9px!important;border-radius:14px!important}.supermarket-brand-lockup strong{font-size:22px!important;letter-spacing:-1.1px!important}.supermarket-brand-lockup strong:after{margin-top:6px;font-size:5px!important;letter-spacing:1.4px!important}}
+
+/* Auth logo: use the real BG Smart Services tuk-tuk mark */
+.mobile-auth-logo{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:190px!important;
+  height:82px!important;
+  margin:0 auto!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  border:0!important;
+  overflow:hidden!important;
+}
+.mobile-auth-logo img{
+  display:block!important;
+  width:190px!important;
+  height:110px!important;
+  max-width:none!important;
+  object-fit:contain!important;
+}
+@media(max-width:430px){
+  .mobile-auth-logo{width:170px!important;height:74px!important}
+  .mobile-auth-logo img{width:170px!important;height:98px!important}
+}
