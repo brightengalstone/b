@@ -96,7 +96,7 @@ function brandName(name) {
 function MarketplaceContent() {
   const searchParams = useSearchParams();
   const requested = searchParams.get('retailer');
-  const requestedCraving = searchParams.get('craving') || searchParams.get('category') || '';
+  const requestedCraving = (searchParams.get('craving') || searchParams.get('category') || '').trim().toLowerCase();
   const [retailers, setRetailers] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
