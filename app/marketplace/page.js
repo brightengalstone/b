@@ -66,19 +66,17 @@ const RESTAURANT_IMAGES = {
   "uncle faouzi": "https://tb-static.uber.com/prod/image-proc/processed_images/539495ca17684e669c7d1239d1841cb1/c9252e6c6cd289c588c3381bc77b1dfc.jpeg"
 };
 function productImage(p, selected) {
-  if (p.image_url) return p.image_url;
-  if (selected) {
-    const brand = brandName(selected.name).toLowerCase();
-    if (brand !== 'chicken licken') {
-      const params = new URLSearchParams({ brand, name: p.name, category: p.category || '' });
-      return '/api/restaurant-product-image?' + params.toString();
-    }
-  }
-  if (selected && brandName(selected.name).toLowerCase() === 'chicken licken') {
+  if (!selected) return p.image_url || null;
+  const brand = brandName(selected.name).toLowerCase();
+  // Prefer the restaurant's official product image resolver so placeholder
+  // stock images already stored in the database cannot be shown as the
+  // product itself.
+  if (brand === 'chicken licken') {
     const params = new URLSearchParams({ name: p.name, category: p.category || '' });
     return '/api/chicken-licken-image?' + params.toString();
   }
-  return null;
+  const params = new URLSearchParams({ brand, name: p.name, category: p.category || '' });
+  return '/api/restaurant-product-image?' + params.toString();
 }
 
 function restaurantImage(name, logoUrl){
