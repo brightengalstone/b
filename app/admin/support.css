@@ -139,3 +139,17 @@
 @media(max-width:430px){.admin-stat-grid{grid-template-columns:1fr}.admin-header-actions{gap:6px}.admin-mobile-customer-link span{display:none}.admin-header h1{font-size:21px}}
 
 .admin-shell{background:#f4f7f6!important}.admin-sidebar{background:#0d1713!important;color:#fff!important}.admin-brand-mark{background:#19c77a!important;color:#06120c!important}.admin-nav-item.active{background:#19c77a!important;color:#06120c!important}.admin-main{padding-left:40px!important;padding-right:40px!important}.admin-stat{border-radius:20px!important;box-shadow:0 12px 30px rgba(13,36,24,.08)!important}.admin-panel{border-radius:20px!important;box-shadow:0 12px 34px rgba(13,36,24,.07)!important}
+
+/* Grouped admin navigation: keep secondary pages inside the sidebar */
+.admin-grouped-nav{gap:10px!important;padding-top:6px!important}
+.admin-nav-group{border-radius:16px}
+.admin-nav-group-title{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:transparent;color:rgba(255,255,255,.58);padding:8px 12px 6px;text-transform:uppercase;letter-spacing:.11em;font-size:10px;font-weight:800;cursor:pointer}
+.admin-nav-group.active-group .admin-nav-group-title{color:rgba(255,255,255,.88)}
+.admin-nav-chevron{transition:transform .2s ease;opacity:.7}
+.admin-nav-chevron.open{transform:rotate(90deg)}
+.admin-nav-submenu{display:grid;gap:3px}
+.admin-nav-submenu .admin-nav-item{margin:0}
+.admin-sidebar-bottom{margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.09)}
+@media (max-width:900px){
+  .admin-nav-group-title{padding-left:10px;padding-right:10px}
+}
