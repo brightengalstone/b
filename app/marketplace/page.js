@@ -350,24 +350,35 @@ function MarketplaceContent() {
                   const first = group.branches[0];
                   return (
                     <article className="restaurant-card restaurant-card-new" key={group.brand}>
-                      <div className="restaurant-cover">
-                        <img
-                          src={restaurantImage(group.brand, first.logo_url)}
-                          alt=""
-                          loading="lazy"
-                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                        />
-                        <div className="restaurant-cover-shade"/>
-                        <div className="restaurant-cover-logo">
-                          <RetailerLogo slug={first.slug} large logoUrl={first.logo_url} name={group.brand}/>
+                      <button className="restaurant-visual-card" type="button" onClick={() => chooseBranch(first.id)}>
+                        <div className="restaurant-visual-image">
+                          <img
+                            src={restaurantImage(group.brand, first.logo_url)}
+                            alt={group.brand}
+                            loading="lazy"
+                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = first.logo_url || ''; }}
+                          />
+                          <div className="restaurant-visual-gradient"/>
+                          <div className="restaurant-visual-logo">
+                            <RetailerLogo slug={first.slug} large logoUrl={first.logo_url} name={group.brand}/>
+                          </div>
+                          <span className="restaurant-visual-tag">FAST FOOD</span>
                         </div>
-                        <div className="restaurant-cover-badge">FAST FOOD</div>
-                      </div>
-                      <div className="restaurant-card-top">
-                        <div>
-                          <h3>{group.brand}</h3>
-                          <p>{group.branches.length} {group.branches.length === 1 ? 'branch' : 'branches'} · Delivery in Eersterust</p>
+                        <div className="restaurant-visual-body">
+                          <div>
+                            <h3>{group.brand}</h3>
+                            <p>{group.branches.length} {group.branches.length === 1 ? 'branch' : 'branches'} · Eersterust delivery</p>
+                          </div>
+                          <span className="restaurant-view">View menu <ArrowLeft size={15}/></span>
                         </div>
+                      </button>
+                      <div className="restaurant-branch-picks">
+                        {group.branches.map(r => (
+                          <button className="branch-choice" key={r.id} onClick={() => chooseBranch(r.id)}>
+                            <span><strong>{r.shopping_location || 'Restaurant branch'}</strong><small>{r.pickup_address || 'Pickup location available'}</small></span>
+                            <Navigation size={16}/>
+                          </button>
+                        ))}
                       </div>
                       <div className="branch-list">
                         {group.branches.map(r => (
