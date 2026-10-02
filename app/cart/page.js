@@ -98,7 +98,7 @@ export default function Cart() {
       <div className="cart-shell">
         <div className="cart-topbar">
           <Link className="cart-brand" href="/marketplace" aria-label="Back to marketplace">
-            <span className="brand-mark"><CartIcon /></span><span>BG Smart Services</span>
+            <span className="cart-logo-mark" aria-hidden="true"><span>BG</span></span><span className="cart-logo-type"><strong>BG</strong><small>SMART SERVICES</small></span>
           </Link>
           <div className="cart-top-actions"><NotificationBell /><Link className="cart-back" href="/marketplace">Continue shopping</Link></div>
         </div>
