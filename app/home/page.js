@@ -26,11 +26,11 @@ const RESTAURANT_IMAGES={
 const RESTAURANT_FALLBACKS={...RESTAURANT_IMAGES};
 
 const SUPERMARKETS=[
-{name:'Pick n Pay',image:'https://media.licdn.com/dms/image/v2/D4D10AQGbxFUtSS3MJw/image-shrink_800/image-shrink_800/0/1724485779807?e=2147483647&t=7hHNWrITynWSdt6p5AzkeBf4PxHqScT1q7y8a6Zs6n8&v=beta'},
-{name:'Shoprite',image:'https://iol-prod.appspot.com/image/60ed7ef8e2b12c14f478ad2ca4f17339d2cf64a5/1000/jpeg'},
-{name:'Checkers',image:'https://megaplex.co.za/images/90deg-checkers_20240329.jpg'},
-{name:'SPAR',image:'https://iol-prod.appspot.com/image/46e60177c71cccc609cc0ae10e58dc1edd73e56d%3Dw700'},
-{name:'Woolworths',image:'https://upload.wikimedia.org/wikipedia/commons/6/6a/Woolworths_Food%2C_Main_St._JHB.jpg'}
+{name:'Pick n Pay',tone:'blue'},
+{name:'Shoprite',tone:'red'},
+{name:'Checkers',tone:'blue'},
+{name:'SPAR',tone:'green'},
+{name:'Woolworths',tone:'charcoal'}
 ];
 
 function SupermarketComingSoon(){
@@ -40,7 +40,7 @@ return <section className="supermarket-coming-soon" aria-label="Supermarkets com
 <div className="supermarket-section-head"><div><span className="section-eyebrow">COMING SOON</span><h2>Supermarkets</h2><p>More everyday shopping is coming to BG Smart Services.</p></div><div className="supermarket-dots">{SUPERMARKETS.map((s,i)=><button key={s.name} className={i===slide?'is-active':''} onClick={()=>setSlide(i)} aria-label={s.name}/>)}</div></div>
 <div className="supermarket-carousel">
 <div className="supermarket-card">
-<div className="supermarket-card-art"><img className="supermarket-real-image" src={SUPERMARKETS[slide].image} alt={SUPERMARKETS[slide].name}/><span className="supermarket-badge">COMING SOON</span></div>
+<div className={"supermarket-card-art supermarket-brand-art supermarket-brand-"+SUPERMARKETS[slide].tone}><div className="supermarket-brand-lockup"><span className="supermarket-brand-mark">BG</span><strong>{SUPERMARKETS[slide].name}</strong></div><span className="supermarket-badge">COMING SOON</span></div>
 <div className="supermarket-card-copy"><span>SUPERMARKET {String(slide+1).padStart(2,'0')} OF 05</span><h3>{SUPERMARKETS[slide].name}</h3><p>{['Everyday essentials','Low-price shopping','Fresh food & groceries','Your local supermarket','Quality food & groceries'][slide]} will be available in a future BG Smart Services update.</p><div className="supermarket-progress"><i style={{width:`${((slide+1)/5)*100}%`}}></i></div></div>
 </div>
 <div className="supermarket-side-label"><span>EXPANDING BEYOND FAST FOOD</span><strong>More local shopping.<br/>One delivery platform.</strong></div>
