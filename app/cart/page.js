@@ -115,7 +115,6 @@ export default function Cart() {
               <div><div className="cart-hero-metric-icon cart-hero-metric-price">R</div><span><small>Subtotal</small><strong>R{subtotal.toFixed(2)}</strong></span></div>
               <div><div className="cart-hero-metric-icon"><StoreIcon /></div><span><small>Store limit</small><strong>One store</strong></span></div>
             </div>
-            {storeNotice && <div className="notice cart-store-notice">{storeNotice}</div>}
           </div>
           <div className="cart-hero-art" aria-hidden="true">
             <div className="cart-hero-ring cart-hero-ring-one"></div><div className="cart-hero-ring cart-hero-ring-two"></div>
@@ -125,6 +124,8 @@ export default function Cart() {
             <div className="cart-hero-float-card cart-float-total"><span className="cart-float-check">OK</span><span><small>Total</small><strong>R{total.toFixed(2)}</strong></span></div>
           </div>
         </header>
+
+        {storeNotice && <div className="notice cart-store-notice cart-store-notice-outside">{storeNotice}</div>}
 
         {!items.length ? (
           <section className="cart-empty food-cart-empty">
