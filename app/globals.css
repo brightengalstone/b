@@ -1105,3 +1105,11 @@ a{color:inherit}
 @keyframes cartCleanSpin{to{transform:rotate(360deg)}}@keyframes cartCleanSpinReverse{to{transform:rotate(-360deg)}}@keyframes cartCleanFloat{50%{transform:translateY(-9px)}}
 @media(max-width:850px){.cart-hero-clean{grid-template-columns:1fr;gap:34px;padding:44px 34px}.cart-clean-visual{justify-self:center;width:280px;height:210px}.cart-clean-circle-one{width:205px;height:205px}.cart-clean-circle-two{width:145px;height:145px}.cart-clean-basket{width:92px;height:92px}.cart-clean-basket svg{width:31px;height:31px}.cart-clean-copy h1{font-size:54px}}
 @media(max-width:560px){.cart-hero-clean{margin:14px 0 20px;padding:34px 23px 28px;min-height:0;gap:25px;border-radius:24px}.cart-clean-kicker{font-size:8px;letter-spacing:1.6px}.cart-clean-copy h1{font-size:43px;letter-spacing:-2.5px;margin:19px 0 14px}.cart-clean-copy h1 span{margin-top:9px;font-size:.58em}.cart-clean-copy p{font-size:12px;line-height:1.65}.cart-clean-visual{width:235px;height:175px}.cart-clean-circle-one{width:170px;height:170px}.cart-clean-circle-two{width:120px;height:120px}.cart-clean-basket{width:78px;height:78px;border-radius:24px}.cart-clean-basket svg{width:27px;height:27px}.cart-clean-basket small{font-size:6px}}
+
+/* Cart brand logo */
+.food-cart-page .cart-brand{gap:10px}
+.food-cart-page .cart-logo-mark{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#07140f;color:#06c167;font-size:22px;font-weight:950;letter-spacing:-2px;line-height:1;box-shadow:0 8px 18px rgba(7,20,15,.12)}
+.food-cart-page .cart-logo-type{display:flex;flex-direction:column;justify-content:center;line-height:1}
+.food-cart-page .cart-logo-type strong{font-size:14px;font-weight:950;letter-spacing:-.5px;color:#07140f}
+.food-cart-page .cart-logo-type small{margin-top:3px;font-size:7px;font-weight:900;letter-spacing:1.5px;color:#0b9f50}
+@media(max-width:560px){.food-cart-page .cart-logo-mark{width:36px;height:36px;border-radius:10px;font-size:20px}.food-cart-page .cart-logo-type strong{font-size:12px}.food-cart-page .cart-logo-type small{font-size:6px;letter-spacing:1.2px}}
