@@ -78,7 +78,25 @@ function TrackingContent(){
           <NotificationBell/>
         </div>
       </header>
-      <section className="tracking-hero"><div><div className="eyebrow">Live delivery tracking</div><h1>{isDelivered?'Your order has arrived.':'Your order is on the move.'}</h1><p>{isDelivered?'Thank you for using BG Smart Services.':'Follow every step from the moment your order is confirmed until it reaches your door.'}</p></div><div className={"tracking-status "+(isLive?'is-live':'')}><span className="live-dot"></span><span>{loading?'Loading status':steps[current][0]}</span></div></section>
+      <section className={"tracking-hero-premium "+(isLive?'hero-live':'')+(isDelivered?' hero-delivered':'')}>
+        <div className="hero-glow hero-glow-one"></div><div className="hero-glow hero-glow-two"></div>
+        <div className="tracking-hero-content">
+          <div className="hero-live-label"><span className="live-dot"></span><span>{loading?'Connecting to your delivery':isLive?'Live delivery':'Delivery tracking'}</span><span className="hero-live-line"></span><small>{isLive?'LIVE':'UP TO DATE'}</small></div>
+          <h1>{isDelivered?'Your order has arrived.':'Track your delivery.'}<span>{isDelivered?'Enjoy your order.':'Every step. All the way to your door.'}</span></h1>
+          <p>{isDelivered?'Thank you for trusting BG Smart Services. Your delivery journey is complete.':'Stay in the know while we bring your order to you in Eersterust.'}</p>
+          <div className="hero-metrics">
+            <div><div className="hero-metric-icon"><Truck size={17}/></div><span><small>Current status</small><strong>{loading?'Loading':steps[current][0]}</strong></span></div>
+            <div><div className="hero-metric-icon"><Clock3 size={17}/></div><span><small>Estimated arrival</small><strong>{eta}</strong></span></div>
+            <div><div className="hero-metric-icon"><MapPin size={17}/></div><span><small>Delivery zone</small><strong>Eersterust</strong></span></div>
+          </div>
+        </div>
+        <div className="hero-orbit">
+          <div className="hero-orbit-ring hero-ring-one"></div><div className="hero-orbit-ring hero-ring-two"></div>
+          <div className="hero-orbit-center"><Truck size={31}/><span>BG</span></div>
+          <div className="hero-orbit-dot hero-dot-one"></div><div className="hero-orbit-dot hero-dot-two"></div><div className="hero-orbit-dot hero-dot-three"></div>
+          <div className="hero-orbit-label"><Radio size={13}/><span>Live connection</span></div>
+        </div>
+      </section>
       {loading?<div className="card tracking-loading"><div className="tracking-loader"></div><strong>Loading your live delivery…</strong><span>Connecting to your order.</span></div>:
       <div className="tracking-grid">
         <section className="tracking-main">
