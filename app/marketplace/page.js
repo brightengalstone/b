@@ -47,9 +47,9 @@ const BRAND_DOMAINS = {
   'romans-denlyn': 'romanspizza.co.za',
   'romans-tshwane': 'romanspizza.co.za',
   'steers-tshwane': 'steers.co.za',
-  'fish-chips-corporation-tshwane': 'fishandchips.co.za',
+  'fish-chips-corp-tshwane': 'fishandchips.co.za',
   'king-pie-tshwane': 'kingpie.co.za',
-  'the-real-fish-chips-tshwane': 'therealfishandchips.co.za',
+  'real-fish-chips-tshwane': 'therealfishandchips.co.za',
   'zebros-tshwane': 'zebros.co.za',
 };
 
