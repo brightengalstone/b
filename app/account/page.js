@@ -105,19 +105,25 @@ export default function Account() {
         </header>
 
         <section className="account-hero">
-          <div>
-            <div className="eyebrow">Your account</div>
+          <div className="account-hero-copy">
+            <span className="account-hero-kicker">BG Smart Services</span>
             <h1>My Account</h1>
-            <p>Manage your BG Smart Services profile and preferences.</p>
+            <p>Everything you need to manage your profile, orders and delivery experience.</p>
+          </div>
+          <div className="account-hero-stat">
+            <span className="account-hero-stat-icon"><UserRound size={20} /></span>
+            <div><strong>{displayName}</strong><small>Customer account</small></div>
           </div>
         </section>
 
         <section className="account-profile-card">
-          <div className="account-avatar">{displayName.slice(0, 1).toUpperCase()}</div>
-          <div className="account-profile-copy">
-            <span className="account-welcome">Welcome back</span>
-            <h2>{displayName}</h2>
-            <p>{user.email}</p>
+          <div className="account-profile-main">
+            <div className="account-avatar">{displayName.slice(0, 1).toUpperCase()}</div>
+            <div className="account-profile-copy">
+              <span className="account-welcome">Welcome back</span>
+              <h2>{displayName}</h2>
+              <p>{user.email}</p>
+            </div>
           </div>
           <Link className="account-edit" href="/account/personal" aria-label="Edit profile"><Pencil size={17} /><span>Edit Profile</span></Link>
         </section>
@@ -126,8 +132,8 @@ export default function Account() {
           <AdminAccess userId={user.id} />
         )}
 
-        <section className="account-section">
-          <div className="account-section-head"><div><span className="eyebrow">Quick access</span><h2>Your activity</h2></div></div>
+        <section className="account-section account-activity-section">
+          <div className="account-section-head"><div><span className="eyebrow">Quick access</span><h2>Your activity</h2></div><span className="account-section-note">Stay on top of every order</span></div>
           <div className="account-quick-grid">
             {accountLinks.map(({ href, icon: Icon, title, text }) => (
               <Link className="account-quick-card" href={href} key={title}>
@@ -182,7 +188,7 @@ export default function Account() {
 
         <section className="account-security-card">
           <div className="account-security-icon"><LockKeyhole size={20} /></div>
-          <div><strong>Security</strong><p>Keep your account protected with a secure password.</p></div>
+          <div className="account-security-copy"><strong>Account security</strong><p>Your password and account access are protected.</p></div>
           <Link href="/account/change-password" className="btn account-password">Change Password</Link>
         </section>
 
