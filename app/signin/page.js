@@ -48,7 +48,6 @@ export default function Signin(){
       });
       setLoading(false);
       setMsg(error?.message||'Account created. Check your email if confirmation is enabled.');
-      return;
       return
     }
 
