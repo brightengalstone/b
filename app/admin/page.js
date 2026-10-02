@@ -692,6 +692,10 @@ export default function AdminPage() {
             <h1>{NAV.find((item) => item.id === active)?.label || 'Settings'}</h1>
           </div>
           <div className="admin-header-actions">
+            <Link className="admin-mobile-customer-link" href="/home" aria-label="Go to customer experience">
+              <ArrowLeft size={16} />
+              <span>Customer Experience</span>
+            </Link>
             <span className="admin-user">{profile.full_name || user.email}</span>
             <button className="admin-icon-button" onClick={() => loadDashboard(true)} title="Refresh dashboard" aria-label="Refresh dashboard">
               <RefreshCw size={18} className={refreshing ? 'admin-spin' : ''} />
