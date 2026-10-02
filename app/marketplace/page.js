@@ -26,9 +26,9 @@ const FAST_FOOD_SLUGS = new Set([
   'romans-tshwane',
   'steers-tshwane',
   'uncle-faouzi-eersterust-plaza',
-  'fish-chips-corporation-tshwane',
+  'fish-chips-corp-tshwane',
   'king-pie-tshwane',
-  'the-real-fish-chips-tshwane',
+  'real-fish-chips-tshwane',
   'zebros-tshwane',
 ]);
 
