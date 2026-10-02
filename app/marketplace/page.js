@@ -22,6 +22,7 @@ const FAST_FOOD_SLUGS = new Set([
   'romans-denlyn',
   'romans-tshwane',
   'steers-tshwane',
+  'uncle-faouzi-eersterust-plaza',
 ]);
 
 const BRAND_DOMAINS = {
