@@ -1178,3 +1178,6 @@ a{color:inherit}
 @media(max-width:760px){.supermarket-brand-visual{width:82%;height:62%;padding:12px;border-radius:16px}.supermarket-card-art .supermarket-brand-visual img[src*="Checkers_Entrance"]{object-fit:cover}}
 
 .supermarket-card-art{position:relative!important;min-height:260px!important;overflow:hidden!important}.supermarket-real-image{display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;opacity:1!important;visibility:visible!important}.supermarket-badge{z-index:5!important}
+
+.admin-mobile-customer-link{display:none;align-items:center;justify-content:center;gap:6px;text-decoration:none;color:#0b9f50;background:#fff;border:1px solid #dfe4eb;border-radius:10px;padding:8px 10px;font-size:11px;font-weight:800;white-space:nowrap}
+@media(max-width:700px){.admin-mobile-customer-link{display:inline-flex}.admin-header-actions{gap:7px}.admin-header-actions .admin-icon-button{width:36px;height:36px}}
