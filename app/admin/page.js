@@ -65,6 +65,9 @@ export default function AdminPage() {
   const [sendingSupportReply, setSendingSupportReply] = useState(null);
   const [generatingPayroll, setGeneratingPayroll] = useState(false);
   const [payingPayrollItem, setPayingPayrollItem] = useState(null);
+  const [driverHistory, setDriverHistory] = useState([]);
+  const [selectedDriverHistory, setSelectedDriverHistory] = useState(null);
+  const [loadingDriverHistory, setLoadingDriverHistory] = useState(false);
   const [driverForm, setDriverForm] = useState({ email: '', password: '', full_name: '', phone: '', vehicle_type: '', vehicle_registration: '' });
   const [error, setError] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
@@ -367,6 +370,30 @@ export default function AdminPage() {
     }));
 
     setSendingSupportReply(null);
+  }
+
+  async function loadDriverHistory(driverId) {
+    if (!supabase || !driverId) return;
+    setLoadingDriverHistory(true);
+    setSelectedDriverHistory(driverId);
+    setError('');
+
+    const { data: history, error: historyError } = await supabase
+      .from('orders')
+      .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, payment_method')
+      .eq('driver_id', driverId)
+      .order('created_at', { ascending: false })
+      .limit(500);
+
+    if (historyError) {
+      setError(historyError.message);
+      setDriverHistory([]);
+      setLoadingDriverHistory(false);
+      return;
+    }
+
+    setDriverHistory(history || []);
+    setLoadingDriverHistory(false);
   }
 
   async function updateDriver(driverId, patch) {
@@ -758,6 +785,7 @@ export default function AdminPage() {
                           <div className="admin-inline-actions">
                             <button className="admin-secondary compact" onClick={() => updateDriver(driver.id, { approved: !driver.approved, available: !driver.approved ? driver.available : false })}>{driver.approved ? 'Revoke approval' : 'Approve'}</button>
                             {driver.approved && <button className="admin-secondary compact" onClick={() => updateDriver(driver.id, { available: !driver.available })}>{driver.available ? 'Set offline' : 'Set available'}</button>}
+                            <button className="admin-secondary compact" onClick={() => loadDriverHistory(driver.id)}>View history</button>
                           </div>
                         </td>
                       </tr>
@@ -767,6 +795,59 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
+
+            {selectedDriverHistory && (() => {
+              const driver = data.driverProfiles.find((item) => item.id === selectedDriverHistory);
+              const account = customerById[selectedDriverHistory];
+              const completed = driverHistory.filter((order) => order.status === 'delivered');
+              const now = new Date();
+              const daysSinceMonday = (now.getDay() + 6) % 7;
+              const weekStart = new Date(now);
+              weekStart.setDate(now.getDate() - daysSinceMonday);
+              weekStart.setHours(0, 0, 0, 0);
+              const completedThisWeek = completed.filter((order) => new Date(order.updated_at || order.created_at) >= weekStart);
+              const totalFees = completed.reduce((sum, order) => sum + Number(order.delivery_fee || 0), 0);
+              return (
+                <section className="admin-panel" style={{ marginTop: 20 }}>
+                  <div className="admin-panel-head">
+                    <div>
+                      <h2>{account?.full_name || 'Driver'} — Delivery History</h2>
+                      <p>Complete delivery record for this driver.</p>
+                    </div>
+                    <button className="admin-secondary compact" onClick={() => { setSelectedDriverHistory(null); setDriverHistory([]); }}>Close history</button>
+                  </div>
+                  <div className="admin-stat-grid">
+                    <Stat icon={CheckCircle2} label="Completed deliveries" value={completed.length} />
+                    <Stat icon={Clock3} label="This week" value={completedThisWeek.length} />
+                    <Stat icon={CircleDollarSign} label="Delivery fees collected" value={money(totalFees)} />
+                    <Stat icon={Package} label="Total assigned" value={driverHistory.length} />
+                  </div>
+                  <div className="admin-table-wrap">
+                    <table className="admin-table">
+                      <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Address</th><th>Status</th><th>Delivery fee</th></tr></thead>
+                      <tbody>
+                        {loadingDriverHistory ? (
+                          <EmptyRow label="Loading driver history..." colSpan={6} />
+                        ) : driverHistory.map((order) => {
+                          const customer = customerById[order.customer_id];
+                          return (
+                            <tr key={order.id}>
+                              <td><strong>#{order.id.slice(0, 8).toUpperCase()}</strong></td>
+                              <td>{formatDate(order.updated_at || order.created_at)}</td>
+                              <td>{customer?.full_name || 'Customer'}</td>
+                              <td><small className="admin-order-address">{order.delivery_address || 'Address not set'}</small></td>
+                              <td><span className={order.status === 'delivered' ? 'admin-status success' : order.status === 'cancelled' ? 'admin-status danger' : 'admin-status warning'}>{order.status.replace('_', ' ')}</span></td>
+                              <td>{money(order.delivery_fee)}</td>
+                            </tr>
+                          );
+                        })}
+                        {!loadingDriverHistory && !driverHistory.length && <EmptyRow label="No deliveries found for this driver." colSpan={6} />}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              );
+            })()}
           </Panel>
         )}
 
