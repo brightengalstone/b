@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, ShoppingCart, Store, RefreshCw, MapPin, Navigation, CheckCircle2, X, Plus, Minus, Heart, ArrowLeft } from 'lucide-react';
+import { Search, ShoppingCart, Store, RefreshCw, MapPin, Navigation, CheckCircle2, X, Plus, Minus, Heart, ArrowLeft, Clock, Star, BadgePercent, ChevronRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import NotificationBell from '../../components/NotificationBell';
 import './marketplace.css';
@@ -429,14 +429,19 @@ function MarketplaceContent() {
                           <div className="restaurant-visual-logo">
                             <RetailerLogo slug={first.slug} large logoUrl={first.logo_url} name={group.brand}/>
                           </div>
-                          <span className="restaurant-visual-tag">FAST FOOD</span>
+                          <span className="restaurant-visual-tag"><BadgePercent size={12}/> {restaurantMeta(group.brand, group.branches.length).offer}</span>
                         </div>
                         <div className="restaurant-visual-body">
-                          <div>
+                          <div className="restaurant-main-copy">
                             <h3>{group.brand}</h3>
-                            <p>{group.branches.length} {group.branches.length === 1 ? 'branch' : 'branches'} · Eersterust delivery</p>
+                            <div className="restaurant-meta-line">
+                              <span><Star size={13} fill="currentColor"/> {restaurantMeta(group.brand, group.branches.length).rating}</span>
+                              <span><Clock size={13}/> {restaurantMeta(group.brand, group.branches.length).eta}</span>
+                              <span>{group.branches.length} {group.branches.length === 1 ? 'branch' : 'branches'}</span>
+                            </div>
+                            <p>Delivery across Eersterust · R65 delivery</p>
                           </div>
-                          <span className="restaurant-view">View menu <ArrowLeft size={15}/></span>
+                          <span className="restaurant-view">View menu <ChevronRight size={16}/></span>
                         </div>
                       </button>
                       <div className="restaurant-branch-picks">
@@ -459,7 +464,16 @@ function MarketplaceContent() {
               <div className="retailer-hero-brand">
                 <button className="btn" type="button" onClick={backToRestaurants}><ArrowLeft size={17}/> Restaurants</button>
                 <RetailerLogo slug={selected.slug} large logoUrl={selected.logo_url} name={brandName(selected.name)}/>
-                <div><div className="eyebrow">BG Smart Services · Fast Food</div><h1>{brandName(selected.name)}</h1><p>{selected.shopping_location} · Selected pickup branch</p></div>
+                <div>
+                  <div className="eyebrow">BG Smart Services · Fast Food</div>
+                  <h1>{brandName(selected.name)}</h1>
+                  <div className="selected-store-meta">
+                    <span><Star size={14} fill="currentColor"/> {restaurantMeta(selected.name).rating}</span>
+                    <span><Clock size={14}/> {restaurantMeta(selected.name).eta}</span>
+                    <span><BadgePercent size={14}/> {restaurantMeta(selected.name).offer}</span>
+                  </div>
+                  <p>{selected.shopping_location} · Selected pickup branch</p>
+                </div>
               </div>
               <div className="store-location-card">
                 <div className="location-icon"><MapPin size={18}/></div>
@@ -533,6 +547,15 @@ function MarketplaceContent() {
           </div>
         )}
 
+        {cartCount > 0 && (
+          <div className="market-sticky-cart">
+            <div className="sticky-cart-copy">
+              <span className="sticky-cart-icon"><ShoppingCart size={18}/></span>
+              <div><strong>{cartCount} {cartCount === 1 ? 'item' : 'items'} in your cart</strong><small>{selected ? selected.name : 'Ready for checkout'}</small></div>
+            </div>
+            <Link href="/cart" className="sticky-cart-button">View cart <ChevronRight size={17}/></Link>
+          </div>
+        )}
         <div className="delivery-note"><CheckCircle2 size={14}/> Exact branch pickup is sent with the order · Delivery across Eersterust · R65 delivery</div>
       </div>
     </main>
