@@ -42,7 +42,23 @@ const BRAND_DOMAINS = {
   'steers-tshwane': 'steers.co.za',
 };
 
-const BRANCH_CLASSES = {};
+
+const RESTAURANT_IMAGES = {
+  "mcdonalds": "https://tb-static.uber.com/prod/image-proc/processed_images/63da31f5a12efe093a58a2bfda353828/bc9c318a9c96996e2d990faf2b0c65f6.jpeg",
+  "kfc": "https://tb-static.uber.com/prod/image-proc/processed_images/c9eed5cae53c68e35c237b07926786ac/3ac2b39ad528f8c8c5dc77c59abb683d.jpeg",
+  "chicken licken": "https://tb-static.uber.com/prod/image-proc/processed_images/edb7ab8c53d9918215554ff2d613bc2e/58f691da9eaef86b0b51f9b2c483fe63.jpeg",
+  "debonairs pizza": "https://media.cylex.net.za/companies/2369/2717/images/-341338167-Large-Chicken-Mushroom-pizza-from-Debonairs-Pizza-placed-on-top-of-a-black-plate-on-a-_755684_large.jpg",
+  "nando's": "https://tb-static.uber.com/prod/image-proc/processed_images/20e813d036254cadbb3a8280a76b55d3/c9252e6c6cd289c588c3381bc77b1dfc.jpeg",
+  "roman's pizza": "https://tb-static.uber.com/prod/image-proc/processed_images/514842a8cd43da79a6a07e730fdc456e/fb86662148be855d931b37d6c1e5fcbe.jpeg",
+  "steers": "https://steers.co.za/images/menu/2023/july/single-page-product-images/burgers/king-steers-burgers/nextImageExportOptimizer/mighty-king-steer-burger-leftright-chips-opt-750.PNG",
+  "hungry lion": "https://img.mrdfood.com/data/d20b9ea3-a721-4606-b68b-269b24cdd9d4.PNG",
+  "uncle faouzi": "https://tb-static.uber.com/prod/image-proc/processed_images/539495ca17684e669c7d1239d1841cb1/c9252e6c6cd289c588c3381bc77b1dfc.jpeg"
+};
+function restaurantImage(name, logoUrl){
+  const key=brandName(name).toLowerCase().replace(/[’‘]/g,"'");
+  return RESTAURANT_IMAGES[key] || logoUrl || null;
+}
+\nconst BRANCH_CLASSES = {};
 function retailerClass(slug, category) {
   return BRANCH_CLASSES[slug] || (category === 'fast-food' ? 'retailer-fast-food' : 'retailer-generic');
 }
@@ -308,7 +324,7 @@ function MarketplaceContent() {
 
         {!selected ? (
           <>
-            <section className="fastfood-hero">
+            <section className="fastfood-hero marketplace-hero-new">
               <div className="fastfood-hero-copy">
                 <span className="fastfood-kicker">BG SMART SERVICES · EERSTERUST</span>
                 <h1>What are you craving?</h1>
@@ -335,7 +351,7 @@ function MarketplaceContent() {
                 {groups.map(group => {
                   const first = group.branches[0];
                   return (
-                    <article className="restaurant-card" key={group.brand}>
+                    <article className="restaurant-card restaurant-card-new" key={group.brand}>
                       <div className="restaurant-card-top">
                         <RetailerLogo slug={first.slug} large logoUrl={first.logo_url} name={group.brand}/>
                         <div><h3>{group.brand}</h3><p>{group.branches.length} {group.branches.length === 1 ? 'branch' : 'branches'}</p></div>
