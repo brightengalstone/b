@@ -11,7 +11,30 @@ const categories=[['Burgers','https://images.unsplash.com/photo-1550547660-d9450
 
 function TukTukMockup(){return <div className="eersterust-tuktuk-mockup" role="img" aria-label="BG Smart Services tuk tuk"><div className="tuk-roof">BG DELIVERY</div><div className="tuk-window"><i></i><i></i><i></i></div><div className="tuk-body"><strong>BG SMART</strong><b>SERVICES</b></div><div className="tuk-wheel tuk-wheel-left"></div><div className="tuk-wheel tuk-wheel-right"></div></div>}
 
-function StoreCard({store,image}){const [brand,location]=store.name.split(' — ');return <Link href={'/marketplace?retailer='+store.slug} className="food-discovery-card"><div className="food-discovery-image">{image?<img src={image} alt={brand} loading="eager" onError={e=>{e.currentTarget.src="https://images.unsplash.com/photo-1568901346375-23c9450c58db?auto=format&fit=crop&w=900&q=90"}}/>:<div className="food-image-fallback"><Utensils size={30}/></div>}<span className="food-time"><Clock3 size={13}/> 30–45 min</span><span className="food-rating"><Star size={12} fill="currentColor"/> 4.8</span></div><div className="food-discovery-info"><div><h3>{brand}</h3><p>{location||store.shopping_location}</p></div><ChevronRight size={18}/></div></Link>}
+const RESTAURANT_IMAGES={
+  "mcdonald's":"https://pub-5bcc3edf34304d04b59dc91e1ad9d2fd.r2.dev/southafrica.tortoisepath.com/uploads/2023/10/13040356/McDonalds-Auckland-Park-Drive-Thru-Johannesburg-South-Africa-TortoisePathcom-3.jpeg",
+  "kfc":"https://img.p.mapq.st/?q=75&url=https%3A%2F%2Fmedia-cdn.tripadvisor.com%2Fmedia%2Fphoto-o%2F26%2Fb2%2F6a%2Fa6%2Fkfc-chicken-bucket-meal.jpg%3Fw%3D3840",
+  "chicken licken":"https://tb-static.uber.com/prod/image-proc/processed_images/edb7ab8c53d9918215554ff2d613bc2e/58f691da9eaef86b0b51f9b2c483fe63.jpeg",
+  "debonairs pizza":"https://media.cylex.net.za/companies/2369/2717/images/-341338167-Large-Chicken-Mushroom-pizza-from-Debonairs-Pizza-placed-on-top-of-a-black-plate-on-a-_755684_large.jpg",
+  "nando's":"https://tb-static.uber.com/prod/image-proc/processed_images/20e813d036254cadbb3a8280a76b55d3/c9252e6c6cd289c588c3381bc77b1dfc.jpeg",
+  "roman's pizza":"https://tb-static.uber.com/prod/image-proc/processed_images/514842a8cd43da79a6a07e730fdc456e/fb86662148be855d931b37d6c1e5fcbe.jpeg",
+  "steers":"https://steers.co.za/images/menu/2023/july/single-page-product-images/burgers/king-steers-burgers/nextImageExportOptimizer/mighty-king-steer-burger-leftright-chips-opt-750.PNG",
+  "hungry lion":"https://tb-static.uber.com/prod/image-proc/processed_images/f9f0b221a1961828212e1d678c1d4946/5283d81c664b43c5f57a3a186d273063.jpeg"
+};
+
+function StoreCard({store,image}){
+  const [brand,location]=store.name.split(' — ');
+  const key=brand.toLowerCase().trim();
+  const restaurantImage=RESTAURANT_IMAGES[key]||image;
+  return <Link href={'/marketplace?retailer='+store.slug} className="food-discovery-card">
+    <div className="food-discovery-image">
+      {restaurantImage?<img src={restaurantImage} alt={brand} loading="lazy"/>:<div className="food-image-fallback"><Utensils size={30}/></div>}
+      <span className="food-time"><Clock3 size={13}/> 30–45 min</span>
+      <span className="food-rating"><Star size={12} fill="currentColor"/> 4.8</span>
+    </div>
+    <div className="food-discovery-info"><div><h3>{brand}</h3><p>{location||store.shopping_location}</p></div><ChevronRight size={18}/></div>
+  </Link>
+}
 
 export default function Home(){
   const[open,setOpen]=useState(false),[stores,setStores]=useState([]),[foodImages,setFoodImages]=useState({}),[name,setName]=useState('Customer'),[unreadCount,setUnreadCount]=useState(0),[search,setSearch]=useState(''),[searchFocused,setSearchFocused]=useState(false); const searchMatches=search.trim()?stores.filter(s=>`${s.name} ${s.slug||''}`.toLowerCase().includes(search.trim().toLowerCase())).slice(0,5):[];
