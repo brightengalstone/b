@@ -20,24 +20,28 @@ const normalize = value => String(value || '')
   .trim()
   .toLowerCase();
 
+function absolutize(value, page) {
+  if (!value || value.startsWith('data:')) return null;
+  if (value.startsWith('//')) return 'https:' + value;
+  if (value.startsWith('/')) return new URL(value, page).toString();
+  if (/^https?:\\/\\//i.test(value)) return value;
+  try { return new URL(value, page).toString(); } catch { return null; }
+}
+
 function findImage(html, productName, page) {
   const target = normalize(productName);
   if (!target) return null;
-  const tags = html.match(/<img\b[^>]*>/gi) || [];
+  const tags = html.match(/<img\\b[^>]*>/gi) || [];
   for (const tag of tags) {
-    const alt = tag.match(/\balt=["']([^"']+)["']/i);
+    const alt = tag.match(/\\balt=["']([^"']+)["']/i);
     if (!alt) continue;
     const candidate = normalize(alt[1]);
     if (!candidate || (candidate !== target && !candidate.includes(target) && !target.includes(candidate))) continue;
-    const src = tag.match(/\bsrc=["']([^"']+)["']/i);
-    if (!src) continue;
-    let url = src[1];
-    if (url.startsWith('//')) url = 'https:' + url;
-    if (url.startsWith('/')) {
-      const origin = new URL(page).origin;
-      url = origin + url;
-    }
-    if (!url.startsWith('data:')) return url;
+    const source = tag.match(/(?:src|data-src|data-lazy-src)=["']([^"']+)["']/i);
+    const srcset = tag.match(/(?:srcset|data-srcset)=["']([^"']+)["']/i);
+    const raw = source?.[1] || (srcset?.[1] || '').split(',').pop()?.trim().split(/\\s+/)[0];
+    const url = absolutize(raw, page);
+    if (url) return url;
   }
   return null;
 }
