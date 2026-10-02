@@ -58,7 +58,8 @@ function restaurantImage(name, logoUrl){
   const key=brandName(name).toLowerCase().replace(/[’‘]/g,"'");
   return RESTAURANT_IMAGES[key] || logoUrl || null;
 }
-\nconst BRANCH_CLASSES = {};
+
+const BRANCH_CLASSES = {};
 function retailerClass(slug, category) {
   return BRANCH_CLASSES[slug] || (category === 'fast-food' ? 'retailer-fast-food' : 'retailer-generic');
 }
