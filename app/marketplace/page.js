@@ -96,7 +96,7 @@ function brandName(name) {
 function MarketplaceContent() {
   const searchParams = useSearchParams();
   const requested = searchParams.get('retailer');
-  const requestedCraving = searchParams.get('category') || '';
+  const requestedCraving = searchParams.get('craving') || searchParams.get('category') || '';
   const [retailers, setRetailers] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -238,7 +238,7 @@ function MarketplaceContent() {
     if (branch) {
       const params = new URLSearchParams();
       params.set('retailer', branch.slug);
-      if (requestedCraving) params.set('category', requestedCraving);
+      if (requestedCraving) params.set('craving', requestedCraving);
       window.history.replaceState(null, '', '/marketplace?' + params.toString());
     }
   }
