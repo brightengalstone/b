@@ -1275,3 +1275,63 @@ a{color:inherit}
     white-space:nowrap;
   }
 }
+
+
+/* Final auth brand lockup */
+.mobile-auth-logo{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-height:44px;
+}
+.mobile-auth-logo-mark{
+  position:relative;
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  border-radius:13px;
+  display:grid;
+  place-items:center;
+  background:#07140f;
+  box-shadow:0 8px 18px rgba(7,20,15,.16);
+  overflow:hidden;
+}
+.mobile-auth-logo-mark span{
+  color:#fff;
+  font-size:17px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:-1.5px;
+}
+.mobile-auth-logo-mark i{
+  position:absolute;
+  left:7px;
+  right:7px;
+  bottom:6px;
+  height:3px;
+  border-radius:99px;
+  background:#18d86d;
+}
+.mobile-auth-logo-wordmark{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  line-height:1;
+}
+.mobile-auth-logo-wordmark strong{
+  color:#07140f;
+  font-size:13px;
+  font-weight:950;
+  letter-spacing:.3px;
+}
+.mobile-auth-logo-wordmark small{
+  margin-top:5px;
+  color:#0b9f50;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:2.2px;
+}
+@media(max-width:560px){
+  .mobile-auth-logo-mark{width:42px;height:42px;flex-basis:42px}
+  .mobile-auth-logo-wordmark strong{font-size:12px}
+}
