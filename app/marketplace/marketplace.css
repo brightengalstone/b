@@ -275,6 +275,44 @@
   object-fit:cover;
   transition:transform .5s ease;
 }
+.restaurant-card-image-fallback,
+.restaurant-card-image-fallback>img,
+.restaurant-card-image-placeholder{
+  width:100%;
+  height:100%;
+}
+.restaurant-card-image-fallback>img{
+  display:block;
+  object-fit:cover;
+}
+.restaurant-card-image-placeholder{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#f5f6f8,#dfe3e8);
+}
+.restaurant-card-image-placeholder img{
+  width:92px;
+  height:92px;
+  object-fit:contain;
+  background:#fff;
+  border-radius:20px;
+  padding:14px;
+  box-shadow:0 10px 28px rgba(0,0,0,.14);
+}
+.restaurant-card-image-placeholder span{
+  width:92px;
+  height:92px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:20px;
+  background:#fff;
+  color:#111827;
+  font-size:28px;
+  font-weight:900;
+  box-shadow:0 10px 28px rgba(0,0,0,.14);
+}
 .restaurant-visual-card:hover .restaurant-visual-image>img{transform:scale(1.06)}
 .restaurant-visual-gradient{
   position:absolute;inset:0;
