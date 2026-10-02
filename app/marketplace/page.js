@@ -73,6 +73,22 @@ function RetailerLogo({ slug, large = false, logoUrl = null, name = 'Restaurant'
   );
 }
 
+
+function matchesCraving(product, craving) {
+  const value = (craving || '').trim().toLowerCase();
+  if (!value) return true;
+  const name = String(product.name || '').toLowerCase();
+  const cat = String(product.category || '').toLowerCase();
+  const desc = String(product.description || '').toLowerCase();
+  if (value === 'burgers') return cat.includes('burger') || name.includes('burger') || desc.includes('burger');
+  if (value === 'chicken') return cat.includes('chicken') || name.includes('chicken') || desc.includes('chicken');
+  if (value === 'pizza') return cat.includes('pizza') || name.includes('pizza') || desc.includes('pizza');
+  if (value === 'meals & combos') return ['meal','combo'].some(x => cat.includes(x) || name.includes(x));
+  if (value === 'sides') return ['side','fries','chips','nugget'].some(x => cat.includes(x) || name.includes(x));
+  if (value === 'drinks') return ['drink','beverage','cola','coke','pepsi','water','juice','shake'].some(x => cat.includes(x) || name.includes(x));
+  return [name, cat, desc].some(x => x.includes(value));
+}
+
 function brandName(name) {
   return (name || 'Restaurant').split(' — ')[0].trim();
 }
@@ -169,19 +185,8 @@ function MarketplaceContent() {
     const map = new Map();
     const term = query.trim().toLowerCase();
     const craving = requestedCraving.trim().toLowerCase();
-    const cravingTerms = craving === 'burgers' ? ['burger']
-      : craving === 'chicken' ? ['chicken']
-      : craving === 'pizza' ? ['pizza']
-      : craving === 'meals & combos' ? ['meal', 'combo']
-      : craving === 'sides' ? ['side', 'fries', 'chips', 'nugget']
-      : craving === 'drinks' ? ['drink', 'beverage', 'cola', 'coke', 'pepsi', 'water', 'juice', 'shake']
-      : craving ? [craving]
-      : [];
-    const branchHasCraving = r => !cravingTerms.length || products.some(p => {
-      if (p.retailer_id !== r.id) return false;
-      const text = [p.name, p.description, p.category, p.size].filter(Boolean).join(' ').toLowerCase();
-      return cravingTerms.some(term => text.includes(term));
-    });
+    const cravingTerms = [];
+    const branchHasCraving = r => !craving || products.some(p => p.retailer_id === r.id && matchesCraving(p, craving));
     for (const r of retailers) {
       const brand = brandName(r.name);
       const searchable = [brand, r.name, r.shopping_location, r.pickup_address].filter(Boolean).join(' ').toLowerCase();
@@ -206,20 +211,11 @@ function MarketplaceContent() {
     if (!selected) return [];
     const term = query.trim().toLowerCase();
     const craving = requestedCraving.trim().toLowerCase();
-    const cravingTerms = craving === 'burgers' ? ['burger']
-      : craving === 'chicken' ? ['chicken']
-      : craving === 'pizza' ? ['pizza']
-      : craving === 'meals & combos' ? ['meal', 'combo']
-      : craving === 'sides' ? ['side', 'fries', 'chips', 'nugget']
-      : craving === 'drinks' ? ['drink', 'beverage', 'cola', 'coke', 'pepsi', 'water', 'juice', 'shake']
-      : craving ? [craving]
-      : [];
     return products.filter(p => {
       const matchesBranch = p.retailer_id === selected.id;
       const matchesCategory = category === 'all' || p.category === category;
       const text = [p.name, p.description, p.category, p.size].filter(Boolean).join(' ').toLowerCase();
-      const matchesCraving = !cravingTerms.length || cravingTerms.some(term => text.includes(term));
-      return matchesBranch && matchesCategory && matchesCraving && (!term || text.includes(term));
+      return matchesBranch && matchesCategory && matchesCraving(p, craving) && (!term || text.includes(term));
     });
   }, [products, selected, query, category, requestedCraving]);
 
