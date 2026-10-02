@@ -48,7 +48,17 @@ export default function Signin(){
       });
       setLoading(false);
       setMsg(error?.message||'Account created. Check your email if confirmation is enabled.');
-      if(!error)setTimeout(()=>window.location.href='/home',700);
+      if(!error)setTimeout(()=>const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', (await supabase.auth.getUser()).data.user?.id)
+      .maybeSingle();
+
+    const role = profile?.role || 'customer';
+    if (role === 'admin') window.location.href = '/admin';
+    else if (role === 'driver') window.location.href = '/driver';
+    else if (role === 'merchant') window.location.href = '/merchant';
+    else window.location.href = '/home',700);
       return
     }
 
