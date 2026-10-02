@@ -27,7 +27,7 @@ const RESTAURANT_FALLBACKS={...RESTAURANT_IMAGES};
 
 function StoreCard({store,image}){
   const [brand,location]=store.name.split(' — ');
-  const key=brand.toLowerCase().trim();
+  const key=brand.toLowerCase().trim().replace(/[’‘]/g,"'");
   const restaurantImage=RESTAURANT_IMAGES[key]||image;
   return <Link href={'/marketplace?retailer='+store.slug} className="food-discovery-card">
     <div className="food-discovery-image">
