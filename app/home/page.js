@@ -25,6 +25,24 @@ const RESTAURANT_IMAGES={
 
 const RESTAURANT_FALLBACKS={...RESTAURANT_IMAGES};
 
+const SUPERMARKETS=[
+{name:'Pick n Pay',image:'https://logo.clearbit.com/pnp.co.za',accent:'Everyday essentials'},
+{name:'Shoprite',image:'https://logo.clearbit.com/shoprite.co.za',accent:'Low-price shopping'},
+{name:'Checkers',image:'https://logo.clearbit.com/checkers.co.za',accent:'Fresh food & groceries'},
+{name:'SPAR',image:'https://logo.clearbit.com/spar.co.za',accent:'Your local supermarket'},
+{name:'Woolworths',image:'https://logo.clearbit.com/woolworths.co.za',accent:'Quality food & groceries'}
+];
+
+function SupermarketComingSoon(){
+const [slide,setSlide]=useState(0);
+useEffect(()=>{const timer=setInterval(()=>setSlide(s=>(s+1)%SUPERMARKETS.length),4500);return()=>clearInterval(timer)},[]);
+const shop=SUPERMARKETS[slide];
+return <section className="supermarket-coming-soon" aria-label="Supermarkets coming soon">
+<div className="supermarket-section-head"><div><span className="section-eyebrow">COMING SOON</span><h2>Supermarkets</h2><p>More everyday shopping is coming to BG Smart Services.</p></div><div className="supermarket-dots">{SUPERMARKETS.map((s,i)=><button key={s.name} className={i===slide?'is-active':''} onClick={()=>setSlide(i)} aria-label={`Show ${s.name}`}/>)}</div></div>
+<div className="supermarket-carousel"><div className="supermarket-card"><div className="supermarket-card-art"><div className="supermarket-glow"></div><img src={shop.image} alt={shop.name} onError={e=>{e.currentTarget.style.display='none';e.currentTarget.nextElementSibling.style.display='grid'}}/><div className="supermarket-logo-fallback">{shop.name.split(' ').map(w=>w[0]).join('').slice(0,3)}</div><span className="supermarket-badge">COMING SOON</span></div><div className="supermarket-card-copy"><span>SUPERMARKET {String(slide+1).padStart(2,'0')}</span><h3>{shop.name}</h3><p>{shop.accent} will be available here in a future BG Smart Services update.</p><div className="supermarket-progress"><i style={{width:`${((slide+1)/5)*100}%`}}></i></div></div></div><div className="supermarket-side-label"><span>EXPANDING BEYOND FAST FOOD</span><strong>More local shopping.<br/>One delivery platform.</strong></div></div>
+</section>
+}
+
 function StoreCard({store,image}){
   const [brand,location]=store.name.split(' — ');
   const key=brand.toLowerCase().trim().replace(/[’‘]/g,"'");
@@ -51,7 +69,7 @@ export default function Home(){
 
 
 
-    <nav className="delivery-bottom-nav"><Link href="/home" className="active"><House size={19}/><small>Home</small></Link><Link href="/marketplace"><Store size={19}/><small>Browse</small></Link><Link href="/cart"><ShoppingCart size={19}/><small>Cart</small></Link><Link href="/orders"><Package size={19}/><small>Orders</small></Link><button onClick={()=>setOpen(true)}><MoreHorizontal size={19}/><small>More</small></button></nav>
+    <SupermarketComingSoon />\n\n    <nav className="delivery-bottom-nav"><Link href="/home" className="active"><House size={19}/><small>Home</small></Link><Link href="/marketplace"><Store size={19}/><small>Browse</small></Link><Link href="/cart"><ShoppingCart size={19}/><small>Cart</small></Link><Link href="/orders"><Package size={19}/><small>Orders</small></Link><button onClick={()=>setOpen(true)}><MoreHorizontal size={19}/><small>More</small></button></nav>
     {open&&<div className="menu-overlay" onClick={()=>setOpen(false)}><aside className="app-menu" onClick={e=>e.stopPropagation()}><div className="menu-head"><div><span className="brand-mark">BG</span><strong>Smart Services</strong></div><button className="icon-button" aria-label="Close menu" onClick={()=>setOpen(false)}><X size={20}/></button></div><nav className="menu-list">{menuItems.map(([Icon,label,href])=><Link href={href} key={label} onClick={()=>setOpen(false)}><Icon size={19}/><span>{label}</span></Link>)}<button className="menu-signout" onClick={async()=>{await supabase.auth.signOut();window.location.href='/'}}><LogOut size={19}/><span>Sign Out</span></button></nav></aside></div>}
     </main>
 }
