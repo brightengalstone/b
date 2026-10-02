@@ -36,8 +36,21 @@ export default function Cart() {
   const [storeNotice, setStoreNotice] = useState('');
 
   useEffect(() => {
-    try { setItems(JSON.parse(localStorage.getItem('bg_cart') || '[]')); }
-    catch { setItems([]); }
+    try {
+      const saved = JSON.parse(localStorage.getItem('bg_cart') || '[]');
+      // Repair carts created before product images were persisted.
+      const repaired = saved.map(item => {
+        if (item.image_url || item.image) return item;
+        return {
+          ...item,
+          image_url: item.catalogue_image_url || item.product_image_url || '',
+        };
+      });
+      setItems(repaired);
+      if (JSON.stringify(repaired) !== JSON.stringify(saved)) {
+        localStorage.setItem('bg_cart', JSON.stringify(repaired));
+      }
+    } catch { setItems([]); }
     const tick = () => setStatus(getOrderingStatus());
     tick();
     const id = setInterval(tick, 30000);
