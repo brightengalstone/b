@@ -41,6 +41,36 @@ export default function Checkout() {
     }
 
     (async () => {
+      // Hydrate legacy cart entries from the live catalogue so Review your order
+      // always uses the same exact product image as the Marketplace.
+      try {
+        const saved = JSON.parse(localStorage.getItem('bg_cart') || '[]');
+        const ids = saved.map(item => item.id).filter(id => id && !String(id).startsWith('demo-'));
+        let productRows = [];
+        if (supabase && ids.length) {
+          const { data } = await supabase
+            .from('retailer_products')
+            .select('id,name,category,image_url')
+            .in('id', ids);
+          productRows = data || [];
+        }
+        const byId = Object.fromEntries(productRows.map(p => [p.id, p]));
+        const hydrated = saved.map(item => {
+          const product = byId[item.id];
+          const fallback = !item.image_url && !item.image && /chicken licken/i.test(item.storeName || item.store || item.merchantName || '')
+            ? '/api/chicken-licken-image?' + new URLSearchParams({ name: item.name || product?.name || '', category: item.category || product?.category || '' }).toString()
+            : '';
+          return {
+            ...item,
+            image_url: item.image_url || item.image || product?.image_url || fallback || '',
+          };
+        });
+        setItems(hydrated);
+        localStorage.setItem('bg_cart', JSON.stringify(hydrated));
+      } catch {
+        try { setItems(JSON.parse(localStorage.getItem('bg_cart') || '[]')); } catch { setItems([]); }
+      }
+
       if (!supabase) return;
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
