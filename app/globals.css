@@ -1335,3 +1335,27 @@ a{color:inherit}
   .mobile-auth-logo-mark{width:42px;height:42px;flex-basis:42px}
   .mobile-auth-logo-wordmark strong{font-size:12px}
 }
+
+/* Coming Soon supermarket brand graphics — photo-free presentation */
+.supermarket-brand-art{position:relative!important;display:grid!important;place-items:center!important;min-height:260px!important;padding:26px!important;overflow:hidden!important;background:#f4f6f8!important}
+.supermarket-brand-art:before{content:"";position:absolute;width:230px;height:230px;border-radius:50%;border:1px solid rgba(16,24,40,.07);top:50%;left:50%;transform:translate(-50%,-50%)}
+.supermarket-brand-art:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.78);top:50%;left:50%;transform:translate(-50%,-50%)}
+.supermarket-brand-lockup{position:relative!important;z-index:3!important;width:min(250px,90%)!important;min-height:118px!important;padding:22px 16px!important;border-radius:18px!important;display:grid!important;place-items:center!important;text-align:center!important;background:#fff!important;border:1px solid rgba(16,24,40,.08)!important;box-shadow:0 18px 40px rgba(16,24,40,.12)!important}
+.supermarket-brand-lockup .supermarket-brand-mark{display:none!important}
+.supermarket-brand-lockup strong{font-size:clamp(24px,3vw,38px)!important;line-height:1!important;letter-spacing:-1.7px!important;font-weight:950!important}
+.supermarket-brand-lockup strong:after{content:"COMING SOON";display:block;margin-top:9px;font-size:7px;line-height:1;letter-spacing:2px;font-weight:900;color:#667085}
+.supermarket-brand-blue{background:#eef5fc!important}
+.supermarket-brand-blue .supermarket-brand-lockup{color:#0055b8!important;border-color:rgba(0,85,184,.18)!important}
+.supermarket-brand-blue .supermarket-brand-lockup strong:after{color:#3978bd!important}
+.supermarket-brand-red{background:#fbf0f1!important}
+.supermarket-brand-red .supermarket-brand-lockup{color:#d71920!important;border-color:rgba(215,25,32,.18)!important}
+.supermarket-brand-red .supermarket-brand-lockup strong:after{color:#b64a4f!important}
+.supermarket-brand-green{background:#f0f8f3!important}
+.supermarket-brand-green .supermarket-brand-lockup{color:#08783e!important;border-color:rgba(8,120,62,.18)!important}
+.supermarket-brand-green .supermarket-brand-lockup strong:after{color:#4c8464!important}
+.supermarket-brand-charcoal{background:#f1f2f1!important}
+.supermarket-brand-charcoal .supermarket-brand-lockup{color:#202421!important;border-color:rgba(32,36,33,.15)!important}
+.supermarket-brand-charcoal .supermarket-brand-lockup strong:after{color:#6d746f!important}
+.supermarket-brand-art .supermarket-real-image,.supermarket-brand-art img{display:none!important}
+.supermarket-brand-art .supermarket-glow{display:none!important}
+@media(max-width:760px){.supermarket-brand-art{min-height:190px!important;padding:14px!important}.supermarket-brand-art:before{width:165px;height:165px}.supermarket-brand-art:after{width:110px;height:110px}.supermarket-brand-lockup{width:90%!important;min-height:88px!important;padding:16px 9px!important;border-radius:14px!important}.supermarket-brand-lockup strong{font-size:22px!important;letter-spacing:-1.1px!important}.supermarket-brand-lockup strong:after{margin-top:6px;font-size:5px!important;letter-spacing:1.4px!important}}
