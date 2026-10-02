@@ -236,7 +236,7 @@ function MarketplaceContent() {
   function chooseBranch(id) {
     const branch = retailers.find(r => r.id === id);
     setSelectedId(id);
-    setCategory(requestedCraving || 'all');
+    setCategory('all');
     setQuery('');
     setSelectedProduct(null);
     if (branch) {
