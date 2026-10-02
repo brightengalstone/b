@@ -62,6 +62,7 @@ function brandName(name) {
 function MarketplaceContent() {
   const searchParams = useSearchParams();
   const requested = searchParams.get('retailer');
+  const requestedCraving = searchParams.get('category') || '';
   const [retailers, setRetailers] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -149,17 +150,32 @@ function MarketplaceContent() {
   const groups = useMemo(() => {
     const map = new Map();
     const term = query.trim().toLowerCase();
+    const craving = requestedCraving.trim().toLowerCase();
+    const cravingTerms = craving === 'burgers' ? ['burger']
+      : craving === 'chicken' ? ['chicken']
+      : craving === 'pizza' ? ['pizza']
+      : craving === 'meals & combos' ? ['meal', 'combo']
+      : craving === 'sides' ? ['side', 'fries', 'chips', 'nugget']
+      : craving === 'drinks' ? ['drink', 'beverage', 'cola', 'coke', 'pepsi', 'water', 'juice', 'shake']
+      : craving ? [craving]
+      : [];
+    const branchHasCraving = r => !cravingTerms.length || products.some(p => {
+      if (p.retailer_id !== r.id) return false;
+      const text = [p.name, p.description, p.category, p.size].filter(Boolean).join(' ').toLowerCase();
+      return cravingTerms.some(term => text.includes(term));
+    });
     for (const r of retailers) {
       const brand = brandName(r.name);
       const searchable = [brand, r.name, r.shopping_location, r.pickup_address].filter(Boolean).join(' ').toLowerCase();
       if (term && !searchable.includes(term)) continue;
+      if (!branchHasCraving(r)) continue;
       if (!map.has(brand)) map.set(brand, []);
       map.get(brand).push(r);
     }
     return [...map.entries()]
       .map(([brand, branches]) => ({ brand, branches }))
       .sort((a, b) => a.brand.localeCompare(b.brand));
-  }, [retailers, query]);
+  }, [retailers, products, query, requestedCraving]);
 
   const selected = retailers.find(r => r.id === selectedId) || null;
 
@@ -171,13 +187,23 @@ function MarketplaceContent() {
   const visibleProducts = useMemo(() => {
     if (!selected) return [];
     const term = query.trim().toLowerCase();
+    const craving = requestedCraving.trim().toLowerCase();
+    const cravingTerms = craving === 'burgers' ? ['burger']
+      : craving === 'chicken' ? ['chicken']
+      : craving === 'pizza' ? ['pizza']
+      : craving === 'meals & combos' ? ['meal', 'combo']
+      : craving === 'sides' ? ['side', 'fries', 'chips', 'nugget']
+      : craving === 'drinks' ? ['drink', 'beverage', 'cola', 'coke', 'pepsi', 'water', 'juice', 'shake']
+      : craving ? [craving]
+      : [];
     return products.filter(p => {
       const matchesBranch = p.retailer_id === selected.id;
       const matchesCategory = category === 'all' || p.category === category;
       const text = [p.name, p.description, p.category, p.size].filter(Boolean).join(' ').toLowerCase();
-      return matchesBranch && matchesCategory && (!term || text.includes(term));
+      const matchesCraving = !cravingTerms.length || cravingTerms.some(term => text.includes(term));
+      return matchesBranch && matchesCategory && matchesCraving && (!term || text.includes(term));
     });
-  }, [products, selected, query, category]);
+  }, [products, selected, query, category, requestedCraving]);
 
   function getCart() {
     try { return JSON.parse(localStorage.getItem('bg_cart') || '[]'); } catch { return []; }
@@ -192,10 +218,15 @@ function MarketplaceContent() {
   function chooseBranch(id) {
     const branch = retailers.find(r => r.id === id);
     setSelectedId(id);
-    setCategory('all');
+    setCategory(requestedCraving || 'all');
     setQuery('');
     setSelectedProduct(null);
-    if (branch) window.history.replaceState(null, '', '/marketplace?retailer=' + encodeURIComponent(branch.slug));
+    if (branch) {
+      const params = new URLSearchParams();
+      params.set('retailer', branch.slug);
+      if (requestedCraving) params.set('category', requestedCraving);
+      window.history.replaceState(null, '', '/marketplace?' + params.toString());
+    }
   }
 
   function backToRestaurants() {
