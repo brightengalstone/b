@@ -71,16 +71,55 @@ function restaurantImage(name, logoUrl){
   return RESTAURANT_IMAGES[key] || logoUrl || null;
 }
 
+function restaurantLogoSource(slug, logoUrl) {
+  if (logoUrl) return logoUrl;
+  if (BRAND_DOMAINS[slug]) return 'https://www.google.com/s2/favicons?domain=' + BRAND_DOMAINS[slug] + '&sz=128';
+  return null;
+}
+
 const BRANCH_CLASSES = {};
 function retailerClass(slug, category) {
   return BRANCH_CLASSES[slug] || (category === 'fast-food' ? 'retailer-fast-food' : 'retailer-generic');
 }
 
+function RestaurantCardImage({ name, logoUrl, slug }) {
+  const imageSrc = restaurantImage(name, logoUrl);
+  const logoSrc = restaurantLogoSource(slug, logoUrl);
+  const [imageFailed, setImageFailed] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
+
+  return (
+    <div className="restaurant-card-image-fallback">
+      {!imageFailed && imageSrc ? (
+        <img
+          src={imageSrc}
+          alt={name}
+          loading="lazy"
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        <div className="restaurant-card-image-placeholder">
+          {logoSrc && !logoFailed ? (
+            <img src={logoSrc} alt={name + ' logo'} loading="lazy" onError={() => setLogoFailed(true)} />
+          ) : (
+            <span>{name.slice(0, 2).toUpperCase()}</span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function RetailerLogo({ slug, large = false, logoUrl = null, name = 'Restaurant', category = 'fast-food' }) {
-  const src = logoUrl || (BRAND_DOMAINS[slug] ? 'https://www.google.com/s2/favicons?domain=' + BRAND_DOMAINS[slug] + '&sz=128' : null);
+  const src = restaurantLogoSource(slug, logoUrl);
+  const [failed, setFailed] = useState(false);
   return (
     <div className={'retailer-logo ' + retailerClass(slug, category) + (large ? ' large' : '')} aria-label={name + ' logo'}>
-      {src ? <img src={src} alt="" loading="lazy" /> : <span>{name.slice(0, 2).toUpperCase()}</span>}
+      {src && !failed ? (
+        <img src={src} alt={name + ' logo'} loading="lazy" onError={() => setFailed(true)} />
+      ) : (
+        <span>{name.slice(0, 2).toUpperCase()}</span>
+      )}
     </div>
   );
 }
@@ -385,12 +424,7 @@ function MarketplaceContent() {
                     <article className="restaurant-card restaurant-card-new" key={group.brand}>
                       <button className="restaurant-visual-card" type="button" onClick={() => chooseBranch(first.id)}>
                         <div className="restaurant-visual-image">
-                          <img
-                            src={restaurantImage(group.brand, first.logo_url)}
-                            alt={group.brand}
-                            loading="lazy"
-                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = first.logo_url || ''; }}
-                          />
+                          <RestaurantCardImage name={group.brand} logoUrl={first.logo_url} slug={first.slug} />
                           <div className="restaurant-visual-gradient"/>
                           <div className="restaurant-visual-logo">
                             <RetailerLogo slug={first.slug} large logoUrl={first.logo_url} name={group.brand}/>
