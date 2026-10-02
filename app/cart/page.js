@@ -114,7 +114,7 @@ export default function Cart() {
             <div className="cart-clean-circle cart-clean-circle-two"></div>
             <div className="cart-clean-basket"><CartIcon /><small>BG SMART</small></div>
           </div>
-        </header>>
+        </header>
 
         {storeNotice && <div className="notice cart-store-notice cart-store-notice-outside">{storeNotice}</div>}
 
