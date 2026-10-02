@@ -24,7 +24,7 @@ export default function Welcome() {
           </p>
 
           <div className="landing-actions">
-            <Link className="landing-primary" href="/signin">
+            <Link className="landing-primary" href="/home">
               Get Started <ArrowRight size={20} />
             </Link>
             <Link className="landing-secondary" href="/signin">Sign in</Link>
