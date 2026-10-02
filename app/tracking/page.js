@@ -103,11 +103,23 @@ function TrackingContent(){
           <div className="card tracking-map-card">
             <div className="tracking-map-head"><div><span className="eyebrow">Delivery route</span><h2>{isLive?'Driver is on the way':isDelivered?'Delivered to you':eta}</h2></div><div className="tracking-live-badge"><Radio size={14}/>{lastUpdated}</div></div>
             <div className="live-map">
-              <div className="map-grid-lines"></div><div className="map-road road-a"></div><div className="map-road road-b"></div><div className="map-road road-c"></div><div className="map-route"></div>
-              <div className="map-location restaurant-location"><div className="map-marker store-marker"><PackageCheck size={17}/></div><span>Collection</span></div>
-              <div className={"map-driver "+(isLive?'moving':'')}><div className="driver-pulse"></div><div className="driver-marker"><Truck size={18}/></div></div>
-              <div className="map-location home-location"><div className="map-marker home-marker"><MapPin size={17}/></div><span>Eersterust</span></div>
+              <div className="map-grid-lines"></div>
+              <div className="map-neighborhood neighborhood-one">Eersterust</div>
+              <div className="map-neighborhood neighborhood-two">Willow Park</div>
+              <div className="map-neighborhood neighborhood-three">Silverton</div>
+              <div className="map-road road-a"></div><div className="map-road road-b"></div><div className="map-road road-c"></div>
+              <div className="map-road road-d"></div><div className="map-road road-e"></div>
+              <div className="map-route-shadow"></div><div className="map-route"></div>
+              <div className="route-node route-node-one"></div><div className="route-node route-node-two"></div><div className="route-node route-node-three"></div>
+              <div className="map-location restaurant-location"><div className="map-marker store-marker"><PackageCheck size={17}/></div><span>Collection point</span></div>
+              <div className={"map-driver "+(isLive?'moving':'')} style={{left:(18+(current/5)*67)+'%',top:(24+(current/5)*58)+'%'}}>
+                <div className="driver-pulse"></div><div className="driver-marker"><Truck size={18}/></div>
+                <div className="driver-live-tag"><Radio size={10}/> {isDelivered?'Delivered':isLive?'Driver live':'Order'} </div>
+              </div>
+              <div className="map-location home-location"><div className="map-marker home-marker"><MapPin size={17}/></div><span>Your delivery</span></div>
+              <div className="map-scale"><span></span><b>Route</b></div>
               <div className="map-label"><Navigation size={13}/> Eersterust delivery zone</div>
+              <div className="map-live-chip"><span className="live-dot"></span>{isDelivered?'Delivery complete':isLive?'Live route':'Route preview'}</div>
             </div>
             <div className="tracking-map-footer">
               <div><Clock3 size={17}/><span><small>Estimated arrival</small><strong>{eta}</strong></span></div>
