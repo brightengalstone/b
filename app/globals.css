@@ -916,3 +916,6 @@ a{color:inherit}
 .delivery-hero-copy{align-items:center;text-align:center}
 
 .modern-hero-top{justify-content:center}.modern-hero-actions{justify-content:center}
+
+/* FINAL HOME CENTERING */
+.delivery-hero{grid-template-columns:1fr;text-align:center}.delivery-hero-copy{align-items:center}.delivery-hero h1,.delivery-hero p{margin-left:auto;margin-right:auto}.modern-hero-top,.modern-hero-actions{justify-content:center}.modern-hero-visual{min-height:300px}.modern-food-float{left:50%;transform:translateX(-50%)}.modern-hero-status{right:50%;transform:translateX(50%)}.category-scroller,.food-card-scroller{justify-content:center}
