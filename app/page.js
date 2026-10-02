@@ -64,66 +64,24 @@ export default function Welcome() {
           </div>
 
           <div className="welcome-visual" aria-hidden="true">
-            <div className="welcome-card-back welcome-card-back-one" />
-            <div className="welcome-card-back welcome-card-back-two" />
-
-            <div className="welcome-phone">
-              <div className="welcome-phone-top">
-                <span className="welcome-phone-notch" />
-              </div>
-              <div className="welcome-phone-content">
-                <div className="phone-mini-header">
-                  <div>
-                    <small>Delivering to</small>
-                    <strong>Eersterust</strong>
-                  </div>
-                  <span className="phone-avatar">BG</span>
-                </div>
-
-                <div className="phone-search">
-                  <span className="phone-search-icon">⌕</span>
-                  <span>What are you craving?</span>
-                </div>
-
-                <div className="phone-hero">
-                  <div>
-                    <small>LOCAL FAVOURITE</small>
-                    <strong>Good food.<br />Right at home.</strong>
-                    <span>Delivery from R65</span>
-                  </div>
-                  <div className="phone-hero-circle"><ShoppingBag size={25} /></div>
-                </div>
-
-                <div className="phone-section-title">
-                  <strong>Popular near you</strong>
-                  <span>See all <ChevronRight size={13} /></span>
-                </div>
-
-                <div className="phone-restaurant-row">
-                  <div className="phone-food-card">
-                    <div className="phone-food-image food-one"><span>McD</span></div>
-                    <strong>McDonald's</strong>
-                    <small>20–30 min · 4.7</small>
-                  </div>
-                  <div className="phone-food-card">
-                    <div className="phone-food-image food-two"><span>KFC</span></div>
-                    <strong>KFC</strong>
-                    <small>20–30 min · 4.6</small>
-                  </div>
-                </div>
-              </div>
+            <div className="road-glow" />
+            <div className="welcome-tuktuk-scene">
+              <div className="tuktuk-message">YOUR ORDER IS ON THE WAY</div>
+              <img src="/bg-tuktuk.svg" alt="" className="welcome-tuktuk" />
+              <div className="tuktuk-shadow" />
+              <span className="tuktuk-light light-one" />
+              <span className="tuktuk-light light-two" />
             </div>
-
+            <div className="welcome-route-line"><span /><i /><b /><em /></div>
             <div className="welcome-float welcome-float-one">
               <span className="welcome-float-icon"><MapPin size={16} /></span>
               <div><strong>Eersterust only</strong><small>Delivered locally</small></div>
             </div>
-
             <div className="welcome-float welcome-float-two">
               <span className="welcome-check">✓</span>
               <div><strong>Order confirmed</strong><small>Your driver is on the way</small></div>
             </div>
-          </div>
+          </div></div>
         </div>
 
         <footer className="welcome-footer">
@@ -136,6 +94,27 @@ export default function Welcome() {
       </section>
 
       <style>{`
+
+        .welcome-tuktuk-scene{width:100%;height:520px;position:relative;display:flex;align-items:center;justify-content:center;overflow:visible}
+        .welcome-tuktuk{width:min(720px,100%);position:relative;z-index:3;filter:drop-shadow(0 28px 25px rgba(0,0,0,.42));animation:tuktukDrive 7s cubic-bezier(.55,.05,.25,1) infinite}
+        .tuktuk-shadow{position:absolute;width:70%;height:35px;bottom:96px;border-radius:50%;background:rgba(0,0,0,.55);filter:blur(16px);z-index:1;animation:tuktukShadow 7s ease-in-out infinite}
+        .road-glow{position:absolute;width:900px;height:260px;bottom:35px;background:radial-gradient(ellipse,rgba(28,216,110,.18),transparent 67%);filter:blur(12px)}
+        .welcome-route-line{position:absolute;bottom:77px;left:8%;right:8%;height:2px;background:linear-gradient(90deg,transparent,#1bd36b 15%,#1bd36b 85%,transparent);opacity:.35}
+        .welcome-route-line span,.welcome-route-line i,.welcome-route-line b,.welcome-route-line em{position:absolute;width:8px;height:8px;border-radius:50%;background:#20d970;top:-3px;box-shadow:0 0 16px rgba(32,217,112,.8)}
+        .welcome-route-line span{left:12%}.welcome-route-line i{left:39%}.welcome-route-line b{left:67%}.welcome-route-line em{right:5%}
+        .tuktuk-message{position:absolute;top:40px;left:50%;transform:translateX(-50%);z-index:4;color:#8fbca1;font-size:10px;font-weight:950;letter-spacing:2px;white-space:nowrap;animation:messagePulse 2.4s ease-in-out infinite}
+        .tuktuk-light{position:absolute;z-index:4;width:180px;height:70px;border-radius:50%;filter:blur(18px);background:rgba(38,223,117,.15);top:235px;animation:lightPulse 1.8s ease-in-out infinite}
+        .light-one{left:9%}.light-two{right:9%;animation-delay:-.9s}
+        .welcome-float{position:absolute;z-index:5;display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:15px;border:1px solid rgba(192,230,205,.17);background:rgba(13,28,19,.86);backdrop-filter:blur(18px);box-shadow:0 18px 40px rgba(0,0,0,.28);animation:welcomeFloat 4s ease-in-out infinite}
+        .welcome-float strong{display:block;font-size:10px}.welcome-float small{display:block;color:#789082;font-size:8px;margin-top:2px}
+        .welcome-float-icon,.welcome-check{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:rgba(27,211,107,.12);color:#26db74}
+        .welcome-check{font-size:17px;font-weight:950}.welcome-float-one{left:0;top:30%}.welcome-float-two{right:-10px;bottom:22%;animation-delay:-1.6s}
+        @keyframes tuktukDrive{0%,8%{transform:translateX(-115%);opacity:0}18%{opacity:1}45%{transform:translateX(0) scale(1);opacity:1}70%{transform:translateX(8%) scale(1.02);opacity:1}92%{transform:translateX(120%);opacity:0}100%{transform:translateX(120%);opacity:0}}
+        @keyframes tuktukShadow{0%,10%,90%,100%{transform:scaleX(.65);opacity:.2}45%,70%{transform:scaleX(1);opacity:.6}}
+        @keyframes messagePulse{50%{opacity:.5;letter-spacing:2.5px}}
+        @keyframes lightPulse{50%{opacity:.8;transform:scaleX(1.15)}}
+        @media(max-width:900px){.welcome-visual{height:475px;transform:scale(.82);margin-top:-20px;margin-bottom:-25px}.welcome-tuktuk-scene{height:430px}.tuktuk-message{top:18px}.welcome-float-one{left:-8px}.welcome-float-two{right:-8px}}
+        @media(max-width:560px){.welcome-visual{height:410px;transform:scale(.7);margin-top:-35px;margin-bottom:-55px}.welcome-tuktuk-scene{height:370px}.tuktuk-message{font-size:8px}.welcome-float-one{left:-15px}.welcome-float-two{right:-15px}}
         .welcome-page{min-height:100svh;background:#07110c;color:#f6faf7;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;position:relative}
         .welcome-page:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 18%,rgba(24,207,104,.12),transparent 32%),radial-gradient(circle at 82% 70%,rgba(24,207,104,.08),transparent 30%),linear-gradient(135deg,#07110c 0%,#0a1710 52%,#06100b 100%)}
         .welcome-noise{position:absolute;inset:0;opacity:.04;background-image:linear-gradient(rgba(255,255,255,.7) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.7) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(circle at center,#000,transparent 78%)}
