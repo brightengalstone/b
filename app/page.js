@@ -82,7 +82,7 @@ export default function Welcome() {
               <span className="welcome-check">✓</span>
               <div><strong>Order confirmed</strong><small>Your driver is on the way</small></div>
             </div>
-          </div></div>
+          </div>
         </div>
 
         <footer className="welcome-footer">
