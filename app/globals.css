@@ -892,3 +892,19 @@ a{color:inherit}
 .restaurant-search-suggestion>svg{color:#98a09b;flex:none}
 .restaurant-search-empty{padding:16px 14px;font-size:13px;color:#737a76}
 @media(max-width:760px){.delivery-search-wrap{margin:18px 16px 0}.restaurant-search-suggestions{top:calc(100% + 8px);border-radius:17px}.restaurant-search-suggestion{padding:10px}.suggestion-thumb{width:42px;height:42px}}
+
+/* Craving categories — visual food discovery */
+.food-categories{max-width:1180px;margin:42px auto 0}
+.food-categories .section-heading{align-items:flex-end;margin-bottom:18px}
+.food-categories .section-heading>div{display:grid;gap:4px}
+.food-categories .section-heading h2{font-size:clamp(24px,3vw,32px);letter-spacing:-1px}
+.food-category{position:relative;height:148px;min-width:174px;flex:1;overflow:hidden;border-radius:22px;text-decoration:none;color:#fff;background:#151915;box-shadow:0 12px 28px rgba(15,23,42,.08);isolation:isolate;transition:transform .2s ease,box-shadow .2s ease}
+.food-category img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
+.food-category-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.04) 20%,rgba(0,0,0,.76) 100%);z-index:1}
+.food-category strong{position:absolute;left:17px;bottom:17px;font-size:15px;font-weight:850;letter-spacing:-.2px;z-index:2;max-width:130px}
+.food-category>svg{position:absolute;right:14px;bottom:15px;z-index:2;opacity:.85}
+.food-category:hover{transform:translateY(-4px);box-shadow:0 18px 34px rgba(15,23,42,.14)}
+.food-category:hover img{transform:scale(1.07)}
+.category-scroller{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:13px}
+@media(max-width:1000px){.food-categories{margin-left:20px;margin-right:20px}.category-scroller{grid-template-columns:repeat(3,minmax(0,1fr))}.food-category{min-width:0}}
+@media(max-width:620px){.food-categories{margin:34px 16px 0}.category-scroller{display:flex;overflow-x:auto;gap:12px;padding:2px 2px 10px;scrollbar-width:none}.category-scroller::-webkit-scrollbar{display:none}.food-category{min-width:150px;width:150px;height:132px;border-radius:19px}.food-category strong{left:14px;bottom:14px;font-size:14px}.food-category>svg{right:12px;bottom:13px}}
