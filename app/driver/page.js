@@ -73,7 +73,15 @@ export default function DriverPage() {
     }
 
     const productById = Object.fromEntries(productRows.map((product) => [product.id, product]));
-    setItems((orderItems || []).map((item) => ({ ...item, product: productById[item.retailer_product_id] || null })));
+    const shopName = String(shop?.name || '').toLowerCase();
+    const hydratedItems = (orderItems || []).map((item) => {
+      const product = productById[item.retailer_product_id] || null;
+      const imageUrl = product?.image_url || (shopName.includes('chicken licken') && product?.name
+        ? `/api/chicken-licken-image?${new URLSearchParams({ name: product.name, category: product.category || '' }).toString()}`
+        : '');
+      return { ...item, product, imageUrl };
+    });
+    setItems(hydratedItems);
     setRetailer(shop || null);
   }
 
@@ -326,6 +334,13 @@ export default function DriverPage() {
               <div className="driver-items">
                 {items.map((item) => (
                   <div className="driver-item" key={item.id}>
+                    <div className="driver-item-image">
+                      {item.imageUrl ? (
+                        <img src={item.imageUrl} alt={item.product?.name || 'Product'} loading="lazy" />
+                      ) : (
+                        <Package size={20} />
+                      )}
+                    </div>
                     <div className="driver-item-copy"><strong>{item.product?.name || 'Product'}</strong><span>{item.product?.size || item.product?.category || 'Item'}</span></div>
                     <strong className="driver-quantity">× {item.quantity}</strong>
                   </div>
