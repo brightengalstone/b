@@ -1,14 +1,15 @@
 'use client';
-import {useState} from 'react';
-import {useSearchParams} from 'next/navigation';
+import {useEffect,useState} from 'react';
 import {Eye,EyeOff,ArrowLeft,Check,UserRound,Truck,Store} from 'lucide-react';
 import Link from 'next/link';
 import {supabase} from '../../lib/supabase';
 
 export default function Signin(){
-  const searchParams=useSearchParams();
-  const initialMode=searchParams.get('mode');
-  const[signup,setSignup]=useState(initialMode==='signup'),[forgot,setForgot]=useState(false),[showPassword,setShowPassword]=useState(false),[showRetype,setShowRetype]=useState(false),[accepted,setAccepted]=useState(false),[accountType,setAccountType]=useState('customer');
+  const[signup,setSignup]=useState(false),[forgot,setForgot]=useState(false),[showPassword,setShowPassword]=useState(false),[showRetype,setShowRetype]=useState(false),[accepted,setAccepted]=useState(false),[accountType,setAccountType]=useState('customer');
+  useEffect(()=>{
+    const mode=new URLSearchParams(window.location.search).get('mode');
+    setSignup(mode==='signup');
+  },[]);
   const[name,setName]=useState(''),[surname,setSurname]=useState(''),[cellphone,setCellphone]=useState(''),[address,setAddress]=useState(''),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[retype,setRetype]=useState(''),[msg,setMsg]=useState(''),[loading,setLoading]=useState(false);
 
   async function socialSignIn(provider){
