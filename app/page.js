@@ -39,11 +39,11 @@ export default function Welcome() {
             </p>
 
             <div className="welcome-actions">
-              <Link href="/signin" className="welcome-primary">
+              <Link href="/signin?mode=signup" className="welcome-primary">
                 Start ordering
                 <ArrowRight size={19} />
               </Link>
-              <Link href="/signin" className="welcome-secondary">
+              <Link href="/signin?mode=login" className="welcome-secondary">
                 Sign in
               </Link>
             </div>
