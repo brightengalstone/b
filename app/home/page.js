@@ -19,7 +19,8 @@ const RESTAURANT_IMAGES={
   "nando's":"https://tb-static.uber.com/prod/image-proc/processed_images/20e813d036254cadbb3a8280a76b55d3/c9252e6c6cd289c588c3381bc77b1dfc.jpeg",
   "roman's pizza":"https://tb-static.uber.com/prod/image-proc/processed_images/514842a8cd43da79a6a07e730fdc456e/fb86662148be855d931b37d6c1e5fcbe.jpeg",
   "steers":"https://steers.co.za/images/menu/2023/july/single-page-product-images/burgers/king-steers-burgers/nextImageExportOptimizer/mighty-king-steer-burger-leftright-chips-opt-750.PNG",
-  "hungry lion":"https://tb-static.uber.com/prod/image-proc/processed_images/f9f0b221a1961828212e1d678c1d4946/5283d81c664b43c5f57a3a186d273063.jpeg"
+  "hungry lion":"https://tb-static.uber.com/prod/image-proc/processed_images/f9f0b221a1961828212e1d678c1d4946/5283d81c664b43c5f57a3a186d273063.jpeg",
+  "uncle faouzi":"https://tb-static.uber.com/prod/image-proc/processed_images/539495ca17684e669c7d1239d1841cb1/c9252e6c6cd289c588c3381bc77b1dfc.jpeg"
 };
 
 function StoreCard({store,image}){
