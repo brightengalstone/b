@@ -540,18 +540,27 @@ a{color:inherit}
 .delivery-header-actions .round-icon{display:grid;place-items:center;width:42px;height:42px;border:1px solid #e1e1df;border-radius:50%;background:#fff;color:#111;text-decoration:none;position:relative}
 .delivery-header-actions .round-icon i{position:absolute;right:8px;top:7px;width:7px;height:7px;border-radius:50%;background:#06c167}
 .desktop-more{border:1px solid #e1e1df;cursor:pointer}
-.delivery-hero{max-width:1180px;min-height:410px;margin:12px auto 0;border-radius:28px;background:#111;overflow:hidden;display:grid;grid-template-columns:1.1fr .9fr;position:relative;color:#fff}
-.delivery-hero-copy{padding:62px 64px;position:relative;z-index:2}
-.hero-label{font-size:11px;letter-spacing:2px;color:#70e3a6;font-weight:800}
-.delivery-hero h1{font-size:58px;line-height:.98;letter-spacing:-3px;margin:18px 0 18px}
-.delivery-hero h1 em{color:#06c167;font-style:normal}
-.delivery-hero p{max-width:510px;color:#c8c8c8;line-height:1.65;font-size:16px}
-.hero-cta{display:inline-flex;align-items:center;gap:8px;background:#06c167;color:#07170f;text-decoration:none;font-weight:800;padding:14px 19px;border-radius:999px;margin-top:12px}
-.delivery-hero-art{position:relative;min-height:410px}
-.hero-ring{position:absolute;width:390px;height:390px;border-radius:50%;background:#06c167;right:-30px;top:10px;opacity:.95}
-.hero-food-card{position:absolute;right:65px;top:62px;width:190px;padding:22px;border-radius:20px;background:#fff;color:#111;box-shadow:0 25px 60px #0007;display:grid;gap:7px}
-.hero-food-card svg{color:#06c167}.hero-food-card strong{font-size:20px}.hero-food-card span{font-size:12px;color:#777}
-.hero-tuktuk{position:absolute;right:70px;bottom:48px;color:#111;transform:rotate(-5deg)}
+.delivery-hero{max-width:1180px;min-height:430px;margin:12px auto 0;border-radius:30px;background:#101310;overflow:hidden;display:grid;grid-template-columns:1.02fr .98fr;position:relative;color:#fff;border:1px solid rgba(255,255,255,.06);box-shadow:0 24px 70px rgba(0,0,0,.12)}
+.delivery-hero-copy{padding:56px 58px;position:relative;z-index:3;display:flex;flex-direction:column;justify-content:center}
+.modern-hero-glow{position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(6,193,103,.22),transparent 68%);left:-180px;top:-170px;pointer-events:none}
+.modern-hero-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hero-label{font-size:10px;letter-spacing:2.2px;color:#70e3a6;font-weight:900}
+.hero-delivery-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.06);border-radius:999px;color:#d7ded9;font-size:9px;font-weight:800}
+.delivery-hero h1{font-size:clamp(46px,5vw,66px);line-height:.94;letter-spacing:-3.8px;margin:20px 0 18px;max-width:600px}
+.delivery-hero h1 em{color:#39df83;font-style:normal}
+.delivery-hero p{max-width:500px;color:#b7c0bb;line-height:1.65;font-size:14px;margin:0}
+.modern-hero-actions{display:flex;align-items:center;gap:18px;margin-top:25px;flex-wrap:wrap}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:#39df83;color:#07170f;text-decoration:none;font-weight:900;padding:13px 18px;border-radius:13px;box-shadow:0 12px 30px rgba(57,223,131,.18);transition:transform .18s ease,box-shadow .18s ease}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(57,223,131,.25)}
+.hero-mini-note{font-size:11px;color:#89958f}.hero-mini-note span{color:#fff;font-weight:900;margin-right:4px}
+.modern-hero-visual{position:relative;min-height:430px;overflow:hidden}
+.modern-hero-image{position:absolute;inset:18px 18px 18px 0;border-radius:24px;background-image:url("https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1100&q=88");background-size:cover;background-position:center;transform:scale(1.02)}
+.modern-hero-image-shade{position:absolute;inset:18px 18px 18px 0;border-radius:24px;background:linear-gradient(90deg,rgba(16,19,16,.58) 0%,rgba(16,19,16,.08) 48%,rgba(6,193,103,.08) 100%),linear-gradient(0deg,rgba(0,0,0,.28),transparent 55%)}
+.modern-food-float{position:absolute;left:22px;bottom:42px;display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid rgba(255,255,255,.16);background:rgba(13,18,15,.78);backdrop-filter:blur(12px);border-radius:15px;box-shadow:0 16px 35px rgba(0,0,0,.3)}
+.modern-food-icon{width:34px;height:34px;border-radius:10px;background:#39df83;color:#07170f;display:grid;place-items:center}
+.modern-food-float span:last-child{display:grid;gap:2px}.modern-food-float strong{font-size:10px}.modern-food-float small{font-size:9px;color:#9da9a2}
+.modern-hero-status{position:absolute;right:38px;top:40px;display:flex;align-items:center;gap:7px;padding:9px 11px;background:#fff;color:#111;border-radius:999px;font-size:9px;font-weight:900;box-shadow:0 12px 30px rgba(0,0,0,.2)}
+.status-dot{width:7px;height:7px;background:#06c167;border-radius:50%;box-shadow:0 0 0 4px rgba(6,193,103,.14)}
 .delivery-search{max-width:760px;margin:26px auto 0;background:#fff;border:1px solid #e5e5e2;border-radius:999px;height:58px;display:flex;align-items:center;gap:13px;padding:0 21px;box-shadow:0 8px 30px #00000008}
 .delivery-search svg{color:#06c167}.delivery-search a{color:#777;text-decoration:none;font-size:14px;width:100%}
 .food-categories,.restaurant-discovery,.delivery-promise{max-width:1180px;margin:42px auto 0;padding:0 28px}
