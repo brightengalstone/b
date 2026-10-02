@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, ShoppingCart, Store, RefreshCw, MapPin, Navigation, CheckCircle2, X, Plus, Minus, Heart, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import NotificationBell from '../../components/NotificationBell';
@@ -97,6 +97,7 @@ function brandName(name) {
 }
 
 function MarketplaceContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const requested = searchParams.get('retailer');
   const requestedCraving = (searchParams.get('craving') || searchParams.get('category') || '').trim().toLowerCase();
@@ -117,8 +118,7 @@ function MarketplaceContent() {
     const params = new URLSearchParams(window.location.search);
     if (next) params.set('craving', next);
     else params.delete('craving');
-    window.history.replaceState(null, '', '/marketplace' + (params.toString() ? '?' + params.toString() : ''));
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    router.replace('/marketplace' + (params.toString() ? '?' + params.toString() : ''));
   }
 
   async function load() {
