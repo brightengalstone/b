@@ -11,17 +11,17 @@ const PAGES = {
 };
 
 const FALLBACK_PAGES = Object.values(PAGES);
-const normalize = value => String(value || '').replace(/<[^>]+>/g, ' ').replace(/[®™]/g, '').replace(/[’‘]/g, "'").replace(/&amp;/g, '&').replace(/\\s+/g, ' ').trim().toLowerCase();
+const normalize = value => String(value || '').replace(/<[^>]+>/g, ' ').replace(/[®™]/g, '').replace(/[’‘]/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim().toLowerCase();
 
 function findImage(html, productName) {
   const target = normalize(productName);
-  const imgTags = html.match(/<img\\b[^>]*>/gi) || [];
+  const imgTags = html.match(/<img\b[^>]*>/gi) || [];
   for (const tag of imgTags) {
-    const altMatch = tag.match(/\\balt=["']([^"']*)["']/i);
+    const altMatch = tag.match(/\balt=["']([^"']*)["']/i);
     if (!altMatch) continue;
     const alt = normalize(altMatch[1]);
     if (!alt || (alt !== target && !alt.includes(target) && !target.includes(alt))) continue;
-    const srcMatch = tag.match(/\\bsrc=["']([^"']+)["']/i);
+    const srcMatch = tag.match(/\bsrc=["']([^"']+)["']/i);
     if (!srcMatch) continue;
     let src = srcMatch[1];
     if (src.startsWith('data:')) continue;
