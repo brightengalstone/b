@@ -33,3 +33,5 @@ The database schema exists separately in Supabase. Production checkout, payments
 
 
 <!-- Deployment sync 1790955015650 -->
+
+<!-- Marketplace deployment sync -->
