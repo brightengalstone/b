@@ -293,7 +293,7 @@ function MarketplaceContent() {
       directions_url: selected?.directions_url || '',
       description: p.description || '',
       size: p.size || '',
-      image_url: p.image_url || '',
+      image_url: productImage(p, selected) || '',
       last_verified_at: p.last_verified_at || null,
     });
 
