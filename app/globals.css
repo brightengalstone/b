@@ -893,6 +893,7 @@ a{color:inherit}
 .restaurant-search-empty{padding:16px 14px;font-size:13px;color:#737a76}
 @media(max-width:760px){.delivery-search-wrap{margin:18px 16px 0}.restaurant-search-suggestions{top:calc(100% + 8px);border-radius:17px}.restaurant-search-suggestion{padding:10px}.suggestion-thumb{width:42px;height:42px}}
 
+.food-categories .section-heading .section-see-all{display:inline-flex;align-items:center;gap:5px;padding:9px 13px;border:1px solid #e2e7e3;border-radius:999px;background:#fff;color:#167043;text-decoration:none;font-size:12px;font-weight:800;line-height:1;box-shadow:0 5px 14px rgba(15,23,42,.05);transition:transform .18s ease,background .18s ease,border-color .18s ease}.food-categories .section-heading .section-see-all:hover{transform:translateY(-1px);background:#f2f8f4;border-color:#cfe1d5}.food-categories .section-heading .section-see-all svg{transition:transform .18s ease}.food-categories .section-heading .section-see-all:hover svg{transform:translateX(2px)}
 /* Craving categories — visual food discovery */
 .food-categories{max-width:1180px;margin:42px auto 0}
 .food-categories .section-heading{align-items:flex-end;margin-bottom:18px}
