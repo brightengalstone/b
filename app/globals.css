@@ -1149,3 +1149,23 @@ a{color:inherit}
 @keyframes customerNavRise { from { opacity: 0; transform: translate(-50%, 18px); } to { opacity: 1; transform: translate(-50%, 0); } }
 @media (max-width: 520px) { .customer-bottom-nav { width: calc(100% - 16px); bottom: max(8px, env(safe-area-inset-bottom)); padding: 6px; border-radius: 21px; } .customer-bottom-nav-item { min-height: 58px; font-size: 10px; border-radius: 16px; } }
 @media (prefers-reduced-motion: reduce) { .customer-bottom-nav, .customer-bottom-nav-item, .customer-bottom-nav-icon { animation: none; transition: none; } }
+
+
+/* Orders: keep the complete order card inside the viewport */
+.order-real-items{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px!important;overflow:visible!important;width:100%;box-sizing:border-box}
+.order-real-item{min-width:0!important;width:100%;box-sizing:border-box;padding-right:8px!important;border-right:0!important}
+.order-real-item>span:nth-child(2){min-width:0!important;max-width:none!important;overflow:hidden}
+.order-more-items{grid-column:1/-1;white-space:normal!important}
+.order-real-head,.order-real-bottom,.order-real-actions{min-width:0;width:100%;box-sizing:border-box}
+.order-real-date{min-width:0;max-width:48%}
+.order-real-date small{max-width:100%;text-align:right}
+.order-real-store{min-width:0;max-width:52%}
+.order-real-store>div{min-width:0}
+.order-card-real{min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden}
+
+@media(max-width:460px){
+  .order-real-items{grid-template-columns:1fr 1fr!important}
+  .order-real-item{padding-right:4px!important}
+  .order-real-store{max-width:54%}
+  .order-real-date{max-width:46%}
+}
