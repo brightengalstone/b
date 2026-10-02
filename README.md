@@ -28,3 +28,5 @@ Upload the project to GitHub and connect the repository to Vercel. Set the same 
 
 ## Important
 The database schema exists separately in Supabase. Production checkout, payments, notifications, automatic driver dispatch, support, and role-based admin permissions are implemented with Supabase controls.
+
+<!-- deployment trigger: 2026-10-02 -->
