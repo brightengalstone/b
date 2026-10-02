@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { Search, ShoppingCart, Store, RefreshCw, MapPin, Navigation, CheckCircle2, X, Plus, Minus, Heart, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import NotificationBell from '../../components/NotificationBell';
+import './marketplace.css';
 
 const FAST_FOOD_SLUGS = new Set([
   'mcdonalds-denlyn',
@@ -324,8 +325,8 @@ function MarketplaceContent() {
             <section className="fastfood-hero marketplace-hero-new">
               <div className="fastfood-hero-copy">
                 <span className="fastfood-kicker">BG SMART SERVICES · EERSTERUST</span>
-                <h1>What are you craving?</h1>
-                <p>Choose a restaurant, select the exact branch, order your food, and our driver collects it for delivery to Eersterust.</p>
+                <h1>Find something delicious</h1>
+                <p>Choose a restaurant, explore the menu, and order your favourites for delivery across Eersterust.</p>
               </div>
               <div className="fastfood-hero-badge"><span>FAST</span><strong>FOOD</strong><small>Delivered to Eersterust</small></div>
             </section>
