@@ -26,11 +26,11 @@ const RESTAURANT_IMAGES={
 const RESTAURANT_FALLBACKS={...RESTAURANT_IMAGES};
 
 const SUPERMARKETS=[
-{name:'Pick n Pay',image:'/supermarkets/pick-n-pay.svg'},
-{name:'Shoprite',image:'/supermarkets/shoprite.svg'},
-{name:'Checkers',image:'/supermarkets/checkers.svg'},
-{name:'SPAR',image:'/supermarkets/spar.svg'},
-{name:'Woolworths',image:'/supermarkets/woolworths.svg'}
+{name:'Pick n Pay',image:'https://media.licdn.com/dms/image/v2/D4D10AQGbxFUtSS3MJw/image-shrink_800/image-shrink_800/0/1724485779807?e=2147483647&t=7hHNWrITynWSdt6p5AzkeBf4PxHqScT1q7y8a6Zs6n8&v=beta'},
+{name:'Shoprite',image:'https://iol-prod.appspot.com/image/60ed7ef8e2b12c14f478ad2ca4f17339d2cf64a5/1000/jpeg'},
+{name:'Checkers',image:'https://megaplex.co.za/images/90deg-checkers_20240329.jpg'},
+{name:'SPAR',image:'https://iol-prod.appspot.com/image/46e60177c71cccc609cc0ae10e58dc1edd73e56d%3Dw700'},
+{name:'Woolworths',image:'https://upload.wikimedia.org/wikipedia/commons/6/6a/Woolworths_Food%2C_Main_St._JHB.jpg'}
 ];
 
 function SupermarketComingSoon(){
