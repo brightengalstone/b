@@ -108,7 +108,7 @@ export default function Signin(){
         <button className="mobile-back" type="button" onClick={back} aria-label="Go back"><ArrowLeft size={18}/></button>
 
 
-        {signup&&<style>{\`\
+        {signup&&<style>{`\
           .signup-experience{overflow:hidden}
           .signup-bag-opening{height:230px;position:relative;display:flex;align-items:flex-end;justify-content:center;margin:-8px -6px 8px;animation:signupOpenOut .9s ease both}
           .signup-bag{position:relative;width:126px;height:142px;z-index:3;animation:bagArrive .9s .1s cubic-bezier(.2,.85,.25,1) both;transform-origin:50% 100%}
@@ -135,7 +135,7 @@ export default function Signin(){
           @keyframes signupContentIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
           @media(max-width:600px){.signup-bag-opening{height:205px}.signup-bag{transform:scale(.9);transform-origin:50% 100%}.signup-bag-caption{font-size:6px;letter-spacing:1.4px}}
           @media(prefers-reduced-motion:reduce){.signup-bag-opening,.signup-bag,.signup-float-item,.signup-bag-shadow,.signup-bag-caption,.signup-experience .mobile-auth-title,.signup-experience .mobile-auth-form{animation:none!important;opacity:1!important;transform:none!important}}
-        \`}</style>}
+        `}</style>}
         <div className="mobile-auth-title">
           <span className="mobile-auth-welcome">WELCOME BACK</span>
           <h1>{forgot?'Reset Password':signup?'Create Your Account':'Welcome Back'}</h1>
