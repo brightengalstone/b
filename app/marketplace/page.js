@@ -65,46 +65,37 @@ const RESTAURANT_IMAGES = {
   "hungry lion": "https://img.mrdfood.com/data/d20b9ea3-a721-4606-b68b-269b24cdd9d4.PNG",
   "uncle faouzi": "https://tb-static.uber.com/prod/image-proc/processed_images/539495ca17684e669c7d1239d1841cb1/c9252e6c6cd289c588c3381bc77b1dfc.jpeg"
 };
-function productImage(p, selected) {
+function productImage(p) {
   const stored = String(p?.image_url || '').trim();
-  if (stored) return stored;
-  if (selected) {
-    const brand = brandName(selected.name).toLowerCase();
-    return RESTAURANT_IMAGES[brand] || null;
-  }
-  return null;
-}
-
-function productFallbackImage(selected) {
-  if (!selected) return null;
-  return RESTAURANT_IMAGES[brandName(selected.name).toLowerCase()] || selected.logo_url || null;
+  return stored || null;
 }
 
 function ProductImage({ product, selected, className = '' }) {
-  const primary = productImage(product, selected);
-  const fallback = productFallbackImage(selected);
-  const [src, setSrc] = useState(primary || fallback || '');
+  const primary = productImage(product);
+  const [src, setSrc] = useState(primary || '');
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    setSrc(primary || fallback || '');
+    setSrc(primary || '');
     setFailed(false);
-  }, [primary, fallback]);
+  }, [primary, product?.id]);
 
   if (!src || failed) {
-    return <RetailerLogo slug={selected?.slug} logoUrl={selected?.logo_url} name={selected ? brandName(selected.name) : 'Restaurant'} />;
+    return (
+      <div className="product-image-placeholder" aria-label="Product image unavailable">
+        <Store size={24} />
+        <span>Product image unavailable</span>
+      </div>
+    );
   }
 
   return (
     <img
       className={className}
       src={src}
-      alt={product?.name || (selected ? brandName(selected.name) : 'Product')}
+      alt={product?.name || 'Product'}
       loading="lazy"
-      onError={() => {
-        if (fallback && src !== fallback) setSrc(fallback);
-        else setFailed(true);
-      }}
+      onError={() => setFailed(true)}
     />
   );
 }
@@ -391,7 +382,7 @@ function MarketplaceContent() {
       directions_url: selected?.directions_url || '',
       description: p.description || '',
       size: p.size || '',
-      image_url: productImage(p, selected) || '',
+      image_url: productImage(p) || '',
       last_verified_at: p.last_verified_at || null,
     });
 
