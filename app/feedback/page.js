@@ -6,7 +6,6 @@ import { ArrowLeft, CheckCircle2, MessageSquare, Star, Truck } from 'lucide-reac
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { supabase } from '../../lib/supabase';
-import './feedback.css';
 
 function FeedbackContent() {
   const params = useSearchParams();
