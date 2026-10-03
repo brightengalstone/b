@@ -87,8 +87,7 @@ export default function Signin(){
     <header className="mobile-auth-brand">
       <Link href="/" aria-label="BG Smart Services home">
         <span className="mobile-auth-logo" aria-label="BG Smart Services">
-          <span className="mobile-auth-logo-mark" aria-hidden="true"><span>BG</span><i /></span>
-          <span className="mobile-auth-logo-wordmark" aria-hidden="true"><strong>BG SMART SERVICES</strong><small>LOCAL DELIVERY</small></span>
+          <img src="/bg-tuktuk.svg" alt="BG Smart Services — Local Delivery" />
         </span>
       </Link>
     </header>
