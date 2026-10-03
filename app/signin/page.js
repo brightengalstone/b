@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState} from 'react';
+import React,{useEffect,useState} from 'react';
 import {Eye,EyeOff,ArrowLeft,Check,UserRound,Truck,Store} from 'lucide-react';
 import Link from 'next/link';
 import {supabase} from '../../lib/supabase';
@@ -83,94 +83,81 @@ export default function Signin(){
 
   const back=()=>{if(forgot)setForgot(false);else if(signup)setSignup(false);else window.location.href='/'};
 
-  return <main className="mobile-auth-screen">
-    <header className="mobile-auth-brand">
-      <Link href="/" aria-label="BG Smart Services home">
-        <span className="mobile-auth-logo" aria-label="BG Smart Services">
-          <img src="/bg-tuktuk.svg" alt="BG Smart Services — Local Delivery" />
-        </span>
-      </Link>
-    </header>
+  const [signupStep,setSignupStep]=useState(1);
+  const nextSignupStep=()=>{setMsg('');if(signupStep===1){if(!name.trim()||!surname.trim()||!cellphone.trim()){setMsg('Please complete your personal details.');return}}if(signupStep===2){if(!email.trim()||!address.trim()){setMsg('Please complete your contact and delivery details.');return}}setSignupStep(Math.min(3,signupStep+1));};
+  const prevSignupStep=()=>{setMsg('');setSignupStep(Math.max(1,signupStep-1));};
 
-    <div className="mobile-auth-stage">
-      <section className={signup?"mobile-auth-card signup-experience":"mobile-auth-card"}>
-        {signup&&<div className="signup-bag-opening" aria-hidden="true">
-          <div className="signup-float-item signup-item-one">BG</div>
-          <div className="signup-float-item signup-item-two"><span /></div>
-          <div className="signup-float-item signup-item-three"><span /><span /></div>
-          <div className="signup-bag">
-            <div className="signup-bag-handle" />
-            <div className="signup-bag-body"><span>BG</span></div>
+  return <main className={signup?"modern-signup-screen":"mobile-auth-screen"}>
+    <style>{`
+      .modern-signup-screen{min-height:100svh;background:linear-gradient(145deg,#f7fbf8,#fff 55%,#eef8f1);color:#101713;overflow-x:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      .modern-signup-wrap{min-height:100svh;width:min(1120px,100%);margin:auto;padding:22px 24px 28px;display:flex;flex-direction:column}
+      .modern-signup-top{display:flex;justify-content:space-between;align-items:center}
+      .modern-signup-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#101713}
+      .modern-signup-logo-mark{font-size:34px;font-weight:1000;letter-spacing:-4px;color:#17c867}
+      .modern-signup-logo-text{font-size:10px;font-weight:950;letter-spacing:2px}
+      .modern-signup-back{border:0;background:#fff;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#526158;box-shadow:0 8px 25px rgba(18,50,31,.08);cursor:pointer}
+      .modern-signup-layout{flex:1;display:grid;grid-template-columns:minmax(260px,.85fr) minmax(360px,1.15fr);gap:70px;align-items:center;padding:30px 5%}
+      .modern-signup-intro{animation:msIntro .7s ease both}
+      .modern-signup-kicker{display:inline-flex;align-items:center;gap:8px;color:#18bd61;font-size:9px;font-weight:950;letter-spacing:2px}
+      .modern-signup-kicker i{width:7px;height:7px;border-radius:50%;background:#18c968;box-shadow:0 0 0 6px rgba(24,201,104,.1)}
+      .modern-signup-intro h1{font-size:clamp(42px,5vw,72px);line-height:.94;letter-spacing:-4px;margin:22px 0 18px;font-weight:1000}
+      .modern-signup-intro h1 span{color:#18c968}
+      .modern-signup-intro p{max-width:390px;color:#617067;font-size:15px;line-height:1.65;margin:0}
+      .modern-journey{margin-top:42px;display:flex;align-items:center;max-width:410px}
+      .modern-journey-step{display:flex;align-items:center;gap:9px;color:#9aa59e;font-size:9px;font-weight:950;letter-spacing:1px;white-space:nowrap}
+      .modern-journey-step.active{color:#152019}
+      .modern-journey-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#edf2ee;color:#78857c}
+      .modern-journey-step.active .modern-journey-dot{background:#18c968;color:#fff}
+      .modern-journey-line{height:1px;flex:1;background:#dce4df;margin:0 9px}
+      .modern-form-card{background:rgba(255,255,255,.9);border:1px solid #e7eee9;border-radius:26px;padding:30px;box-shadow:0 25px 70px rgba(24,64,39,.1);animation:msCard .75s .08s ease both}
+      .modern-form-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:25px}
+      .modern-form-head small{color:#8a958e;font-size:8px;font-weight:950;letter-spacing:1.5px}
+      .modern-form-head h2{font-size:28px;letter-spacing:-1.5px;margin:5px 0 0;font-weight:950}
+      .modern-step-count{font-size:10px;color:#18bd61;font-weight:950}
+      .modern-fields{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+      .modern-field{display:flex;flex-direction:column;gap:7px}
+      .modern-field.full{grid-column:1/-1}
+      .modern-field label{font-size:9px;font-weight:900;letter-spacing:.7px;color:#66736b}
+      .modern-field input{height:50px;border:1px solid #dfe7e2;border-radius:12px;padding:0 14px;background:#fbfdfb;color:#162019;outline:none;font-size:13px;transition:border .2s,box-shadow .2s}
+      .modern-field input:focus{border-color:#18c968;box-shadow:0 0 0 4px rgba(24,201,104,.1)}
+      .modern-password{position:relative}.modern-password input{width:100%;padding-right:45px}.modern-password button{position:absolute;right:5px;top:5px;width:40px;height:40px;border:0;background:transparent;color:#77837b;cursor:pointer}
+      .modern-actions{display:flex;gap:10px;margin-top:22px}.modern-actions button{height:52px;border-radius:12px;font-size:10px;font-weight:950;letter-spacing:1px;cursor:pointer}.modern-primary{flex:1;border:0;background:#18c968;color:#fff;box-shadow:0 13px 28px rgba(24,201,104,.2)}.modern-secondary{width:52px;border:1px solid #dfe7e2;background:#fff;color:#526158}
+      .modern-terms{display:flex;gap:10px;align-items:flex-start;margin-top:19px;color:#7b877f;font-size:9px;line-height:1.5}.modern-terms input{accent-color:#18c968;margin-top:2px}.modern-terms a{color:#172019;font-weight:850}
+      .modern-notice{margin-top:14px;padding:11px 12px;border-radius:10px;background:#fff5f5;color:#b42318;font-size:10px}
+      .modern-switch{text-align:center;margin-top:22px;font-size:10px;color:#87928b}.modern-switch button{border:0;background:none;color:#111a15;font-weight:950;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+      .modern-footer{text-align:center;color:#9aa59e;font-size:8px;font-weight:900;letter-spacing:1.5px;padding-top:10px}
+      .modern-footer span{color:#18bd61}
+      @keyframes msIntro{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}@keyframes msCard{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:none}}
+      @media(max-width:760px){.modern-signup-wrap{padding:18px 16px}.modern-signup-layout{display:block;padding:35px 0 20px}.modern-signup-intro{text-align:center}.modern-signup-intro p{margin:auto;font-size:13px}.modern-signup-intro h1{font-size:47px;letter-spacing:-3px;margin:18px 0 14px}.modern-journey{margin:28px auto 25px;max-width:340px}.modern-journey-step{font-size:7px;gap:5px}.modern-journey-dot{width:25px;height:25px}.modern-form-card{padding:22px 18px;border-radius:21px}.modern-form-head h2{font-size:24px}.modern-fields{grid-template-columns:1fr}.modern-field.full{grid-column:auto}.modern-actions{margin-top:18px}.modern-signup-logo-mark{font-size:29px}.modern-signup-logo-text{font-size:8px;letter-spacing:1.5px}}
+      @media(prefers-reduced-motion:reduce){.modern-signup-intro,.modern-form-card{animation:none}}
+    `}</style>
+    <div className="modern-signup-wrap">
+      <header className="modern-signup-top">
+        <Link href="/" className="modern-signup-logo" aria-label="BG Smart Services home"><span className="modern-signup-logo-mark">BG</span><span className="modern-signup-logo-text">SMART SERVICES</span></Link>
+        <button className="modern-signup-back" type="button" onClick={back} aria-label="Go back"><ArrowLeft size={18}/></button>
+      </header>
+      <div className="modern-signup-layout">
+        <section className="modern-signup-intro">
+          <div className="modern-signup-kicker"><i/> EERSTERUST / POORT</div>
+          <h1>Let's get<br/><span>you started.</span></h1>
+          <p>Create your BG Smart Services account and make your local shopping experience simple from the start.</p>
+          <div className="modern-journey">
+            {[["01","About you"],["02","Your details"],["03","Secure"]].map((x,i)=><React.Fragment key={x[0]}><div className={signupStep===i+1?"modern-journey-step active":"modern-journey-step"}><span className="modern-journey-dot">{x[0]}</span><span>{x[1]}</span></div>{i<2&&<div className="modern-journey-line"/>}</React.Fragment>)}
           </div>
-          <div className="signup-bag-shadow" />
-          <div className="signup-bag-caption">YOUR SHOPPING EXPERIENCE STARTS HERE</div>
-        </div>}
-        <button className="mobile-back" type="button" onClick={back} aria-label="Go back"><ArrowLeft size={18}/></button>
-
-
-        {signup&&<style>{`\
-          .signup-experience{overflow:hidden}
-          .signup-bag-opening{height:230px;position:relative;display:flex;align-items:flex-end;justify-content:center;margin:-8px -6px 8px;animation:signupOpenOut .9s ease both}
-          .signup-bag{position:relative;width:126px;height:142px;z-index:3;animation:bagArrive .9s .1s cubic-bezier(.2,.85,.25,1) both;transform-origin:50% 100%}
-          .signup-bag-body{position:absolute;left:0;right:0;bottom:0;height:108px;border-radius:10px 10px 17px 17px;background:linear-gradient(145deg,#22d474,#11b95c);box-shadow:0 22px 35px rgba(18,170,83,.24);display:flex;align-items:center;justify-content:center;overflow:hidden}
-          .signup-bag-body:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.2),transparent 42%)}
-          .signup-bag-body span{position:relative;color:#fff;font-size:38px;font-weight:1000;letter-spacing:-4px;transform:translateX(-2px)}
-          .signup-bag-handle{position:absolute;width:68px;height:48px;left:29px;top:0;border:7px solid #16bd61;border-bottom:0;border-radius:40px 40px 0 0;z-index:-1;transform:translateY(-23px)}
-          .signup-bag-shadow{position:absolute;width:116px;height:15px;bottom:-2px;border-radius:50%;background:rgba(20,39,29,.12);filter:blur(7px);animation:shadowIn .8s .2s ease both}
-          .signup-float-item{position:absolute;z-index:4;opacity:0;box-shadow:0 12px 24px rgba(20,39,29,.13)}
-          .signup-item-one{left:calc(50% - 88px);top:48px;width:48px;height:48px;border-radius:12px;background:#fff;color:#16bd61;font-size:15px;font-weight:1000;display:flex;align-items:center;justify-content:center;animation:itemOne 1.25s .35s cubic-bezier(.18,.8,.25,1) both}
-          .signup-item-two{right:calc(50% - 91px);top:36px;width:39px;height:50px;border-radius:7px;background:#f6faf7;transform:rotate(12deg);animation:itemTwo 1.25s .45s cubic-bezier(.18,.8,.25,1) both}
-          .signup-item-two span{display:block;width:23px;height:6px;background:#16bd61;border-radius:4px;margin:14px auto 0}
-          .signup-item-three{left:calc(50% + 42px);top:78px;width:42px;height:42px;border-radius:50%;background:#fff;transform:rotate(-14deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;animation:itemThree 1.25s .5s cubic-bezier(.18,.8,.25,1) both}
-          .signup-item-three span{width:21px;height:4px;border-radius:4px;background:#16bd61}
-          .signup-bag-caption{position:absolute;bottom:0;color:#7a877f;font-size:7px;font-weight:950;letter-spacing:1.8px;text-align:center;animation:captionIn .7s .8s ease both}
-          .signup-experience .mobile-auth-title,.signup-experience .mobile-auth-form{animation:signupContentIn .75s 1.35s ease both;animation-fill-mode:both}
-          @keyframes bagArrive{from{opacity:0;transform:translateY(38px) scale(.82)}to{opacity:1;transform:none}}
-          @keyframes itemOne{0%{opacity:0;transform:translateY(70px) rotate(-18deg) scale(.55)}22%{opacity:1}72%{opacity:1;transform:translate(-12px,-38px) rotate(8deg) scale(1)}100%{opacity:0;transform:translate(-35px,-90px) rotate(-8deg) scale(.9)}}
-          @keyframes itemTwo{0%{opacity:0;transform:translateY(75px) rotate(12deg) scale(.55)}22%{opacity:1}72%{opacity:1;transform:translate(15px,-55px) rotate(-9deg) scale(1)}100%{opacity:0;transform:translate(42px,-108px) rotate(7deg) scale(.9)}}
-          @keyframes itemThree{0%{opacity:0;transform:translateY(55px) rotate(-14deg) scale(.55)}25%{opacity:1}72%{opacity:1;transform:translate(28px,-25px) rotate(15deg) scale(1)}100%{opacity:0;transform:translate(62px,-74px) rotate(4deg) scale(.88)}}
-          @keyframes shadowIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
-          @keyframes captionIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-          @keyframes signupOpenOut{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-          @keyframes signupContentIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-          @media(max-width:600px){.signup-bag-opening{height:205px}.signup-bag{transform:scale(.9);transform-origin:50% 100%}.signup-bag-caption{font-size:6px;letter-spacing:1.4px}}
-          @media(prefers-reduced-motion:reduce){.signup-bag-opening,.signup-bag,.signup-float-item,.signup-bag-shadow,.signup-bag-caption,.signup-experience .mobile-auth-title,.signup-experience .mobile-auth-form{animation:none!important;opacity:1!important;transform:none!important}}
-        `}</style>}
-        <div className="mobile-auth-title">
-          <span className="mobile-auth-welcome">WELCOME BACK</span>
-          <h1>{forgot?'Reset Password':signup?'Create Your Account':'Welcome Back'}</h1>
-          <p>{forgot?'Enter your email to reset your password.':signup?'Fill in your details to get started':accountType==='driver'?'Driver access for active BG Smart Services drivers.':accountType==='merchant'?'Restaurant partner access for approved businesses.':'Sign in to continue shopping.'}</p>
-        </div>
-
-        {!forgot&&!signup&&<div className="account-type-picker">
-          <div className="account-type-label">Sign in as</div>
-          <div className="account-type-options">
-            <button type="button" className={accountType==='customer'?'account-type-option active':'account-type-option'} onClick={()=>setAccountType('customer')}><UserRound size={18}/><span>Customer</span></button>
-            <button type="button" className={accountType==='driver'?'account-type-option active':'account-type-option'} onClick={()=>setAccountType('driver')}><Truck size={18}/><span>Driver</span></button>
-            <button type="button" className={accountType==='merchant'?'account-type-option active':'account-type-option'} onClick={()=>setAccountType('merchant')}><Store size={18}/><span>Restaurant Partner</span></button>
-          </div>
-        </div>}
-
-        <form className="mobile-auth-form" onSubmit={submit}>
-          {forgot?<label><span>Email Address</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter your email" required/></label>:signup?<><label><span>First Name</span><input value={name} onChange={e=>setName(e.target.value)} placeholder="Enter your first name" required/></label><label><span>Surname</span><input value={surname} onChange={e=>setSurname(e.target.value)} placeholder="Enter your surname" required/></label><label><span>Mobile Number</span><input type="tel" value={cellphone} onChange={e=>setCellphone(e.target.value)} placeholder="Enter your mobile number" required/></label><label><span>Email Address</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter your email address" autoComplete="email" required/></label><label><span>Delivery Address</span><input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Enter your delivery address" required/></label><label><span>Create Password</span><span className="mobile-password"><input type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your password" minLength={6} required/><button type="button" onClick={()=>setShowPassword(!showPassword)}>{showPassword?<EyeOff size={17}/>:<Eye size={17}/>}</button></span></label><label><span>Retype Password</span><span className="mobile-password"><input type={showRetype?'text':'password'} value={retype} onChange={e=>setRetype(e.target.value)} placeholder="Retype your password" minLength={6} required/><button type="button" onClick={()=>setShowRetype(!showRetype)}>{showRetype?<EyeOff size={17}/>:<Eye size={17}/>}</button></span></label><label className="terms-check"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)}/><span className="fake-check">{accepted&&<Check size={13}/>}</span><span>I agree to the BG Smart Services <Link href="/terms">Terms & Conditions</Link> and <Link href="/privacy">Privacy Policy</Link></span></label></>:<><label><span>Email Address</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter your email" required/></label><label><span>Password</span><span className="mobile-password"><input type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your password" required/><button type="button" onClick={()=>setShowPassword(!showPassword)}>{showPassword?<EyeOff size={17}/>:<Eye size={17}/>}</button></span></label></>}
-
-          {msg&&<div className="notice">{msg}</div>}
-          <button className="mobile-green-button" disabled={loading}>{loading?'Please wait…':forgot?'Send Reset Link':signup?'Create Account':'Sign In'}</button>
-          {!forgot&&!signup&&<button className="mobile-text-button" type="button" onClick={()=>setForgot(true)}>Forgot password?</button>}
-          <button className="mobile-text-button" type="button" onClick={()=>{setSignup(!signup);setForgot(false);setMsg('');setAccountType('customer')}}>{signup?'Already have an account? Log In':'Create an account'}</button>
-          {!forgot&&!signup&&<div className="social-login social-login-bottom">
-            <div className="auth-divider"><span>or continue with</span></div>
-            <button type="button" className="social-login-button" disabled={loading} onClick={()=>socialSignIn('google')}>
-              <img className="google-mark" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" aria-hidden="true"/>
-              <span>Continue with Google</span>
-            </button>
-            <button type="button" className="social-login-button" disabled={loading} onClick={()=>socialSignIn('apple')}>
-              <img className="apple-mark" src="https://appleid.cdn-apple.com/appleid/button/logo?color=white&border=false&border_radius=0&scale=1&size=30" alt="" aria-hidden="true"/>
-              <span>Continue with Apple</span>
-            </button>
-          </div>}
-        </form>
-      </section>
+        </section>
+        <section className="modern-form-card">
+          <div className="modern-form-head"><div><small>CREATE YOUR ACCOUNT</small><h2>{signupStep===1?"Tell us about you":signupStep===2?"Your delivery details":"Secure your account"}</h2></div><span className="modern-step-count">0{signupStep} / 03</span></div>
+          <form onSubmit={e=>{e.preventDefault();if(signupStep<3)nextSignupStep();else submit(e)}}>
+            {signupStep===1&&<div className="modern-fields"><div className="modern-field"><label>FIRST NAME</label><input value={name} onChange={e=>setName(e.target.value)} placeholder="Your first name"/></div><div className="modern-field"><label>SURNAME</label><input value={surname} onChange={e=>setSurname(e.target.value)} placeholder="Your surname"/></div><div className="modern-field full"><label>MOBILE NUMBER</label><input type="tel" value={cellphone} onChange={e=>setCellphone(e.target.value)} placeholder="Your mobile number"/></div></div>}
+            {signupStep===2&&<div className="modern-fields"><div className="modern-field full"><label>EMAIL ADDRESS</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></div><div className="modern-field full"><label>DELIVERY ADDRESS</label><input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Where should we deliver?"/></div></div>}
+            {signupStep===3&&<div className="modern-fields"><div className="modern-field full"><label>CREATE PASSWORD</label><span className="modern-password"><input type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 6 characters" minLength={6}/><button type="button" onClick={()=>setShowPassword(!showPassword)}>{showPassword?<EyeOff size={17}/>:<Eye size={17}/>}</button></span></div><div className="modern-field full"><label>RETYPE PASSWORD</label><span className="modern-password"><input type={showRetype?'text':'password'} value={retype} onChange={e=>setRetype(e.target.value)} placeholder="Retype your password" minLength={6}/><button type="button" onClick={()=>setShowRetype(!showRetype)}>{showRetype?<EyeOff size={17}/>:<Eye size={17}/>}</button></span></div><label className="modern-terms"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)}/><span>I agree to the BG Smart Services <Link href="/terms">Terms & Conditions</Link> and <Link href="/privacy">Privacy Policy</Link>.</span></label></div>}
+            {msg&&<div className="modern-notice">{msg}</div>}
+            <div className="modern-actions">{signupStep>1&&<button type="button" className="modern-secondary" onClick={prevSignupStep} aria-label="Previous step"><ArrowLeft size={17}/></button>}<button type="submit" className="modern-primary" disabled={loading}>{loading?"Creating account…":signupStep===3?"Create Account":"Continue"}</button></div>
+          </form>
+          <div className="modern-switch">Already have an account? <button type="button" onClick={()=>{setSignup(false);setSignupStep(1);setMsg('')}}>Sign in</button></div>
+        </section>
+      </div>
+      <footer className="modern-footer">LOCAL <span>•</span> CONVENIENT <span>•</span> MADE FOR POORT</footer>
     </div>
   </main>
 }
