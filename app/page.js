@@ -45,13 +45,28 @@ export default function Welcome() {
           <div className="welcome-showcase" aria-hidden="true">
             <div className="showcase-glow" />
             <div className="showcase-card showcase-card-one">
-              <div className="fake-food food-red">McDONALD'S</div>
-              <strong>McDonald's</strong>
+              <div className="brand-photo brand-mcd">
+                <img
+                  src="https://www.mcdonalds.co.za/media/about/_featuredimage/McDonalds_Our-History.png"
+                  alt="McDonald's restaurant"
+                />
+              </div>
+              <div className="brand-logo brand-logo-mcd">
+                <img
+                  src="https://corporate.mcdonalds.com/content/dam/sites/corp/nfl/newsroom/Thumb_McDonaldsWordmark.jpg.coredownload.jpeg"
+                  alt="McDonald's logo"
+                />
+              </div>
               <small>Fast food · Burgers</small>
             </div>
             <div className="showcase-card showcase-card-two">
-              <div className="fake-food food-dark">KFC</div>
-              <strong>KFC</strong>
+              <div className="brand-photo brand-chicken">
+                <img
+                  src="https://signedition.co.za/wp-content/uploads/2020/07/Chicken-Licken-Signage-2_sign-edition-400x400.jpg"
+                  alt="Chicken Licken restaurant"
+                />
+              </div>
+              <div className="brand-name">Chicken Licken</div>
               <small>Chicken · Fast food</small>
             </div>
             <div className="showcase-card showcase-card-three">
@@ -106,9 +121,15 @@ export default function Welcome() {
         .welcome-showcase{height:570px;position:relative;display:flex;align-items:center;justify-content:center;animation:show .8s .1s ease both}
         .showcase-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:rgba(24,201,104,.12);filter:blur(55px)}
         .showcase-card{position:absolute;width:190px;padding:9px;background:#fff;border:1px solid #e4e9e5;border-radius:16px;box-shadow:0 18px 45px rgba(17,38,26,.13);z-index:2}
-        .showcase-card strong{display:block;font-size:11px;margin:8px 4px 0}.showcase-card small{display:block;color:#8a958e;font-size:8px;margin:3px 4px 2px}
-        .fake-food{height:105px;border-radius:11px;display:grid;place-items:center;color:#fff;font-size:19px;font-weight:950;letter-spacing:-1px}
-        .food-red{background:linear-gradient(135deg,#c51f19,#ef5a28)}.food-dark{background:linear-gradient(135deg,#171717,#333)}.food-orange{background:linear-gradient(135deg,#e77a16,#f1a53b)}
+        .showcase-card small{display:block;color:#8a958e;font-size:8px;margin:5px 4px 2px}
+        .brand-photo{height:105px;border-radius:11px;overflow:hidden;background:#f4f5f4}
+        .brand-photo img{width:100%;height:100%;display:block;object-fit:cover}
+        .brand-mcd img{object-position:center 62%}
+        .brand-chicken img{object-position:center}
+        .brand-logo{height:29px;margin:7px 4px 0;display:flex;align-items:center}
+        .brand-logo img{max-width:100%;height:100%;object-fit:contain;object-position:left center;display:block}
+        .brand-logo-mcd{background:#fff;border-radius:6px;padding:3px 7px}
+        .brand-name{font-size:11px;font-weight:950;margin:8px 4px 0;color:#151b17}
         .showcase-card-one{left:4%;top:12%;transform:rotate(-8deg);animation:cardOne 5s ease-in-out infinite}
         .showcase-card-two{right:4%;top:22%;transform:rotate(8deg);animation:cardTwo 5s ease-in-out infinite -1.5s}
         .showcase-card-three{left:12%;bottom:9%;transform:rotate(6deg);animation:cardThree 5s ease-in-out infinite -3s}
