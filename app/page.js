@@ -40,7 +40,7 @@ export default function Welcome() {
           </p>
 
           <div className="welcome-actions">
-            <Link href="/signin?mode=signup" className="welcome-enter">
+            <Link href="/home" className="welcome-enter">
               ENTER BG SMART SERVICES
               <ArrowRight size={19} />
             </Link>
