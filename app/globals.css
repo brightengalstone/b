@@ -1420,3 +1420,21 @@ a{color:inherit}
   .mobile-auth-brand .mobile-auth-logo{width:230px!important;height:133px!important}
   .mobile-auth-brand .mobile-auth-logo img{width:230px!important;height:133px!important}
 }
+
+
+/* Auth logo: prevent original SVG branding from being compressed/overlapped */
+.mobile-auth-brand .mobile-auth-logo{
+  width:300px!important;
+  height:174px!important;
+  overflow:visible!important;
+}
+.mobile-auth-brand .mobile-auth-logo img{
+  width:300px!important;
+  height:174px!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+@media(max-width:430px){
+  .mobile-auth-brand .mobile-auth-logo{width:270px!important;height:156px!important}
+  .mobile-auth-brand .mobile-auth-logo img{width:270px!important;height:156px!important}
+}
