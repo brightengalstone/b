@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, Eye, EyeOff, Truck, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Truck, ShieldCheck, Mail, LockKeyhole, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabase';
 
@@ -11,6 +11,7 @@ export default function DriverLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [focused, setFocused] = useState('');
 
   async function submit(event) {
     event.preventDefault();
@@ -99,6 +100,7 @@ export default function DriverLoginPage() {
         </header>
 
         <section className="driver-login-card">
+          <div className="driver-card-glow" />
           <div className="driver-login-icon"><Truck size={25} /></div>
           <span className="driver-eyebrow">Driver access</span>
           <h1>Driver Login</h1>
@@ -107,19 +109,21 @@ export default function DriverLoginPage() {
           <form className="driver-login-form" onSubmit={submit}>
             <label>
               <span>Email address</span>
-              <input
+              <div className="driver-input-wrap"><Mail size={16} /><input
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="Enter your driver email"
                 autoComplete="email"
                 required
-              />
+                onFocus={() => setFocused("email")}
+                onBlur={() => setFocused("")}
+              /></div>
             </label>
 
             <label>
               <span>Password</span>
-              <span className="driver-password">
+              <span className="driver-password"><LockKeyhole size={16} className="driver-lock-icon" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -127,6 +131,8 @@ export default function DriverLoginPage() {
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   required
+                  onFocus={() => setFocused("password")}
+                  onBlur={() => setFocused("")}
                 />
                 <button type="button" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? 'Hide password' : 'Show password'}>
                   {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
