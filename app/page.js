@@ -47,7 +47,7 @@ export default function Welcome() {
             <Link href="/signin" className="welcome-signin">
               Already a member? <span>Sign in</span>
             </Link>
-            <Link href="/signin?mode=signup" className="welcome-create-account">
+            <Link href="/signup" className="welcome-create-account">
               Create an account
             </Link>
           </div>
