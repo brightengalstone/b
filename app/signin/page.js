@@ -93,9 +93,49 @@ export default function Signin(){
     </header>
 
     <div className="mobile-auth-stage">
-      <section className="mobile-auth-card">
+      <section className={signup?"mobile-auth-card signup-experience":"mobile-auth-card"}>
+        {signup&&<div className="signup-bag-opening" aria-hidden="true">
+          <div className="signup-float-item signup-item-one">BG</div>
+          <div className="signup-float-item signup-item-two"><span /></div>
+          <div className="signup-float-item signup-item-three"><span /><span /></div>
+          <div className="signup-bag">
+            <div className="signup-bag-handle" />
+            <div className="signup-bag-body"><span>BG</span></div>
+          </div>
+          <div className="signup-bag-shadow" />
+          <div className="signup-bag-caption">YOUR SHOPPING EXPERIENCE STARTS HERE</div>
+        </div>}
         <button className="mobile-back" type="button" onClick={back} aria-label="Go back"><ArrowLeft size={18}/></button>
 
+
+        {signup&&<style>{\`\
+          .signup-experience{overflow:hidden}
+          .signup-bag-opening{height:230px;position:relative;display:flex;align-items:flex-end;justify-content:center;margin:-8px -6px 8px;animation:signupOpenOut .9s ease both}
+          .signup-bag{position:relative;width:126px;height:142px;z-index:3;animation:bagArrive .9s .1s cubic-bezier(.2,.85,.25,1) both;transform-origin:50% 100%}
+          .signup-bag-body{position:absolute;left:0;right:0;bottom:0;height:108px;border-radius:10px 10px 17px 17px;background:linear-gradient(145deg,#22d474,#11b95c);box-shadow:0 22px 35px rgba(18,170,83,.24);display:flex;align-items:center;justify-content:center;overflow:hidden}
+          .signup-bag-body:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.2),transparent 42%)}
+          .signup-bag-body span{position:relative;color:#fff;font-size:38px;font-weight:1000;letter-spacing:-4px;transform:translateX(-2px)}
+          .signup-bag-handle{position:absolute;width:68px;height:48px;left:29px;top:0;border:7px solid #16bd61;border-bottom:0;border-radius:40px 40px 0 0;z-index:-1;transform:translateY(-23px)}
+          .signup-bag-shadow{position:absolute;width:116px;height:15px;bottom:-2px;border-radius:50%;background:rgba(20,39,29,.12);filter:blur(7px);animation:shadowIn .8s .2s ease both}
+          .signup-float-item{position:absolute;z-index:4;opacity:0;box-shadow:0 12px 24px rgba(20,39,29,.13)}
+          .signup-item-one{left:calc(50% - 88px);top:48px;width:48px;height:48px;border-radius:12px;background:#fff;color:#16bd61;font-size:15px;font-weight:1000;display:flex;align-items:center;justify-content:center;animation:itemOne 1.25s .35s cubic-bezier(.18,.8,.25,1) both}
+          .signup-item-two{right:calc(50% - 91px);top:36px;width:39px;height:50px;border-radius:7px;background:#f6faf7;transform:rotate(12deg);animation:itemTwo 1.25s .45s cubic-bezier(.18,.8,.25,1) both}
+          .signup-item-two span{display:block;width:23px;height:6px;background:#16bd61;border-radius:4px;margin:14px auto 0}
+          .signup-item-three{left:calc(50% + 42px);top:78px;width:42px;height:42px;border-radius:50%;background:#fff;transform:rotate(-14deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;animation:itemThree 1.25s .5s cubic-bezier(.18,.8,.25,1) both}
+          .signup-item-three span{width:21px;height:4px;border-radius:4px;background:#16bd61}
+          .signup-bag-caption{position:absolute;bottom:0;color:#7a877f;font-size:7px;font-weight:950;letter-spacing:1.8px;text-align:center;animation:captionIn .7s .8s ease both}
+          .signup-experience .mobile-auth-title,.signup-experience .mobile-auth-form{animation:signupContentIn .75s 1.35s ease both;animation-fill-mode:both}
+          @keyframes bagArrive{from{opacity:0;transform:translateY(38px) scale(.82)}to{opacity:1;transform:none}}
+          @keyframes itemOne{0%{opacity:0;transform:translateY(70px) rotate(-18deg) scale(.55)}22%{opacity:1}72%{opacity:1;transform:translate(-12px,-38px) rotate(8deg) scale(1)}100%{opacity:0;transform:translate(-35px,-90px) rotate(-8deg) scale(.9)}}
+          @keyframes itemTwo{0%{opacity:0;transform:translateY(75px) rotate(12deg) scale(.55)}22%{opacity:1}72%{opacity:1;transform:translate(15px,-55px) rotate(-9deg) scale(1)}100%{opacity:0;transform:translate(42px,-108px) rotate(7deg) scale(.9)}}
+          @keyframes itemThree{0%{opacity:0;transform:translateY(55px) rotate(-14deg) scale(.55)}25%{opacity:1}72%{opacity:1;transform:translate(28px,-25px) rotate(15deg) scale(1)}100%{opacity:0;transform:translate(62px,-74px) rotate(4deg) scale(.88)}}
+          @keyframes shadowIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+          @keyframes captionIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+          @keyframes signupOpenOut{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+          @keyframes signupContentIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+          @media(max-width:600px){.signup-bag-opening{height:205px}.signup-bag{transform:scale(.9);transform-origin:50% 100%}.signup-bag-caption{font-size:6px;letter-spacing:1.4px}}
+          @media(prefers-reduced-motion:reduce){.signup-bag-opening,.signup-bag,.signup-float-item,.signup-bag-shadow,.signup-bag-caption,.signup-experience .mobile-auth-title,.signup-experience .mobile-auth-form{animation:none!important;opacity:1!important;transform:none!important}}
+        \`}</style>}
         <div className="mobile-auth-title">
           <span className="mobile-auth-welcome">WELCOME BACK</span>
           <h1>{forgot?'Reset Password':signup?'Create Your Account':'Welcome Back'}</h1>
