@@ -4,149 +4,119 @@ import { ArrowRight, MapPin, Search, ShoppingBag, Clock3, Truck, ChevronRight } 
 export default function Welcome() {
   return (
     <main className="welcome-page">
-      <div className="welcome-bg" aria-hidden="true" />
-      <section className="welcome-shell">
+      <div className="welcome-orb welcome-orb-one" aria-hidden="true" />
+      <div className="welcome-orb welcome-orb-two" aria-hidden="true" />
+
+      <section className="welcome-screen">
         <header className="welcome-header">
-          <Link href="/" className="welcome-logo" aria-label="BG Smart Services home">
-            <span className="welcome-logo-mark">BG</span>
-            <span className="welcome-logo-name">SMART SERVICES</span>
+          <Link href="/" className="welcome-brand" aria-label="BG Smart Services">
+            <span className="welcome-brand-mark">BG</span>
+            <span className="welcome-brand-name">SMART SERVICES</span>
           </Link>
-          <div className="welcome-location">
-            <MapPin size={15} />
-            <span>Eersterust</span>
-            <ChevronRight size={14} />
-          </div>
+          <span className="welcome-status"><span /> EERSTERUST</span>
         </header>
 
-        <div className="welcome-hero">
-          <div className="welcome-copy">
-            <div className="welcome-pill"><span /> EERSTERUST DELIVERY</div>
-            <h1>Your favourites,<br /><span>delivered.</span></h1>
-            <p>Food, groceries and everyday essentials from local shops and restaurants — delivered to your door.</p>
-
-            <div className="welcome-search">
-              <Search size={19} />
-              <span>What are you looking for?</span>
-            </div>
-
-            <div className="welcome-actions">
-              <Link href="/signin?mode=signup" className="welcome-primary">
-                Start ordering <ArrowRight size={18} />
-              </Link>
-              <Link href="/signin?mode=login" className="welcome-secondary">Sign in</Link>
-            </div>
-
-            <div className="welcome-note">
-              <Truck size={16} />
-              <span><strong>R65 delivery</strong> · Eersterust only</span>
-            </div>
+        <div className="welcome-center">
+          <div className="welcome-intro">
+            <span className="welcome-line" />
+            <span>WELCOME</span>
+            <span className="welcome-line" />
           </div>
 
-          <div className="welcome-showcase" aria-hidden="true">
-            <div className="showcase-glow" />
-            <div className="showcase-card showcase-card-one">
-              <div className="brand-photo brand-mcd">
-                <img
-                  src="https://www.mcdonalds.co.za/media/about/_featuredimage/McDonalds_Our-History.png"
-                  alt="McDonald's restaurant"
-                />
-              </div>
-              <div className="brand-logo brand-logo-mcd">
-                <img
-                  src="https://corporate.mcdonalds.com/content/dam/sites/corp/nfl/newsroom/Thumb_McDonaldsWordmark.jpg.coredownload.jpeg"
-                  alt="McDonald's logo"
-                />
-              </div>
-              <small>Fast food · Burgers</small>
-            </div>
-            <div className="showcase-card showcase-card-two">
-              <div className="brand-photo brand-chicken">
-                <img
-                  src="https://signedition.co.za/wp-content/uploads/2020/07/Chicken-Licken-Signage-2_sign-edition-400x400.jpg"
-                  alt="Chicken Licken restaurant"
-                />
-              </div>
-              <div className="brand-name">Chicken Licken</div>
-              <small>Chicken · Fast food</small>
-            </div>
-            <div className="showcase-card showcase-card-three">
-              <div className="fake-food food-orange">SHOP</div>
-              <strong>Local shopping</strong>
-              <small>Groceries · Essentials</small>
-            </div>
-            <div className="showcase-tuktuk">
-              <div className="delivery-badge"><span><Clock3 size={14} /></span><div><strong>On the way</strong><small>Your order is coming</small></div></div>
-              <img src="/bg-tuktuk.svg" alt="" />
-            </div>
+          <div className="welcome-brand-hero">
+            <span>BG</span>
+            <strong>SMART SERVICES</strong>
+          </div>
+
+          <p className="welcome-tagline">Built for Poort. Made for you.</p>
+
+          <div className="welcome-divider" />
+
+          <h1>Welcome to<br /><span>BG Smart Services</span></h1>
+
+          <p className="welcome-local">
+            <MapPin size={17} strokeWidth={2.2} />
+            Proudly serving Eersterust aka Poort
+          </p>
+
+          <div className="welcome-actions">
+            <Link href="/signin?mode=signup" className="welcome-enter">
+              ENTER BG SMART SERVICES
+              <ArrowRight size={19} />
+            </Link>
+            <Link href="/signin?mode=login" className="welcome-signin">
+              Already a member? <span>Sign in</span>
+            </Link>
           </div>
         </div>
 
-        <section className="welcome-services" aria-label="How BG Smart Services works">
-          <div className="service"><span><Search size={17} /></span><div><strong>Choose what you want</strong><small>Browse local stores and restaurants</small></div></div>
-          <div className="service"><span><ShoppingBag size={17} /></span><div><strong>Place your order</strong><small>Simple, secure checkout</small></div></div>
-          <div className="service"><span><Truck size={17} /></span><div><strong>We deliver to you</strong><small>Track your order from pickup to door</small></div></div>
-        </section>
-
         <footer className="welcome-footer">
-          <span>Built for Eersterust</span><i /><span>Food · Shopping · Delivery</span>
+          <span>LOCAL</span>
+          <i />
+          <span>CONVENIENT</span>
+          <i />
+          <span>MADE FOR POORT</span>
         </footer>
       </section>
 
       <style>{`
-        .welcome-page{min-height:100svh;background:#fff;color:#111815;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;position:relative}
-        .welcome-bg{position:absolute;inset:0;background:radial-gradient(circle at 84% 28%,rgba(27,211,107,.11),transparent 30%),radial-gradient(circle at 12% 80%,rgba(27,211,107,.07),transparent 28%);pointer-events:none}
-        .welcome-shell{width:min(1280px,100%);min-height:100svh;margin:auto;padding:22px 38px 18px;position:relative;z-index:1;display:flex;flex-direction:column}
-        .welcome-header{display:flex;align-items:center;justify-content:space-between}
-        .welcome-logo{display:flex;align-items:center;gap:10px;color:#101712;text-decoration:none}
-        .welcome-logo-mark{font-size:31px;font-weight:950;letter-spacing:-3px;color:#18c968;line-height:.8}
-        .welcome-logo-name{font-size:11px;font-weight:950;letter-spacing:2px}
-        .welcome-location{display:flex;align-items:center;gap:6px;padding:10px 13px;border:1px solid #e1e7e3;border-radius:999px;background:#fff;color:#3d4942;font-size:12px;font-weight:800;box-shadow:0 5px 20px rgba(15,35,23,.05)}
-        .welcome-location svg:first-child{color:#16bb60}
-        .welcome-hero{flex:1;display:grid;grid-template-columns:minmax(0,.95fr) minmax(430px,1.05fr);align-items:center;gap:55px;padding:48px 0 34px}
-        .welcome-copy{max-width:620px;animation:rise .7s ease both}
-        .welcome-pill{display:inline-flex;align-items:center;gap:8px;color:#159f50;font-size:10px;font-weight:950;letter-spacing:1.5px}
-        .welcome-pill span{width:7px;height:7px;border-radius:50%;background:#18ca68;box-shadow:0 0 0 5px rgba(24,202,104,.1)}
-        .welcome-copy h1{font-size:clamp(58px,6.6vw,88px);line-height:.9;letter-spacing:-5px;margin:24px 0 24px;font-weight:950}
-        .welcome-copy h1 span{color:#16c766}
-        .welcome-copy>p{max-width:550px;color:#5d6962;font-size:16px;line-height:1.65;margin:0}
-        .welcome-search{height:56px;max-width:520px;margin-top:27px;border:1px solid #dce3de;border-radius:12px;background:#fff;display:flex;align-items:center;gap:11px;padding:0 17px;color:#8a958e;box-shadow:0 7px 24px rgba(21,47,31,.06)}
-        .welcome-search svg{color:#536159}.welcome-search span{font-size:13px;font-weight:650}
-        .welcome-actions{display:flex;gap:10px;margin-top:14px}
-        .welcome-primary,.welcome-secondary{min-height:52px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;font-size:13px;font-weight:900;transition:.2s ease}
-        .welcome-primary{padding:0 23px;background:#18c968;color:#fff;box-shadow:0 9px 24px rgba(24,201,104,.22)}
-        .welcome-primary:hover{transform:translateY(-2px);background:#12b95c}
-        .welcome-secondary{padding:0 22px;border:1px solid #dce3de;color:#202b25;background:#fff}
-        .welcome-secondary:hover{transform:translateY(-2px);background:#f7faf8}
-        .welcome-note{display:flex;align-items:center;gap:8px;margin-top:18px;color:#68756d;font-size:11px}.welcome-note svg{color:#18bd61}.welcome-note strong{color:#1b2720}
-        .welcome-showcase{height:570px;position:relative;display:flex;align-items:center;justify-content:center;animation:show .8s .1s ease both}
-        .showcase-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:rgba(24,201,104,.12);filter:blur(55px)}
-        .showcase-card{position:absolute;width:190px;padding:9px;background:#fff;border:1px solid #e4e9e5;border-radius:16px;box-shadow:0 18px 45px rgba(17,38,26,.13);z-index:2}
-        .showcase-card small{display:block;color:#8a958e;font-size:8px;margin:5px 4px 2px}
-        .brand-photo{height:105px;border-radius:11px;overflow:hidden;background:#f4f5f4}
-        .brand-photo img{width:100%;height:100%;display:block;object-fit:cover}
-        .brand-mcd img{object-position:center 62%}
-        .brand-chicken img{object-position:center}
-        .brand-logo{height:29px;margin:7px 4px 0;display:flex;align-items:center}
-        .brand-logo img{max-width:100%;height:100%;object-fit:contain;object-position:left center;display:block}
-        .brand-logo-mcd{background:#fff;border-radius:6px;padding:3px 7px}
-        .brand-name{font-size:11px;font-weight:950;margin:8px 4px 0;color:#151b17}
-        .showcase-card-one{left:4%;top:12%;transform:rotate(-8deg);animation:cardOne 5s ease-in-out infinite}
-        .showcase-card-two{right:4%;top:22%;transform:rotate(8deg);animation:cardTwo 5s ease-in-out infinite -1.5s}
-        .showcase-card-three{left:12%;bottom:9%;transform:rotate(6deg);animation:cardThree 5s ease-in-out infinite -3s}
-        .showcase-tuktuk{position:absolute;z-index:4;bottom:3%;width:520px;max-width:90%;filter:drop-shadow(0 25px 20px rgba(0,0,0,.2));animation:tukFloat 4s ease-in-out infinite}
-        .showcase-tuktuk img{width:100%;display:block}
-        .delivery-badge{position:absolute;right:-30px;top:2px;z-index:5;display:flex;align-items:center;gap:8px;padding:9px 11px;background:#fff;border:1px solid #e4e9e5;border-radius:12px;box-shadow:0 13px 30px rgba(17,38,26,.14);white-space:nowrap}
-        .delivery-badge>span{width:28px;height:28px;border-radius:9px;background:#e9f9ef;color:#13b95b;display:grid;place-items:center}.delivery-badge strong{display:block;font-size:9px}.delivery-badge small{display:block;color:#89948d;font-size:7px;margin-top:2px}
-        .welcome-services{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;border-top:1px solid #e7ece8;padding-top:20px}
-        .service{display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:12px;background:#f7f9f7}
-        .service>span{width:35px;height:35px;border-radius:10px;background:#e5f8ed;color:#14b85b;display:grid;place-items:center;flex:none}
-        .service strong{display:block;font-size:10px}.service small{display:block;color:#7c8880;font-size:8px;margin-top:3px}
-        .welcome-footer{display:flex;justify-content:center;align-items:center;gap:10px;padding-top:14px;color:#8b968f;font-size:8px;font-weight:750}.welcome-footer i{width:3px;height:3px;border-radius:50%;background:#b8c1bb}
-        @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-        @keyframes show{from{opacity:0;transform:translateX(22px) scale(.97)}to{opacity:1;transform:none}}
-        @keyframes cardOne{50%{transform:rotate(-5deg) translateY(-8px)}}@keyframes cardTwo{50%{transform:rotate(5deg) translateY(7px)}}@keyframes cardThree{50%{transform:rotate(9deg) translateY(-6px)}}@keyframes tukFloat{50%{transform:translateY(-7px)}}
-        @media(max-width:900px){.welcome-shell{padding:18px 18px 14px}.welcome-hero{grid-template-columns:1fr;gap:20px;padding:45px 0 22px}.welcome-copy{text-align:center;margin:auto}.welcome-pill{justify-content:center}.welcome-copy>p{margin:auto}.welcome-search{margin-left:auto;margin-right:auto;text-align:left}.welcome-actions{justify-content:center}.welcome-note{justify-content:center}.welcome-showcase{height:430px;transform:scale(.88);margin:-15px 0 -30px}.welcome-services{margin-top:5px}.welcome-footer{padding-top:10px}}
-        @media(max-width:560px){.welcome-shell{padding:15px 12px 10px}.welcome-logo-name{font-size:8px;letter-spacing:1.3px}.welcome-logo-mark{font-size:27px}.welcome-location{font-size:10px;padding:8px 10px}.welcome-hero{padding-top:32px}.welcome-copy h1{font-size:48px;letter-spacing:-3.5px;line-height:.93}.welcome-copy>p{font-size:13px;line-height:1.55}.welcome-search{height:51px;margin-top:22px}.welcome-actions{display:grid;grid-template-columns:1.3fr 1fr}.welcome-primary,.welcome-secondary{min-height:49px;font-size:11px;padding:0 10px}.welcome-showcase{height:350px;transform:scale(.68);margin:-40px 0 -75px}.showcase-card{width:190px}.welcome-services{grid-template-columns:1fr;gap:6px}.service{padding:9px}.welcome-footer{font-size:7px}}
+        .welcome-page{min-height:100svh;background:#f8faf8;color:#101713;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;position:relative}
+        .welcome-page:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,#f8faf8 0%,#ffffff 48%,#eef8f2 100%);z-index:0}
+        .welcome-page:after{content:"";position:absolute;width:72vw;height:72vw;max-width:900px;max-height:900px;border:1px solid rgba(20,195,96,.10);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 110px rgba(20,195,96,.025),0 0 0 220px rgba(20,195,96,.018);pointer-events:none}
+        .welcome-orb{position:absolute;border-radius:50%;filter:blur(2px);pointer-events:none}
+        .welcome-orb-one{width:280px;height:280px;right:-110px;top:-100px;background:rgba(24,201,104,.12)}
+        .welcome-orb-two{width:230px;height:230px;left:-120px;bottom:-80px;background:rgba(24,201,104,.08)}
+        .welcome-screen{position:relative;z-index:2;width:min(1180px,100%);min-height:100svh;margin:auto;padding:28px 38px 22px;display:flex;flex-direction:column}
+        .welcome-header{display:flex;align-items:center;justify-content:space-between;animation:fadeDown .7s ease both}
+        .welcome-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#101713}
+        .welcome-brand-mark{font-size:32px;line-height:.8;font-weight:950;letter-spacing:-3.5px;color:#18c968}
+        .welcome-brand-name{font-size:10px;letter-spacing:2.2px;font-weight:950}
+        .welcome-status{display:flex;align-items:center;gap:8px;font-size:9px;font-weight:900;letter-spacing:1.5px;color:#66736b}
+        .welcome-status span{width:7px;height:7px;border-radius:50%;background:#19c968;box-shadow:0 0 0 5px rgba(25,201,104,.10)}
+        .welcome-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:35px 0}
+        .welcome-intro{display:flex;align-items:center;gap:12px;color:#7b877f;font-size:9px;font-weight:950;letter-spacing:3px;animation:reveal .8s .1s ease both}
+        .welcome-line{width:34px;height:1px;background:#ccd5cf}
+        .welcome-brand-hero{margin-top:30px;display:flex;flex-direction:column;align-items:center;animation:logoReveal 1s .25s cubic-bezier(.2,.8,.2,1) both}
+        .welcome-brand-hero span{font-size:clamp(76px,11vw,132px);font-weight:1000;line-height:.72;letter-spacing:-10px;color:#18c968}
+        .welcome-brand-hero strong{font-size:clamp(12px,1.5vw,18px);letter-spacing:6px;font-weight:950;margin-top:17px}
+        .welcome-tagline{font-size:clamp(15px,1.8vw,20px);font-weight:700;letter-spacing:.2px;color:#445149;margin:34px 0 0;animation:rise .8s .65s ease both}
+        .welcome-divider{width:1px;height:42px;background:#d4ddd7;margin:24px 0;animation:grow .7s 1s ease both}
+        .welcome-center h1{font-size:clamp(38px,5.2vw,70px);line-height:1.02;letter-spacing:-3.5px;margin:0;font-weight:950;animation:rise .8s 1.05s ease both}
+        .welcome-center h1 span{color:#18c968}
+        .welcome-local{display:flex;align-items:center;justify-content:center;gap:8px;color:#56635b;font-size:13px;font-weight:700;margin:20px 0 0;animation:rise .8s 1.2s ease both}
+        .welcome-local svg{color:#18bd61}
+        .welcome-actions{display:flex;flex-direction:column;align-items:center;margin-top:31px;animation:rise .8s 1.35s ease both}
+        .welcome-enter{min-height:56px;padding:0 27px;border-radius:12px;background:#18c968;color:#fff;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:13px;font-size:11px;font-weight:950;letter-spacing:1.1px;box-shadow:0 15px 35px rgba(24,201,104,.24);transition:transform .2s ease,box-shadow .2s ease,background .2s ease}
+        .welcome-enter:hover{transform:translateY(-3px);background:#11b85b;box-shadow:0 19px 40px rgba(24,201,104,.28)}
+        .welcome-signin{margin-top:17px;color:#77837b;text-decoration:none;font-size:11px;font-weight:650}
+        .welcome-signin span{color:#121b16;font-weight:900;margin-left:3px;text-decoration:underline;text-underline-offset:3px}
+        .welcome-footer{display:flex;justify-content:center;align-items:center;gap:11px;color:#9aa49e;font-size:8px;font-weight:900;letter-spacing:1.5px;animation:fadeUp .8s 1.45s ease both}
+        .welcome-footer i{width:3px;height:3px;border-radius:50%;background:#b8c2bb}
+        @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+        @keyframes reveal{from{opacity:0;letter-spacing:0}to{opacity:1;letter-spacing:3px}}
+        @keyframes logoReveal{from{opacity:0;transform:scale(.72) translateY(18px);filter:blur(9px)}to{opacity:1;transform:none;filter:none}}
+        @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+        @keyframes grow{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:scaleY(1)}}
+        @media(max-width:600px){
+          .welcome-screen{padding:20px 18px 17px}
+          .welcome-brand-mark{font-size:28px}.welcome-brand-name{font-size:8px;letter-spacing:1.6px}
+          .welcome-status{font-size:8px;letter-spacing:1px}
+          .welcome-center{padding:25px 0}
+          .welcome-intro{font-size:8px;letter-spacing:2.4px}
+          .welcome-brand-hero{margin-top:25px}
+          .welcome-brand-hero span{font-size:86px;letter-spacing:-7px}
+          .welcome-brand-hero strong{font-size:11px;letter-spacing:4px;margin-top:14px}
+          .welcome-tagline{font-size:15px;margin-top:27px}
+          .welcome-divider{height:34px;margin:20px 0}
+          .welcome-center h1{font-size:40px;letter-spacing:-2.5px}
+          .welcome-local{font-size:11px;margin-top:17px}
+          .welcome-enter{width:100%;max-width:330px;min-height:54px;font-size:10px}
+          .welcome-signin{font-size:10px}
+          .welcome-footer{font-size:7px;gap:8px;letter-spacing:1px}
+          .welcome-page:after{width:125vw;height:125vw}
+        }
+        @media(prefers-reduced-motion:reduce){.welcome-header,.welcome-intro,.welcome-brand-hero,.welcome-tagline,.welcome-divider,.welcome-center h1,.welcome-local,.welcome-actions,.welcome-footer{animation:none!important}}
       `}</style>
     </main>
   );
