@@ -1,6 +1,6 @@
 'use client';
 import React,{useEffect,useState} from 'react';
-import {Eye,EyeOff,ArrowLeft,Mail,LockKeyhole,ArrowRight,ShieldCheck} from 'lucide-react';
+import {Eye,EyeOff,ArrowLeft,Mail,LockKeyhole,ArrowRight,ShieldCheck,CheckCircle2} from 'lucide-react';
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
 import {supabase} from '../../lib/supabase';
@@ -22,17 +22,18 @@ export default function Signin(){
       setLoading(false);setMsg(error?.message||'Password reset email sent. Check your email for the reset link.');return
     }
     if(signup){
+      if(signupSuccess){return}
       if(!accepted){setMsg('Please accept the Terms & Conditions and Privacy Policy.');return}
       if(!normalizedEmail){setMsg('Please enter your email address.');return}
       if(password!==retype){setMsg('Passwords do not match.');return}
       setLoading(true);
       const{data:signUpData,error}=await supabase.auth.signUp({email:normalizedEmail,password,options:{data:{name,surname,cellphone,address,full_name:`${name} ${surname}`.trim()}}});
-      if(error){setLoading(false);setMsg(error.message);return}
-      if(!signUpData?.session){
-        const{error:signInError}=await supabase.auth.signInWithPassword({email:normalizedEmail,password});
-        if(signInError){setLoading(false);setMsg('Your account was created. Please confirm your email before signing in.');return}
-      }
-      setLoading(false);window.location.href='/home';return
+      setLoading(false);
+      if(error){setMsg(error.message);return}
+      setSignupConfirmation(!signUpData?.session);
+      setSignupSuccess(true);
+      setMsg('');
+      return
     }
     if(!normalizedEmail){setMsg('Please enter your email address.');return}
     if(!password){setMsg('Please enter your password.');return}
@@ -84,6 +85,8 @@ export default function Signin(){
       .modern-terms{display:flex;gap:10px;align-items:flex-start;margin-top:19px;color:#7b877f;font-size:9px;line-height:1.5}.modern-terms input{accent-color:#18c968;margin-top:2px}.modern-terms a{color:#172019;font-weight:850}
       .modern-journey{margin-top:42px;display:flex;align-items:center;max-width:410px}.modern-journey-step{display:flex;align-items:center;gap:9px;color:#9aa59e;font-size:9px;font-weight:950;letter-spacing:1px;white-space:nowrap}.modern-journey-step.active{color:#152019}.modern-journey-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#edf2ee;color:#78857c}.modern-journey-step.active .modern-journey-dot{background:#18c968;color:#fff}.modern-journey-line{height:1px;flex:1;background:#dce4df;margin:0 9px}
       .modern-footer{text-align:center;color:#9aa59e;font-size:8px;font-weight:900;letter-spacing:1.5px;padding-top:10px}.modern-footer span{color:#18bd61}
+      .modern-signup-success{flex:1;display:grid;place-items:center;padding:45px 0 25px;animation:maIntro .65s ease both}.modern-success-card{width:min(560px,100%);text-align:center;background:rgba(255,255,255,.94);border:1px solid #e1eee5;border-radius:30px;padding:48px 42px;box-shadow:0 28px 80px rgba(24,64,39,.12)}.modern-success-icon{width:72px;height:72px;margin:0 auto 22px;border-radius:22px;display:grid;place-items:center;background:#e9f9ef;color:#18bd61;box-shadow:0 12px 30px rgba(24,201,104,.12)}.modern-success-card small{color:#18bd61;font-size:8px;font-weight:950;letter-spacing:2px}.modern-success-card h1{font-size:clamp(38px,6vw,58px);line-height:.98;letter-spacing:-3px;margin:15px 0 17px;font-weight:1000}.modern-success-card h1 span{color:#18c968}.modern-success-card p{max-width:420px;margin:0 auto;color:#68756d;font-size:13px;line-height:1.7}.modern-email-note{margin:22px auto 0;max-width:390px;padding:13px 15px;border-radius:13px;background:#f2faf5;color:#55705e;display:flex;align-items:center;justify-content:center;gap:9px;font-size:9px;font-weight:800;line-height:1.5}.modern-success-button{margin-top:27px;width:100%;height:52px;border:0;border-radius:13px;background:#18c968;color:#fff;font-size:10px;font-weight:950;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;box-shadow:0 14px 30px rgba(24,201,104,.2)}.modern-success-home{margin-top:14px;border:0;background:none;color:#657169;font-size:9px;font-weight:900;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+      @media(max-width:760px){.modern-success-card{padding:38px 22px;border-radius:23px}.modern-success-card h1{letter-spacing:-2.5px}.modern-signup-success{padding:30px 0 20px}}
       @keyframes maIntro{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}@keyframes maCard{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:none}}
       @media(max-width:760px){.modern-auth-wrap,.modern-signup-wrap{padding:18px 16px}.modern-auth-layout,.modern-signup-layout{display:block;padding:35px 0 20px}.modern-auth-intro,.modern-signup-intro{text-align:center}.modern-auth-intro p,.modern-signup-intro p{margin:auto;font-size:13px}.modern-auth-intro h1,.modern-signup-intro h1{font-size:47px;letter-spacing:-3px;margin:18px 0 14px}.modern-auth-points{max-width:310px;margin:25px auto}.modern-form-card{padding:22px 18px;border-radius:21px}.modern-form-head h2{font-size:24px}.modern-fields{grid-template-columns:1fr}.modern-field.full{grid-column:auto}.modern-actions{margin-top:18px}.modern-auth-logo-mark,.modern-signup-logo-mark{font-size:29px}.modern-auth-logo-text,.modern-signup-logo-text{font-size:8px;letter-spacing:1.5px}}
       @media(prefers-reduced-motion:reduce){.modern-auth-intro,.modern-form-card,.modern-signup-intro{animation:none}}
@@ -91,7 +94,17 @@ export default function Signin(){
     {signup?
       <div className="modern-signup-wrap">
         <header className="modern-signup-top"><Link href="/" className="modern-signup-logo"><span className="modern-signup-logo-mark">BG</span><span className="modern-signup-logo-text">SMART SERVICES</span></Link><button className="modern-signup-back" onClick={back} aria-label="Go back"><ArrowLeft size={18}/></button></header>
-        <div className="modern-signup-layout">
+        {signupSuccess?<div className="modern-signup-success">
+          <div className="modern-success-card">
+            <div className="modern-success-icon"><CheckCircle2 size={34}/></div>
+            <small>BG SMART SERVICES</small>
+            <h1>Account created<br/><span>successfully.</span></h1>
+            <p>Your account is ready. {signupConfirmation?'We’ve sent a confirmation email to your email address. Please confirm it before signing in.':'You can now sign in and start shopping in Eersterust.'}</p>
+            {signupConfirmation&&<div className="modern-email-note"><Mail size={16}/><span>Check your inbox and spam folder for the confirmation email.</span></div>}
+            <button className="modern-success-button" onClick={()=>window.location.href='/signin'}>Continue to Sign In <ArrowRight size={17}/></button>
+            <button className="modern-success-home" onClick={()=>window.location.href='/'}>Back to Welcome</button>
+          </div>
+        </div>:<div className="modern-signup-layout">
           <section className="modern-signup-intro"><div className="modern-signup-kicker"><i/> EERSTERUST / POORT</div><h1>Let's get<br/><span>you started.</span></h1><p>Create your BG Smart Services account and make your local shopping experience simple from the start.</p><div className="modern-journey">{[['01','About you'],['02','Your details'],['03','Secure']].map((x,i)=><React.Fragment key={x[0]}><div className={signupStep===i+1?'modern-journey-step active':'modern-journey-step'}><span className="modern-journey-dot">{x[0]}</span><span>{x[1]}</span></div>{i<2&&<div className="modern-journey-line"/>}</React.Fragment>)}</div></section>
           <section className="modern-form-card"><div className="modern-form-head"><div><small>CREATE YOUR ACCOUNT</small><h2>{signupStep===1?'Tell us about you':signupStep===2?'Your delivery details':'Secure your account'}</h2></div><span className="modern-step-count">0{signupStep} / 03</span></div>
             <form onSubmit={e=>{e.preventDefault();if(signupStep<3)nextSignupStep();else submit(e)}}>
@@ -101,7 +114,8 @@ export default function Signin(){
               {msg&&<div className="modern-notice">{msg}</div>}<div className="modern-actions">{signupStep>1&&<button type="button" className="modern-secondary" onClick={prevSignupStep}><ArrowLeft size={17}/></button>}<button type="submit" className="modern-primary" disabled={loading}>{loading?'Creating account…':signupStep===3?'Create Account':'Continue'}</button></div>
             </form><div className="modern-switch">Already have an account? <button type="button" onClick={()=>window.location.href='/signin'}>Sign in</button></div>
           </section>
-        </div><footer className="modern-footer">LOCAL <span>•</span> CONVENIENT <span>•</span> MADE FOR POORT</footer>
+        </div>}
+        <footer className="modern-footer">LOCAL <span>•</span> CONVENIENT <span>•</span> MADE FOR POORT</footer>
       </div>
     :
       <div className="modern-auth-wrap">
