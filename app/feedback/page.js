@@ -113,14 +113,36 @@ function FeedbackContent() {
 
   if (done) return (
     <main className="feedback-page">
-      <div className="feedback-card feedback-success">
-        <div className="feedback-success-icon"><CheckCircle2 size={42}/></div>
-        <span className="feedback-eyebrow">FEEDBACK RECEIVED</span>
-        <h1>Thank you for your feedback.</h1>
-        <p>Your feedback helps BG Smart Services improve the delivery experience for every customer.</p>
-        <div className="feedback-actions">
-          <Link className="feedback-primary" href="/orders">Back to My Orders</Link>
-          <Link className="feedback-secondary" href="/home">Go to Home</Link>
+      <div className="feedback-shell">
+        <Link href="/orders" className="feedback-back"><ArrowLeft size={17}/> My Orders</Link>
+        <div className="feedback-card feedback-success">
+          <div className="feedback-success-icon"><CheckCircle2 size={42}/></div>
+          <span className="feedback-eyebrow">FEEDBACK RECEIVED</span>
+          <h1>Thank you for your feedback.</h1>
+          <p>Your feedback has been received successfully. It helps BG Smart Services recognise good service and improve the delivery experience.</p>
+
+          {order && (
+            <div className="feedback-received-summary">
+              <div className="feedback-received-row">
+                <span>Order</span>
+                <strong>#{String(order.id).slice(0, 8).toUpperCase()}</strong>
+              </div>
+              <div className="feedback-received-row">
+                <span>Overall rating</span>
+                <strong className="feedback-received-rating"><Star size={14} fill="currentColor"/> {overall}/5</strong>
+              </div>
+            </div>
+          )}
+
+          <div className="feedback-received-note">
+            <CheckCircle2 size={17}/>
+            <span>Your feedback is now linked to this delivery.</span>
+          </div>
+
+          <div className="feedback-actions">
+            <Link className="feedback-primary" href="/orders">Back to My Orders</Link>
+            <Link className="feedback-secondary" href="/home">Go to Home</Link>
+          </div>
         </div>
       </div>
     </main>
