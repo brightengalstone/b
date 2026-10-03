@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle2, MessageSquare, Star, Truck } from 'lucide-reac
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { supabase } from '../../lib/supabase';
+import './feedback.css';
 
 function FeedbackContent() {
   const params = useSearchParams();
@@ -108,26 +109,22 @@ function FeedbackContent() {
     setSaving(false);
   }
 
-  if (loading) {
-    return <main className="feedback-page"><div className="feedback-card"><div className="feedback-loading">Loading your delivery…</div></div></main>;
-  }
+  if (loading) return <main className="feedback-page"><div className="feedback-card"><div className="feedback-loading">Loading your delivery…</div></div></main>;
 
-  if (done) {
-    return (
-      <main className="feedback-page">
-        <div className="feedback-card feedback-success">
-          <div className="feedback-success-icon"><CheckCircle2 size={42}/></div>
-          <span className="feedback-eyebrow">FEEDBACK RECEIVED</span>
-          <h1>Thank you for your feedback.</h1>
-          <p>Your feedback helps BG Smart Services improve the delivery experience for every customer.</p>
-          <div className="feedback-actions">
-            <Link className="feedback-primary" href="/orders">Back to My Orders</Link>
-            <Link className="feedback-secondary" href="/home">Go to Home</Link>
-          </div>
+  if (done) return (
+    <main className="feedback-page">
+      <div className="feedback-card feedback-success">
+        <div className="feedback-success-icon"><CheckCircle2 size={42}/></div>
+        <span className="feedback-eyebrow">FEEDBACK RECEIVED</span>
+        <h1>Thank you for your feedback.</h1>
+        <p>Your feedback helps BG Smart Services improve the delivery experience for every customer.</p>
+        <div className="feedback-actions">
+          <Link className="feedback-primary" href="/orders">Back to My Orders</Link>
+          <Link className="feedback-secondary" href="/home">Go to Home</Link>
         </div>
-      </main>
-    );
-  }
+      </div>
+    </main>
+  );
 
   const delivered = order?.status === 'delivered';
 
@@ -139,29 +136,17 @@ function FeedbackContent() {
           <div className="feedback-icon"><Truck size={28}/></div>
           <span className="feedback-eyebrow">DELIVERY COMPLETE</span>
           <h1>How was your delivery?</h1>
-          <p className="feedback-intro">
-            Your feedback helps us recognise good service and find problems that need attention.
-          </p>
-
+          <p className="feedback-intro">Your feedback helps us recognise good service and find problems that need attention.</p>
           {!delivered && <div className="feedback-warning">You can leave feedback once this order has been marked as delivered.</div>}
           {error && <div className="feedback-error">{error}</div>}
-
           <form onSubmit={submit}>
             <Rating label="Overall experience" value={overall} setValue={setOverall}/>
             <Rating label="Driver" value={driverRating} setValue={setDriverRating}/>
             <Rating label="Delivery" value={deliveryRating} setValue={setDeliveryRating}/>
-
             <label className="feedback-comment">
               <span><MessageSquare size={15}/> Tell us more <em>Optional</em></span>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                maxLength={500}
-                placeholder="What went well? Is there anything we should improve?"
-                rows={5}
-              />
+              <textarea value={comment} onChange={(e) => setComment(e.target.value)} maxLength={500} placeholder="What went well? Is there anything we should improve?" rows={5}/>
             </label>
-
             <button className="feedback-submit" disabled={saving || !delivered}>
               {saving ? 'Saving feedback…' : feedback ? 'Update Feedback' : 'Submit Feedback'}
             </button>
@@ -175,19 +160,10 @@ function FeedbackContent() {
 function Rating({ label, value, setValue }) {
   return (
     <div className="feedback-rating">
-      <div className="feedback-rating-head">
-        <strong>{label}</strong>
-        <span>{value ? `${value}/5` : 'Select a rating'}</span>
-      </div>
+      <div className="feedback-rating-head"><strong>{label}</strong><span>{value ? `${value}/5` : 'Select a rating'}</span></div>
       <div className="feedback-stars" role="radiogroup" aria-label={label}>
         {[1,2,3,4,5].map((star) => (
-          <button
-            type="button"
-            key={star}
-            className={star <= value ? 'is-selected' : ''}
-            onClick={() => setValue(star)}
-            aria-label={`${star} out of 5`}
-          >
+          <button type="button" key={star} className={star <= value ? 'is-selected' : ''} onClick={() => setValue(star)} aria-label={`${star} out of 5`}>
             <Star size={27} fill={star <= value ? 'currentColor' : 'none'}/>
           </button>
         ))}
