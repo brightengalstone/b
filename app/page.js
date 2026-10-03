@@ -50,6 +50,20 @@ export default function Welcome() {
             <Link href="/signin?mode=signup" className="welcome-create-account">
               Create an account
             </Link>
+
+            <div className="welcome-partner-access" aria-label="Partner access">
+              <span>PARTNER ACCESS</span>
+              <div className="welcome-partner-links">
+                <Link href="/driver/login" className="welcome-partner-link">
+                  <Truck size={15} />
+                  <span>Driver Sign In</span>
+                </Link>
+                <Link href="/restaurant/login" className="welcome-partner-link">
+                  <ShoppingBag size={15} />
+                  <span>Restaurant Sign In</span>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -95,7 +109,7 @@ export default function Welcome() {
         .welcome-signin span{color:#121b16;font-weight:900;margin-left:3px;text-decoration:underline;text-underline-offset:3px}
         .welcome-create-account{margin-top:12px;color:#18b85e;text-decoration:none;font-size:11px;font-weight:900;letter-spacing:.1px;padding:7px 10px;border-radius:8px;transition:background .2s ease,transform .2s ease}
         .welcome-create-account:hover{background:rgba(24,201,104,.08);transform:translateY(-1px)}
-        .welcome-footer{display:flex;justify-content:center;align-items:center;gap:11px;color:#9aa49e;font-size:8px;font-weight:900;letter-spacing:1.5px;animation:fadeUp .8s 1.45s ease both}
+        .welcome-partner-access{margin-top:24px;width:min(430px,100%);padding-top:18px;border-top:1px solid #e2e8e3}\n        .welcome-partner-access>span{display:block;color:#98a39c;font-size:8px;font-weight:950;letter-spacing:1.8px;margin-bottom:10px}\n        .welcome-partner-links{display:flex;justify-content:center;gap:9px}\n        .welcome-partner-link{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:0 14px;border:1px solid #dce5df;border-radius:10px;background:rgba(255,255,255,.78);color:#26332b;text-decoration:none;font-size:10px;font-weight:850;box-shadow:0 5px 16px rgba(16,23,19,.04);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}\n        .welcome-partner-link:hover{transform:translateY(-2px);border-color:#b8d9c5;box-shadow:0 9px 20px rgba(16,23,19,.07)}\n        .welcome-partner-link svg{color:#18c968}\n        .welcome-footer{display:flex;justify-content:center;align-items:center;gap:11px;color:#9aa49e;font-size:8px;font-weight:900;letter-spacing:1.5px;animation:fadeUp .8s 1.45s ease both}
         .welcome-footer i{width:3px;height:3px;border-radius:50%;background:#b8c2bb}
         @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -118,7 +132,7 @@ export default function Welcome() {
           .welcome-local{font-size:11px;margin-top:17px}
           .welcome-enter{width:100%;max-width:330px;min-height:54px;font-size:10px}
           .welcome-signin{font-size:10px}
-          .welcome-footer{font-size:7px;gap:8px;letter-spacing:1px}
+          .welcome-partner-access{margin-top:20px}\n          .welcome-partner-links{width:100%}\n          .welcome-partner-link{flex:1;padding:0 8px;font-size:9px}\n          .welcome-footer{font-size:7px;gap:8px;letter-spacing:1px}
           .welcome-page:after{width:125vw;height:125vw}
         }
         @media(prefers-reduced-motion:reduce){.welcome-header,.welcome-intro,.welcome-brand-hero,.welcome-tagline,.welcome-divider,.welcome-center h1,.welcome-local,.welcome-actions,.welcome-footer{animation:none!important}}
