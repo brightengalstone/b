@@ -44,8 +44,11 @@ export default function Welcome() {
               ENTER BG SMART SERVICES
               <ArrowRight size={19} />
             </Link>
-            <Link href="/signin?mode=signup" className="welcome-signin">
+            <Link href="/signin" className="welcome-signin">
               Already a member? <span>Sign in</span>
+            </Link>
+            <Link href="/signin?mode=signup" className="welcome-create-account">
+              Create an account
             </Link>
           </div>
         </div>
@@ -90,6 +93,8 @@ export default function Welcome() {
         .welcome-enter:hover{transform:translateY(-3px);background:#11b85b;box-shadow:0 19px 40px rgba(24,201,104,.28)}
         .welcome-signin{margin-top:17px;color:#77837b;text-decoration:none;font-size:11px;font-weight:650}
         .welcome-signin span{color:#121b16;font-weight:900;margin-left:3px;text-decoration:underline;text-underline-offset:3px}
+        .welcome-create-account{margin-top:12px;color:#18b85e;text-decoration:none;font-size:11px;font-weight:900;letter-spacing:.1px;padding:7px 10px;border-radius:8px;transition:background .2s ease,transform .2s ease}
+        .welcome-create-account:hover{background:rgba(24,201,104,.08);transform:translateY(-1px)}
         .welcome-footer{display:flex;justify-content:center;align-items:center;gap:11px;color:#9aa49e;font-size:8px;font-weight:900;letter-spacing:1.5px;animation:fadeUp .8s 1.45s ease both}
         .welcome-footer i{width:3px;height:3px;border-radius:50%;background:#b8c2bb}
         @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
