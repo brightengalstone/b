@@ -45,13 +45,18 @@ export default function Signin(){
       if(password!==retype){setMsg('Passwords do not match.');return}
 
       setLoading(true);
-      const{error}=await supabase.auth.signUp({
+      const{data:signUpData,error}=await supabase.auth.signUp({
         email:normalizedEmail,
         password,
         options:{data:{name,surname,cellphone,address,full_name:`${name} ${surname}`.trim()}}
       });
+      if(error){setLoading(false);setMsg(error.message);return}
+      if(!signUpData?.session){
+        const{error:signInError}=await supabase.auth.signInWithPassword({email:normalizedEmail,password});
+        if(signInError){setLoading(false);setMsg('Your account was created. Please confirm your email before signing in.');return}
+      }
       setLoading(false);
-      setMsg(error?.message||'Account created. Check your email if confirmation is enabled.');
+      window.location.href='/home';
       return
     }
 
