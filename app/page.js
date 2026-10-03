@@ -44,7 +44,7 @@ export default function Welcome() {
               ENTER BG SMART SERVICES
               <ArrowRight size={19} />
             </Link>
-            <Link href="/signin?mode=login" className="welcome-signin">
+            <Link href="/signin?mode=signup" className="welcome-signin">
               Already a member? <span>Sign in</span>
             </Link>
           </div>
