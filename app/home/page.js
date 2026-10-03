@@ -89,7 +89,7 @@ export default function Home(){
       .modern-hero-actions{display:flex;align-items:center;gap:18px;margin-top:28px}
       .hero-cta{display:inline-flex;align-items:center;gap:10px;background:#20d36e;color:#fff;text-decoration:none;padding:14px 18px;border-radius:13px;font-size:10px;font-weight:950;letter-spacing:.7px;box-shadow:0 15px 30px rgba(32,211,110,.22);transition:transform .2s,box-shadow .2s}
       .hero-cta:hover{transform:translateY(-2px);box-shadow:0 19px 38px rgba(32,211,110,.3)}
-      .hero-mini-note{color:#9fac a5;font-size:10px;font-weight:800}.hero-mini-note span{color:#fff;font-size:13px;margin-right:4px}
+      .hero-mini-note{color:#9faca5;font-size:10px;font-weight:800}.hero-mini-note span{color:#fff;font-size:13px;margin-right:4px}
       .modern-hero-visual{position:absolute;right:0;top:0;width:48%;height:100%;overflow:hidden}
       .modern-hero-image{position:absolute;inset:0;background-image:linear-gradient(90deg,#101914 0%,rgba(16,25,20,.62) 25%,rgba(16,25,20,.08) 75%),url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=90');background-size:cover;background-position:center}
       .modern-hero-image-shade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(8,18,12,.48))}
@@ -142,4 +142,5 @@ export default function Home(){
     <nav className="delivery-bottom-nav"><Link href="/home" className="active"><House size={19}/><small>Home</small></Link><Link href="/marketplace"><Store size={19}/><small>Browse</small></Link><Link href="/cart"><ShoppingCart size={19}/><small>Cart</small></Link><Link href="/orders"><Package size={19}/><small>Orders</small></Link><button onClick={()=>setOpen(true)}><MoreHorizontal size={19}/><small>More</small></button></nav>
     {open&&<div className="menu-overlay" onClick={()=>setOpen(false)}><aside className="app-menu" onClick={e=>e.stopPropagation()}><div className="menu-head"><div><span className="brand-mark">BG</span><strong>Smart Services</strong></div><button className="icon-button" aria-label="Close menu" onClick={()=>setOpen(false)}><X size={20}/></button></div><nav className="menu-list">{menuItems.map(([Icon,label,href])=><Link href={href} key={label} onClick={()=>setOpen(false)}><Icon size={19}/><span>{label}</span></Link>)}<button className="menu-signout" onClick={async()=>{await supabase.auth.signOut();window.location.href='/'}}><LogOut size={19}/><span>Sign Out</span></button></nav></aside></div>}
     </main>
+  </>
 }
