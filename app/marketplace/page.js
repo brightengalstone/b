@@ -66,17 +66,47 @@ const RESTAURANT_IMAGES = {
   "uncle faouzi": "https://tb-static.uber.com/prod/image-proc/processed_images/539495ca17684e669c7d1239d1841cb1/c9252e6c6cd289c588c3381bc77b1dfc.jpeg"
 };
 function productImage(p, selected) {
-  if (!selected) return p.image_url || null;
-  const brand = brandName(selected.name).toLowerCase();
-  // Prefer the restaurant's official product image resolver so placeholder
-  // stock images already stored in the database cannot be shown as the
-  // product itself.
-  if (brand === 'chicken licken') {
-    const params = new URLSearchParams({ name: p.name, category: p.category || '' });
-    return '/api/chicken-licken-image?' + params.toString();
+  const stored = String(p?.image_url || '').trim();
+  if (stored) return stored;
+  if (selected) {
+    const brand = brandName(selected.name).toLowerCase();
+    return RESTAURANT_IMAGES[brand] || null;
   }
-  const params = new URLSearchParams({ brand, name: p.name, category: p.category || '' });
-  return '/api/restaurant-product-image?' + params.toString();
+  return null;
+}
+
+function productFallbackImage(selected) {
+  if (!selected) return null;
+  return RESTAURANT_IMAGES[brandName(selected.name).toLowerCase()] || selected.logo_url || null;
+}
+
+function ProductImage({ product, selected, className = '' }) {
+  const primary = productImage(product, selected);
+  const fallback = productFallbackImage(selected);
+  const [src, setSrc] = useState(primary || fallback || '');
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setSrc(primary || fallback || '');
+    setFailed(false);
+  }, [primary, fallback]);
+
+  if (!src || failed) {
+    return <RetailerLogo slug={selected?.slug} logoUrl={selected?.logo_url} name={selected ? brandName(selected.name) : 'Restaurant'} />;
+  }
+
+  return (
+    <img
+      className={className}
+      src={src}
+      alt={product?.name || (selected ? brandName(selected.name) : 'Product')}
+      loading="lazy"
+      onError={() => {
+        if (fallback && src !== fallback) setSrc(fallback);
+        else setFailed(true);
+      }}
+    />
+  );
 }
 
 function restaurantImage(name, logoUrl){
@@ -525,7 +555,7 @@ function MarketplaceContent() {
                   return (
                     <article className="product-card" key={p.id} role="button" tabIndex={0} onClick={() => setSelectedProduct(p)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedProduct(p); }}}>
                       <div className="product-image">
-                        {productImage(p, selected) ? <img src={productImage(p, selected)} alt={p.name} loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <RetailerLogo slug={selected.slug} logoUrl={selected.logo_url} name={brandName(selected.name)}/>} 
+                        <ProductImage product={p} selected={selected} />
                         <button type="button" className={'favorite-toggle ' + (favoriteIds.has(p.id) ? 'is-favorite' : '')} onClick={e => { e.stopPropagation(); toggleFavorite(p); }} aria-label="Favorite"><Heart size={18} fill={favoriteIds.has(p.id) ? 'currentColor' : 'none'}/></button>
                       </div>
                       <div className="product-store">{selected.shopping_location}</div>
@@ -549,7 +579,7 @@ function MarketplaceContent() {
           <div className="product-modal-backdrop" role="presentation" onClick={() => setSelectedProduct(null)}>
             <section className="product-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
               <button className="product-modal-close" type="button" onClick={() => setSelectedProduct(null)} aria-label="Close"><X size={22}/></button>
-              <div className="product-modal-image">{productImage(selectedProduct, selected) ? <img src={productImage(selectedProduct, selected)} alt={selectedProduct.name}/> : <RetailerLogo slug={selected?.slug} name={selected ? brandName(selected.name) : 'Restaurant'}/>} </div>
+              <div className="product-modal-image"><ProductImage product={selectedProduct} selected={selected} /></div>
               <div className="product-modal-store">{selected?.name} · {selected?.shopping_location}</div>
               <h2>{selectedProduct.name}</h2>
               {selectedProduct.size && <p className="product-modal-size">{selectedProduct.size}</p>}
