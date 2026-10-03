@@ -56,7 +56,7 @@ export default function Signin(){
   }
 
   const back=()=>{if(forgot)setForgot(false);else if(signup){window.location.href='/'}else window.location.href='/'};
-  const nextSignupStep=()=>{setMsg('');if(signupStep===1&&!name.trim()||!surname.trim()||!cellphone.trim()){setMsg('Please complete your personal details.');return}if(signupStep===2&&(!email.trim()||!address.trim())){setMsg('Please complete your contact and delivery details.');return}setSignupStep(Math.min(3,signupStep+1))};
+  const nextSignupStep=()=>{setMsg('');if(signupStep===1&&(!name.trim()||!surname.trim()||!cellphone.trim())){setMsg('Please complete your personal details.');return}if(signupStep===2&&(!email.trim()||!address.trim())){setMsg('Please complete your contact and delivery details.');return}setSignupStep(Math.min(3,signupStep+1))};
   const prevSignupStep=()=>{setMsg('');setSignupStep(Math.max(1,signupStep-1))};
 
   return <main className={signup?'modern-signup-screen':'modern-auth-screen'}>
@@ -119,7 +119,7 @@ export default function Signin(){
               {!forgot&&<div className="modern-forgot"><button type="button" onClick={()=>{setForgot(true);setMsg('')}}>Forgot password?</button></div>}
               <div className="modern-actions">{forgot&&<button type="button" className="modern-secondary" onClick={()=>{setForgot(false);setMsg('')}}><ArrowLeft size={17}/></button>}<button type="submit" className="modern-primary" disabled={loading}>{loading?(forgot?'Sending…':'Signing in…'):(forgot?'Send reset link':'Sign In')}<ArrowRight size={17}/></button></div>
             </form>
-            <div className="modern-switch">New to BG Smart Services? <Link href="/signup">Create an account</Link></div>
+            <div className="modern-switch">New to BG Smart Services? <Link href="/signin?mode=signup">Create an account</Link></div>
           </section>
         </div><footer className="modern-footer">LOCAL <span>•</span> CONVENIENT <span>•</span> MADE FOR POORT</footer>
       </div>}
