@@ -59,8 +59,8 @@ const RESTAURANT_IMAGES = {
   "kfc": "https://tb-static.uber.com/prod/image-proc/processed_images/c9eed5cae53c68e35c237b07926786ac/3ac2b39ad528f8c8c5dc77c59abb683d.jpeg",
   "chicken licken": "https://tb-static.uber.com/prod/image-proc/processed_images/ca5a4007ccb693b7022425caac712183/f8403c421bef668ad381b5e82e546060.jpeg",
   "debonairs pizza": "https://media.cylex.net.za/companies/2369/2717/images/-341338167-Large-Chicken-Mushroom-pizza-from-Debonairs-Pizza-placed-on-top-of-a-black-plate-on-a-_755684_large.jpg",
-  "nando's": "https://tb-static.uber.com/prod/image-proc/processed_images/20e813d036254cadbb3a8280a76b55d3/c9252e6c6cd289c588c3381bc77b1dfc.jpeg",
-  "roman's pizza": "https://tb-static.uber.com/prod/image-proc/processed_images/514842a8cd43da79a6a07e730fdc456e/fb86662148be855d931b37d6c1e5fcbe.jpeg",
+  "nando's": "https://tb-static.uber.com/prod/image-proc/processed_images/7b44a49baa80c364b989cd3ca3f9307f/5283d81c664b43c5f57a3a186d273063.jpeg",
+  "roman's pizza": "https://specialsza.co.za/wp-content/uploads/2022/01/q4-1.jpg",
   "steers": "https://steers.co.za/images/menu/2023/july/single-page-product-images/burgers/king-steers-burgers/nextImageExportOptimizer/mighty-king-steer-burger-leftright-chips-opt-750.PNG",
   "hungry lion": "https://img.mrdfood.com/data/d20b9ea3-a721-4606-b68b-269b24cdd9d4.PNG",
   "uncle faouzi": "https://tb-static.uber.com/prod/image-proc/processed_images/539495ca17684e669c7d1239d1841cb1/c9252e6c6cd289c588c3381bc77b1dfc.jpeg"
