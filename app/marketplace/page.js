@@ -105,10 +105,11 @@ function restaurantImage(name, logoUrl){
   return RESTAURANT_IMAGES[key] || logoUrl || null;
 }
 
-function restaurantLogoSource(slug, logoUrl) {
-  if (logoUrl) return logoUrl;
-  if (BRAND_DOMAINS[slug]) return 'https://www.google.com/s2/favicons?domain=' + BRAND_DOMAINS[slug] + '&sz=128';
-  return null;
+function restaurantLogoCandidates(slug, logoUrl) {
+  const candidates = [];
+  if (logoUrl) candidates.push(logoUrl);
+  if (BRAND_DOMAINS[slug]) candidates.push('https://www.google.com/s2/favicons?domain=' + BRAND_DOMAINS[slug] + '&sz=128');
+  return [...new Set(candidates)];
 }
 
 const BRANCH_CLASSES = {};
@@ -118,9 +119,10 @@ function retailerClass(slug, category) {
 
 function RestaurantCardImage({ name, logoUrl, slug }) {
   const imageSrc = restaurantImage(name, logoUrl);
-  const logoSrc = restaurantLogoSource(slug, logoUrl);
+  const logoCandidates = restaurantLogoCandidates(slug, logoUrl);
   const [imageFailed, setImageFailed] = useState(false);
-  const [logoFailed, setLogoFailed] = useState(false);
+  const [logoIndex, setLogoIndex] = useState(0);
+  const logoSrc = logoCandidates[logoIndex] || null;
 
   return (
     <div className="restaurant-card-image-fallback">
@@ -133,8 +135,8 @@ function RestaurantCardImage({ name, logoUrl, slug }) {
         />
       ) : (
         <div className="restaurant-card-image-placeholder">
-          {logoSrc && !logoFailed ? (
-            <img src={logoSrc} alt={name + ' logo'} loading="lazy" onError={() => setLogoFailed(true)} />
+          {logoSrc ? (
+            <img src={logoSrc} alt={name + ' logo'} loading="lazy" onError={() => setLogoIndex(i => i + 1)} />
           ) : (
             <span>{name.slice(0, 2).toUpperCase()}</span>
           )}
@@ -145,12 +147,13 @@ function RestaurantCardImage({ name, logoUrl, slug }) {
 }
 
 function RetailerLogo({ slug, large = false, logoUrl = null, name = 'Restaurant', category = 'fast-food' }) {
-  const src = restaurantLogoSource(slug, logoUrl);
-  const [failed, setFailed] = useState(false);
+  const candidates = restaurantLogoCandidates(slug, logoUrl);
+  const [logoIndex, setLogoIndex] = useState(0);
+  const src = candidates[logoIndex] || null;
   return (
     <div className={'retailer-logo ' + retailerClass(slug, category) + (large ? ' large' : '')} aria-label={name + ' logo'}>
-      {src && !failed ? (
-        <img src={src} alt={name + ' logo'} loading="lazy" onError={() => setFailed(true)} />
+      {src ? (
+        <img src={src} alt={name + ' logo'} loading="lazy" onError={() => setLogoIndex(i => i + 1)} />
       ) : (
         <span>{name.slice(0, 2).toUpperCase()}</span>
       )}
