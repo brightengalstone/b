@@ -55,9 +55,9 @@ const BRAND_DOMAINS = {
 
 
 const RESTAURANT_IMAGES = {
-  "mcdonalds": "https://tb-static.uber.com/prod/image-proc/processed_images/63da31f5a12efe093a58a2bfda353828/bc9c318a9c96996e2d990faf2b0c65f6.jpeg",
+  "mcdonalds": "https://d1ralsognjng37.cloudfront.net/fea6ade1-42fa-4f5d-9b30-bfe2c9bcacee.jpeg",
   "kfc": "https://tb-static.uber.com/prod/image-proc/processed_images/c9eed5cae53c68e35c237b07926786ac/3ac2b39ad528f8c8c5dc77c59abb683d.jpeg",
-  "chicken licken": "https://tb-static.uber.com/prod/image-proc/processed_images/edb7ab8c53d9918215554ff2d613bc2e/58f691da9eaef86b0b51f9b2c483fe63.jpeg",
+  "chicken licken": "https://tb-static.uber.com/prod/image-proc/processed_images/ca5a4007ccb693b7022425caac712183/f8403c421bef668ad381b5e82e546060.jpeg",
   "debonairs pizza": "https://media.cylex.net.za/companies/2369/2717/images/-341338167-Large-Chicken-Mushroom-pizza-from-Debonairs-Pizza-placed-on-top-of-a-black-plate-on-a-_755684_large.jpg",
   "nando's": "https://tb-static.uber.com/prod/image-proc/processed_images/20e813d036254cadbb3a8280a76b55d3/c9252e6c6cd289c588c3381bc77b1dfc.jpeg",
   "roman's pizza": "https://tb-static.uber.com/prod/image-proc/processed_images/514842a8cd43da79a6a07e730fdc456e/fb86662148be855d931b37d6c1e5fcbe.jpeg",
@@ -105,9 +105,16 @@ function restaurantImage(name, logoUrl){
   return RESTAURANT_IMAGES[key] || logoUrl || null;
 }
 
-function restaurantLogoCandidates(slug, logoUrl) {
+const BRAND_LOGOS = {
+  mcdonalds: 'https://www.citypng.com/public/uploads/preview/mcdonalds-yellow-m-symbol-logo-high-resolution-70175169479008933cofjbaaw.png?v=2026032110',
+  'chicken licken': 'https://kids.kiddle.co/images/thumb/7/7c/Chicken_Licken_%28restaurant%29_Logo.svg/320px-Chicken_Licken_%28restaurant%29_Logo.svg.png',
+};
+
+function restaurantLogoCandidates(slug, logoUrl, name = '') {
   const candidates = [];
-  if (logoUrl) candidates.push(logoUrl);
+  const brand = brandName(name || slug).toLowerCase().replace(/[’‘]/g,"'");
+  if (BRAND_LOGOS[brand]) candidates.push(BRAND_LOGOS[brand]);
+  if (logoUrl && !logoUrl.includes('google.com/s2/favicons')) candidates.push(logoUrl);
   if (BRAND_DOMAINS[slug]) candidates.push('https://www.google.com/s2/favicons?domain=' + BRAND_DOMAINS[slug] + '&sz=128');
   return [...new Set(candidates)];
 }
@@ -119,7 +126,7 @@ function retailerClass(slug, category) {
 
 function RestaurantCardImage({ name, logoUrl, slug }) {
   const imageSrc = restaurantImage(name, logoUrl);
-  const logoCandidates = restaurantLogoCandidates(slug, logoUrl);
+  const logoCandidates = restaurantLogoCandidates(slug, logoUrl, name);
   const [imageFailed, setImageFailed] = useState(false);
   const [logoIndex, setLogoIndex] = useState(0);
   const logoSrc = logoCandidates[logoIndex] || null;
@@ -147,7 +154,7 @@ function RestaurantCardImage({ name, logoUrl, slug }) {
 }
 
 function RetailerLogo({ slug, large = false, logoUrl = null, name = 'Restaurant', category = 'fast-food' }) {
-  const candidates = restaurantLogoCandidates(slug, logoUrl);
+  const candidates = restaurantLogoCandidates(slug, logoUrl, name);
   const [logoIndex, setLogoIndex] = useState(0);
   const src = candidates[logoIndex] || null;
   return (
