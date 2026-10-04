@@ -106,7 +106,7 @@ function restaurantImage(name, logoUrl){
 }
 
 const BRAND_LOGOS = {
-  mcdonalds: 'https://www.citypng.com/public/uploads/preview/mcdonalds-yellow-m-symbol-logo-high-resolution-70175169479008933cofjbaaw.png?v=2026032110',
+  mcdonalds: 'https://commons.wikimedia.org/wiki/Special:Redirect/file/McDonald%27s_Golden_Arches.svg',
   'chicken licken': 'https://kids.kiddle.co/images/thumb/7/7c/Chicken_Licken_%28restaurant%29_Logo.svg/320px-Chicken_Licken_%28restaurant%29_Logo.svg.png',
 };
 
