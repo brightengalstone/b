@@ -101,7 +101,7 @@ function ProductImage({ product, selected, className = '' }) {
 }
 
 function restaurantImage(name, logoUrl){
-  const key=brandName(name).toLowerCase().replace(/[’‘]/g,"'");
+  const key=brandName(name).toLowerCase().replace(/[’‘']/g,"").replace(/\s+/g," ").trim();
   return RESTAURANT_IMAGES[key] || logoUrl || null;
 }
 
@@ -112,7 +112,7 @@ const BRAND_LOGOS = {
 
 function restaurantLogoCandidates(slug, logoUrl, name = '') {
   const candidates = [];
-  const brand = brandName(name || slug).toLowerCase().replace(/[’‘]/g,"'");
+  const brand = brandName(name || slug).toLowerCase().replace(/[’‘']/g,"").replace(/\s+/g," ").trim();
   if (BRAND_LOGOS[brand]) candidates.push(BRAND_LOGOS[brand]);
   if (logoUrl && !logoUrl.includes('google.com/s2/favicons')) candidates.push(logoUrl);
   if (BRAND_DOMAINS[slug]) candidates.push('https://www.google.com/s2/favicons?domain=' + BRAND_DOMAINS[slug] + '&sz=128');
