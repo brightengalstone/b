@@ -239,7 +239,7 @@ function MarketplaceContent() {
       return;
     }
 
-    const [{ data: ms, error: me }, { data: ps, error: pe }] = await Promise.all([
+    const [{ data: ms, error: me }, { data: ps, error: pe }, { data: legacyRetailers, error: re }, { data: legacyProducts, error: rpe }] = await Promise.all([
       supabase.from('merchants')
         .select('id,business_name,slug,logo_url,address,active,approved,onboarding_status,cuisine')
         .eq('active', true)
@@ -252,9 +252,19 @@ function MarketplaceContent() {
         .eq('available', true)
         .order('name')
         .limit(1000),
+      supabase.from('retailers')
+        .select('id,name,slug,description,logo_url,active,marketplace_category,shopping_location,pickup_address,directions_url,logo_mark')
+        .eq('active', true)
+        .eq('marketplace_category', 'fast-food')
+        .order('name'),
+      supabase.from('retailer_products')
+        .select('id,retailer_id,name,description,category,size,price,promo_price,image_url,available,last_verified_at,updated_at')
+        .eq('available', true)
+        .order('name')
+        .limit(2000),
     ]);
 
-    if (me || pe) {
+    if (me || pe || re || rpe) {
       setMsg('The restaurant catalogue is temporarily unavailable. Please refresh.');
       setRetailers([]);
       setProducts([]);
@@ -272,9 +282,18 @@ function MarketplaceContent() {
         logo_url: m.logo_url || null,
         active: m.active,
       }));
-      const liveIds = new Set(liveMerchants.map(r => r.id));
-      const normalizedProducts = (ps || [])
-        .filter(p => liveIds.has(p.merchant_id))
+
+      // Keep the existing legacy restaurant catalogue visible for demonstrations.
+      // These legacy restaurants can be removed from the marketplace before launch.
+      const legacy = (legacyRetailers || [])
+        .filter(r => FAST_FOOD_SLUGS.has(r.slug))
+        .map(r => ({
+          ...r,
+          merchant_id: null,
+        }));
+
+      const normalizedMerchantProducts = (ps || [])
+        .filter(p => liveMerchants.some(r => r.id === p.merchant_id))
         .map(p => ({
           ...p,
           retailer_id: p.merchant_id,
@@ -284,11 +303,27 @@ function MarketplaceContent() {
           last_verified_at: p.updated_at || null,
           merchant_id: p.merchant_id,
         }));
-      setRetailers(liveMerchants);
-      setProducts(normalizedProducts);
+
+      const normalizedLegacyProducts = (legacyProducts || [])
+        .filter(p => legacy.some(r => r.id === p.retailer_id))
+        .map(p => ({
+          ...p,
+          merchant_id: null,
+          retailer_id: p.retailer_id,
+          category: p.category || '',
+          size: p.size || '',
+          promo_price: p.promo_price ?? null,
+          last_verified_at: p.last_verified_at || p.updated_at || null,
+        }));
+
+      const allRetailers = [...liveMerchants, ...legacy];
+      const allProducts = [...normalizedMerchantProducts, ...normalizedLegacyProducts];
+
+      setRetailers(allRetailers);
+      setProducts(allProducts);
 
       if (requested) {
-        const match = liveMerchants.find(r => r.slug === requested);
+        const match = allRetailers.find(r => r.slug === requested);
         if (match) setSelectedId(match.id);
       }
     }
