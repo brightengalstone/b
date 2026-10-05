@@ -1585,3 +1585,48 @@ a{color:inherit}
 .tracking-brand{display:flex!important;align-items:center!important;gap:10px!important}
 .tracking-brand-mark{font-size:32px!important}
 @media(max-width:600px){.bg-logo span,.brand-mark,.cart-logo-mark,.checkout-brand .brand-mark,.orders-brand .brand-mark,.account-brand .brand-mark,.rewards-brand .brand-mark,.success-brand .brand-mark,.tracking-brand-mark{font-size:28px!important;letter-spacing:-3px!important}.bg-logo strong,.checkout-brand span:not(.brand-mark),.orders-brand span:not(.brand-mark),.account-brand span:not(.brand-mark),.rewards-brand span:not(.brand-mark),.success-brand span:not(.brand-mark),.cart-logo-type,.market-brand span:not(.brand-mark){font-size:8px!important;letter-spacing:1.6px!important}.cart-logo-type small{font-size:8px!important;letter-spacing:1.6px!important}}
+
+
+/* Browse / Marketplace header — match the Welcome BG Smart Services branding */
+.retail-market.fast-food .market-brand{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  color:#101713!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:0!important;
+}
+.retail-market.fast-food .market-brand .brand-mark{
+  width:auto!important;
+  height:auto!important;
+  min-width:0!important;
+  padding:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#18c968!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:32px!important;
+  line-height:.8!important;
+  font-weight:950!important;
+  letter-spacing:-3.5px!important;
+  box-shadow:none!important;
+}
+.retail-market.fast-food .market-brand > span:not(.brand-mark){
+  display:inline-flex!important;
+  align-items:center!important;
+  color:#101713!important;
+  background:transparent!important;
+  font-size:10px!important;
+  line-height:1!important;
+  letter-spacing:2.2px!important;
+  font-weight:950!important;
+  text-transform:uppercase!important;
+}
+@media(max-width:600px){
+  .retail-market.fast-food .market-brand .brand-mark{font-size:28px!important;letter-spacing:-3px!important}
+  .retail-market.fast-food .market-brand > span:not(.brand-mark){font-size:8px!important;letter-spacing:1.6px!important}
+}
