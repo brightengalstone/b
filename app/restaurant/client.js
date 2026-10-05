@@ -101,9 +101,12 @@ export default function RestaurantDashboardPage() {
 
   async function updateOrder(orderId, status) {
     setUpdating(orderId); setError('');
-    const { error: updateError } = await supabase.from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', orderId).eq('merchant_id', merchant.id);
+    const { error: updateError } = await supabase.rpc('merchant_update_order_status', { p_order_id: orderId, p_status: status });
     if (updateError) setError(updateError.message);
-    else setOrders((current) => current.map((order) => order.id === orderId ? { ...order, status } : order));
+    else {
+      setOrders((current) => current.map((order) => order.id === orderId ? { ...order, status } : order));
+      load(false);
+    }
     setUpdating(null);
   }
 
