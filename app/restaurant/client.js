@@ -294,9 +294,6 @@ export default function RestaurantDashboardPage() {
       {active === 'orders' && !merchant?.active && <section className="restaurant-panel"><div className="empty">Orders will unlock after your restaurant is taken LIVE by BG Smart Services.</div></section>}
 
       {active === 'orders' && merchant?.active && (
-      </nav>
-
-      {active === 'orders' && (
         <section className="restaurant-panel">
           <div className="panel-head"><div><h2>Orders</h2><p>Only orders belonging to {merchant?.business_name} are shown here.</p></div></div>
           <div className="order-list">
