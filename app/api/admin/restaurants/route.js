@@ -54,6 +54,36 @@ export async function GET(request) {
   });
 }
 
+export async function PATCH(request) {
+  const auth = await requireAdmin(request);
+  if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
+  let body;
+  try { body = await request.json(); } catch { return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 }); }
+
+  const merchantId = String(body?.merchant_id || '').trim();
+  const action = String(body?.action || '').trim().toLowerCase();
+  if (!merchantId || !['approve', 'reject'].includes(action)) {
+    return NextResponse.json({ error: 'Restaurant and approval action are required.' }, { status: 400 });
+  }
+
+  const update = action === 'approve'
+    ? { approved: true, active: true }
+    : { approved: false, active: false };
+
+  const { data, error } = await auth.admin
+    .from('merchants')
+    .update(update)
+    .eq('id', merchantId)
+    .select('id, business_name, approved, active, owner_id')
+    .maybeSingle();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data) return NextResponse.json({ error: 'Restaurant record not found.' }, { status: 404 });
+
+  return NextResponse.json({ ok: true, merchant: data });
+}
+
 export async function POST(request) {
   const auth = await requireAdmin(request);
   if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
