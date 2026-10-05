@@ -28,6 +28,7 @@ export default function Checkout() {
   const [deliveryPin, setDeliveryPin] = useState(null);
   const [verifiedAddress, setVerifiedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery');
+  const [rewardCredit, setRewardCredit] = useState(0);
 
   useEffect(() => {
     try {
@@ -75,6 +76,9 @@ export default function Checkout() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      const { data: reward } = await supabase.from('reward_accounts').select('delivery_credit').eq('customer_id', user.id).maybeSingle();
+      setRewardCredit(Number(reward?.delivery_credit || 0));
+
       const { data } = await supabase
         .from('customer_addresses')
         .select('id,label,address_line,suburb,instructions,is_default')
@@ -97,7 +101,9 @@ export default function Checkout() {
     () => items.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0),
     [items]
   );
-  const deliveryFee = items.length ? 65 : 0;
+  const baseDeliveryFee = items.length ? 65 : 0;
+  const appliedRewardCredit = Math.min(baseDeliveryFee, Math.max(0, rewardCredit));
+  const deliveryFee = baseDeliveryFee - appliedRewardCredit;
   const total = subtotal + deliveryFee;
   const itemCount = items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
 
@@ -279,7 +285,8 @@ export default function Checkout() {
       p_delivery_longitude: verifiedAddress?.longitude ?? null,
       p_delivery_address_verified: Boolean(verifiedAddress),
       p_notes: notes,
-      p_payment_method: paymentMethod
+      p_payment_method: paymentMethod,
+      p_reward_credit: appliedRewardCredit
     });
 
     if (orderError) {
@@ -451,8 +458,10 @@ export default function Checkout() {
               <div className="checkout-summary-title"><span className="eyebrow">Order summary</span><h2>Final total</h2></div>
               <div className="checkout-summary-lines">
                 <div><span>Items ({itemCount})</span><strong>{money(subtotal)}</strong></div>
-                <div><span>Delivery</span><strong>R65.00</strong></div>
+                <div><span>Delivery</span><strong>{money(deliveryFee)}</strong></div>
+                {appliedRewardCredit > 0 && <div><span>BG Rewards credit</span><strong>-{money(appliedRewardCredit)}</strong></div>}
               </div>
+              {rewardCredit > 0 && <div className="notice" style={{marginTop:12}}>BG Rewards: {money(rewardCredit)} delivery credit available. {appliedRewardCredit > 0 ? 'Applied automatically.' : ''}</div>}
               <div className="checkout-total"><span>Total</span><strong>{money(total)}</strong></div>
 
               {!status.open ? (
@@ -470,7 +479,7 @@ export default function Checkout() {
                 {busy ? 'Placing order…' : 'Place order'}
               </button>
 
-              <div className="checkout-protection"><ShieldCheck size={17} /><span>R65 delivery · No service fee · Eersterust only</span></div>
+              <div className="checkout-protection"><ShieldCheck size={17} /><span>{appliedRewardCredit > 0 ? 'BG Rewards credit applied · ' : ''}R65 standard delivery · No service fee · Eersterust only</span></div>
             </section>
           </aside>
         </div>
