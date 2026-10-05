@@ -1,6 +1,6 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, useMap, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import { useEffect } from 'react';
 
@@ -38,14 +38,30 @@ export default function LiveDeliveryMap({ driverLocation, destination }) {
     <div className="bg-live-map">
       <MapContainer center={center} zoom={15} scrollWheelZoom={false} zoomControl={true} className="bg-live-map-container">
         <TileLayer
-          attribution='&copy; OpenStreetMap contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
+          maxZoom={20}
         />
+        <ZoomControl position="bottomright" />
         <Recenter position={driver || home} />
-        {route.length > 1 && <Polyline positions={route} pathOptions={{ weight: 5, opacity: 0.82 }} />}
+        {route.length > 1 && <Polyline
+          positions={route}
+          pathOptions={{
+            weight: 6,
+            opacity: 0.9,
+            lineCap: 'round',
+            lineJoin: 'round',
+            className: 'bg-live-route',
+          }}
+        />}
         {driver && (
           <>
-            <Circle center={driver} radius={Math.max(Number(driverLocation.accuracy || 25), 15)} pathOptions={{ fillOpacity: 0.12, weight: 1 }} />
+            <Circle
+              center={driver}
+              radius={Math.max(Number(driverLocation.accuracy || 25), 15)}
+              pathOptions={{ fillOpacity: 0.1, weight: 1, className: 'bg-live-accuracy-ring' }}
+            />
             <Marker position={driver} icon={driverIcon}>
               <Popup><strong>BG driver</strong><br />Live location</Popup>
             </Marker>
