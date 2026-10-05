@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Clock3, MapPin, Package, Phone, Power, RefreshCw, ShoppingBag, Store, Truck, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock3, MapPin, Package, Phone, Power, RefreshCw, ShoppingBag, Store, Truck, XCircle, Navigation } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 const ACTIVE_STATUSES = ['assigned', 'preparing', 'picked_up'];
@@ -31,6 +31,8 @@ export default function DriverPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [deliveryHistory, setDeliveryHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [locationState, setLocationState] = useState('off');
+  const [locationError, setLocationError] = useState('');
 
   const isBusy = Boolean(order && ACTIVE_STATUSES.includes(order.status));
 
@@ -139,6 +141,28 @@ export default function DriverPage() {
     setRetailer(shop || null);
   }
 
+  async function publishDriverLocation(position) {
+    if (!supabase || !user?.id || !order?.id) return;
+    const coords = position.coords;
+    const { error } = await supabase.from('driver_locations').upsert({
+      order_id: order.id,
+      driver_id: user.id,
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+      accuracy: coords.accuracy ?? null,
+      heading: coords.heading ?? null,
+      speed: coords.speed ?? null,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'order_id' });
+    if (error) {
+      setLocationError('Live location could not be updated.');
+      setLocationState('error');
+    } else {
+      setLocationError('');
+      setLocationState('live');
+    }
+  }
+
   async function claimNext() {
     if (!supabase || !user?.id || !driverProfile?.approved || !driverProfile?.available || order) return;
     const { data: orderId, error } = await supabase.rpc('claim_next_delivery');
@@ -222,6 +246,30 @@ export default function DriverPage() {
       if (updatedDriver?.available) await claimNext();
     }
   }
+
+  useEffect(() => {
+    if (!order?.id || !['assigned','preparing','picked_up'].includes(order.status) || typeof navigator === 'undefined' || !navigator.geolocation) {
+      setLocationState('off');
+      setLocationError('');
+      return;
+    }
+
+    setLocationState('requesting');
+    setLocationError('');
+    const watchId = navigator.geolocation.watchPosition(
+      publishDriverLocation,
+      (error) => {
+        setLocationState('error');
+        setLocationError(error.code === 1 ? 'Location permission is required while delivering.' : 'Unable to get your current location.');
+      },
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+      setLocationState('off');
+    };
+  }, [order?.id, order?.status, user?.id]);
 
   useEffect(() => {
     let mounted = true;
@@ -477,6 +525,15 @@ export default function DriverPage() {
             <aside className="driver-card driver-delivery-card">
               <span className="driver-eyebrow">Deliver to</span>
               <div className="driver-address"><MapPin size={21} /><strong>{order.delivery_address}</strong></div>
+              {order.status === 'picked_up' && (
+                <div style={{marginTop:14,padding:'13px 14px',border:'1px solid #dcefe4',borderRadius:14,background:'#f6fbf8',display:'flex',alignItems:'center',gap:10}}>
+                  <Navigation size={17} />
+                  <div style={{display:'grid',gap:3}}>
+                    <strong style={{fontSize:12}}>{locationState === 'live' ? 'Live location is being shared' : locationState === 'requesting' ? 'Requesting location permission…' : 'Live location unavailable'}</strong>
+                    <span style={{fontSize:11,color:'#64748b'}}>{locationError || 'Customers can see your delivery position while you are on the way.'}</span>
+                  </div>
+                </div>
+              )}
               {order.notes && <div className="driver-notes"><strong>Customer notes</strong><span>{order.notes}</span></div>}
               <div className="driver-payment"><span>Payment</span><strong>{order.payment_method === 'cash_on_delivery' ? 'Cash on delivery' : order.payment_method === 'card' ? 'Card paid online' : 'EFT'}</strong></div>
               <div className="driver-delivery-total"><span>Order total</span><strong>{money(order.total)}</strong></div>
