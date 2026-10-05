@@ -40,8 +40,14 @@ export default function RewardsPage() {
     setMessage('');
     const { error } = await supabase.rpc('redeem_bg_reward', { p_points: pointsToRedeem });
     if (error) {
+      console.error('BG Rewards redemption error:', error);
+      const details = [error.message, error.details, error.hint, error.code ? `Code: ${error.code}` : '']
+        .filter(Boolean)
+        .join(' — ');
       setMessageType('error');
-      setMessage(error.message.includes('NOT_ENOUGH_POINTS') ? 'You do not have enough BG Points for that reward yet.' : 'We could not redeem that reward. Please try again.');
+      setMessage(error.message?.includes('NOT_ENOUGH_POINTS')
+        ? 'You do not have enough BG Points for that reward yet.'
+        : `Redemption error: ${details || 'The reward could not be redeemed.'}`);
     } else {
       setMessageType('success');
       setMessage('Your delivery credit is ready and will be applied automatically at checkout.');
