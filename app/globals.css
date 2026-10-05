@@ -1630,3 +1630,32 @@ a{color:inherit}
   .retail-market.fast-food .market-brand .brand-mark{font-size:28px!important;letter-spacing:-3px!important}
   .retail-market.fast-food .market-brand > span:not(.brand-mark){font-size:8px!important;letter-spacing:1.6px!important}
 }
+
+
+/* Payment Methods header — match the Welcome BG Smart Services branding */
+.payment-page .payment-brand{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  color:#101713!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:0!important;
+}
+.payment-page .payment-brand .brand-mark{
+  width:auto!important;height:auto!important;min-width:0!important;
+  padding:0!important;border-radius:0!important;background:transparent!important;
+  color:#18c968!important;display:inline-flex!important;align-items:center!important;
+  justify-content:center!important;font-size:32px!important;line-height:.8!important;
+  font-weight:950!important;letter-spacing:-3.5px!important;box-shadow:none!important;
+}
+.payment-page .payment-brand > span:not(.brand-mark){
+  color:#101713!important;background:transparent!important;font-size:10px!important;
+  line-height:1!important;letter-spacing:2.2px!important;font-weight:950!important;
+  text-transform:uppercase!important;
+}
+@media(max-width:600px){
+ .payment-page .payment-brand .brand-mark{font-size:28px!important;letter-spacing:-3px!important}
+ .payment-page .payment-brand > span:not(.brand-mark){font-size:8px!important;letter-spacing:1.6px!important}
+}
