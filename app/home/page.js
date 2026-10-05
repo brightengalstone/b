@@ -12,7 +12,7 @@ const supermarkets=[
 ['Shoprite','https://commons.wikimedia.org/wiki/Special:FilePath/Shoprite,%20Zeerust.jpg?width=1200','Affordable essentials'],
 ['Checkers','https://commons.wikimedia.org/wiki/Special:FilePath/Aisles%20in%20a%20Checkers%20in%20Durbanville,%20Cape%20Town.jpg?width=1200','Fresh food & groceries'],
 ['SPAR','https://commons.wikimedia.org/wiki/Special:FilePath/Spar%20Store%20in%20De%20Waterkant,%20Cape%20Town.jpg?width=1200','Local supermarket'],
-['Woolworths','https://commons.wikimedia.org/wiki/Special:FilePath/Woolworths%20Somerset%20Mall.jpg?width=1200','Quality food & groceries']
+['Woolworths','https://www.woolworths.co.za/images/new_site/corporate/education/mtd_guide_2.pdf','Quality food & groceries']
 ];
 const futureServices=[
 ['Local Shops','https://commons.wikimedia.org/wiki/Special:FilePath/Local%20shop.jpg?width=1200','Discover more local businesses as BG Smart Services expands.',<StoreIcon size={22}/>],
