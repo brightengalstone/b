@@ -47,16 +47,17 @@ function TrackingContent(){
       if(active){
         setOrder(data||null);
         setId(data?.id||requestedId||'');
-        if (data?.id) {
-          const loc = await supabase.from('driver_locations').select('order_id,driver_id,latitude,longitude,accuracy,heading,speed,updated_at').eq('order_id', data.id).maybeSingle();
-          if (active) setDriverLocation(loc.data || null);
-        } else {
+        if(data?.id){
+          const loc=await supabase.from('driver_locations').select('order_id,driver_id,latitude,longitude,accuracy,heading,speed,updated_at').eq('order_id',data.id).maybeSingle();
+          if(active)setDriverLocation(loc.data||null);
+        }else{
           setDriverLocation(null);
         }
-        setLoading(false)
+        setLoading(false);
       }
     }
     load();
+
     let channel;
     supabase?.auth.getUser().then(({data})=>{
       if(!active||!data?.user)return;
@@ -66,29 +67,25 @@ function TrackingContent(){
           if(requestedId&&payload?.new?.id!==requestedId)return;
           setOrder(current=>({...current||{},...payload.new}));
           setId(payload?.new?.id||requestedId||'');
-        })        }).on('postgres_changes',{event:'*',schema:'public',table:'driver_locations'},payload=>{
-          if(!active) return;
-          const row = payload?.new || payload?.old;
-          if (!row || (row.order_id !== (requestedId || data?.id))) return;
-          if (payload.eventType === 'DELETE') setDriverLocation(null);
+        })
+        .on('postgres_changes',{event:'*',schema:'public',table:'driver_locations'},payload=>{
+          if(!active)return;
+          const row=payload?.new||payload?.old;
+          if(!row)return;
+          const trackedOrderId=requestedId||id;
+          if(row.order_id!==trackedOrderId)return;
+          if(payload.eventType==='DELETE')setDriverLocation(null);
           else setDriverLocation(payload.new);
-        }).subscribe();
+        })
+        .subscribe();
     });
+
     return()=>{active=false;if(channel&&supabase)supabase.removeChannel(channel)};
-  },[requestedId]);
+  },[requestedId,id]);
 
   const status=String(order?.status||'pending').toLowerCase();
   const current=status==='pending'?0:status.includes('confirm')?1:status.includes('prepar')?2:status.includes('assign')||status==='ready'?3:status.includes('picked')?4:status.includes('deliver')?5:0;
   const progress=Math.round((current/(steps.length-1))*100);
-  const routePositions=[
-    {left:18,top:24,label:'Order'},
-    {left:25,top:30,label:'Confirmed'},
-    {left:34,top:37,label:'Preparing'},
-    {left:45,top:45,label:'Driver assigned'},
-    {left:61,top:52,label:'Out for delivery'},
-    {left:82,top:82,label:'Delivered'}
-  ];
-  const driverPosition=routePositions[current];
   const isLive=current>=3&&current<5;
   const isDelivered=current===5;
   const eta=current>=4?'Arriving soon':current===3?'Driver collecting':'Waiting for merchant';
@@ -107,6 +104,7 @@ function TrackingContent(){
           <NotificationBell/>
         </div>
       </header>
+
       <section className={"tracking-hero-premium "+(isLive?'hero-live':'')+(isDelivered?' hero-delivered':'')}>
         <div className="hero-glow hero-glow-one"></div><div className="hero-glow hero-glow-two"></div>
         <div className="tracking-hero-content">
@@ -126,33 +124,34 @@ function TrackingContent(){
           <div className="hero-orbit-label"><Radio size={13}/><span>Live connection</span></div>
         </div>
       </section>
+
       {loading?<div className="card tracking-loading"><div className="tracking-loader"></div><strong>Loading your live delivery…</strong><span>Connecting to your order.</span></div>:
       <div className="tracking-grid">
         <section className="tracking-main">
           <div className="card tracking-map-card">
             <div className="tracking-map-head"><div><span className="eyebrow">Delivery route</span><h2>{isLive?'Driver is on the way':isDelivered?'Delivered to you':eta}</h2></div><div className="tracking-live-badge"><Radio size={14}/>{lastUpdated}</div></div>
-            <LiveDeliveryMap
-              driverLocation={driverLocation}
-              destination={[order?.delivery_latitude, order?.delivery_longitude]}
-            />            </div>
+            <LiveDeliveryMap driverLocation={driverLocation} destination={[order?.delivery_latitude,order?.delivery_longitude]}/>
             <div className="tracking-map-footer">
               <div><Clock3 size={17}/><span><small>Estimated arrival</small><strong>{eta}</strong></span></div>
               <div><ShieldCheck size={17}/><span><small>Delivery fee</small><strong>R{Number(order?.delivery_fee??65).toFixed(2)}</strong></span></div>
               {isLive&&<button className="tracking-call" type="button"><Phone size={16}/> Contact driver</button>}
             </div>
           </div>
+
           <div className="card tracking-card">
             <div className="tracking-order-head"><div><span className="eyebrow">Order number</span><h2>{id||'No order selected'}</h2></div><span className="tracking-pill">R65 delivery</span></div>
             <div className="tracking-progress"><div className="tracking-progress-fill" style={{width:progress+'%'}}></div></div>
             <div className="tracking-timeline">{steps.map(([label,Icon,desc],i)=><div className={"tracking-step "+(i<=current?'is-active ':'')+(i===current?'is-current':'')} key={label}><div className="step-line"></div><div className="step-icon"><Icon size={18}/></div><div className="step-copy"><strong>{label}</strong><span>{desc}</span>{i===current&&<small>Current status</small>}</div></div>)}</div>
           </div>
         </section>
+
         <aside className="tracking-side">
           <div className="card tracking-driver-card">
             <div className="tracking-side-heading"><span className="eyebrow">Your driver</span><span className={isLive?'driver-online':''}><span className="live-dot"></span>{isLive?'Online':'Standby'}</span></div>
             <div className="driver-profile"><div className="driver-avatar">BG</div><div><strong>Your BG Driver</strong><span>BG Smart Services</span></div><ChevronRight size={18}/></div>
             <div className="driver-actions"><button type="button"><Phone size={16}/> Contact</button><button type="button"><Navigation size={16}/> Track</button></div>
           </div>
+
           <div className="card tracking-summary">
             <span className="eyebrow">Delivery details</span><div className="tracking-address"><MapPin size={18}/><span>{order?.delivery_address||'Eersterust'}</span></div>
             {order&&<><div className="summary-row"><span>Subtotal</span><strong>R{Number(order.subtotal||0).toFixed(2)}</strong></div><div className="summary-row"><span>Delivery</span><strong>R{Number(order.delivery_fee??65).toFixed(2)}</strong></div><div className="summary-row summary-total"><span>Total</span><strong>R{(Number(order.subtotal||0)+Number(order.delivery_fee??65)).toFixed(2)}</strong></div></>}
