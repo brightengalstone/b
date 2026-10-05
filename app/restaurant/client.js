@@ -2,17 +2,17 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Clock3, LogOut, Package, RefreshCw, Store, Truck, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock3, ImagePlus, LogOut, Package, Pencil, Plus, RefreshCw, Store, Truck, XCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import './restaurant.css';
-
-const RESTAURANT_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'cancelled'];
 
 function formatDate(value) {
   if (!value) return '—';
   return new Intl.DateTimeFormat('en-ZA', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
 }
 function money(value) { return 'R' + Number(value || 0).toFixed(2); }
+
+const EMPTY_PRODUCT = { id: null, name: '', description: '', price: '', image_url: '', category_id: '', available: true };
 
 export default function RestaurantDashboardPage() {
   const [user, setUser] = useState(null);
@@ -21,6 +21,7 @@ export default function RestaurantDashboardPage() {
   const [orders, setOrders] = useState([]);
   const [items, setItems] = useState([]);
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [customers, setCustomers] = useState({});
   const [payments, setPayments] = useState({});
   const [active, setActive] = useState('orders');
@@ -28,6 +29,9 @@ export default function RestaurantDashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [updating, setUpdating] = useState(null);
+  const [productForm, setProductForm] = useState(EMPTY_PRODUCT);
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [savingProduct, setSavingProduct] = useState(false);
 
   async function load(showSpinner = false) {
     if (!supabase) { setError('Supabase is not configured.'); setLoading(false); return; }
@@ -55,19 +59,21 @@ export default function RestaurantDashboardPage() {
     }
     setMerchant(merchantData);
 
-    const [locationsResult, ordersResult, productsResult] = await Promise.all([
+    const [locationsResult, ordersResult, productsResult, categoriesResult] = await Promise.all([
       supabase.from('merchant_locations').select('id, name, address, phone, active').eq('merchant_id', merchantData.id).order('display_order'),
       supabase.from('orders').select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, notes, created_at, updated_at, customer_id, driver_id, payment_method').eq('merchant_id', merchantData.id).order('created_at', { ascending: false }).limit(200),
       supabase.from('products').select('id, category_id, name, description, price, image_url, available, updated_at').eq('merchant_id', merchantData.id).order('name').limit(500),
+      supabase.from('categories').select('id, name').eq('merchant_id', merchantData.id).order('name'),
     ]);
 
-    const failures = [locationsResult, ordersResult, productsResult].filter((result) => result.error);
+    const failures = [locationsResult, ordersResult, productsResult, categoriesResult].filter((result) => result.error);
     if (failures.length) setError(failures.map((result) => result.error.message).join(' · '));
 
     const nextOrders = ordersResult.data || [];
     setLocations(locationsResult.data || []);
     setOrders(nextOrders);
     setProducts(productsResult.data || []);
+    setCategories(categoriesResult.data || []);
 
     const orderIds = nextOrders.map((order) => order.id);
     const customerIds = [...new Set(nextOrders.map((order) => order.customer_id).filter(Boolean))];
@@ -85,11 +91,7 @@ export default function RestaurantDashboardPage() {
     setRefreshing(false);
   }
 
-  useEffect(() => {
-    let mounted = true;
-    load();
-    return () => { mounted = false; };
-  }, []);
+  useEffect(() => { load(); }, []);
 
   useEffect(() => {
     if (!merchant?.id || !supabase) return undefined;
@@ -110,10 +112,72 @@ export default function RestaurantDashboardPage() {
     setUpdating(null);
   }
 
+  function openAddProduct() {
+    setProductForm({ ...EMPTY_PRODUCT });
+    setShowProductForm(true);
+    setError('');
+  }
+
+  function openEditProduct(product) {
+    setProductForm({
+      id: product.id,
+      name: product.name || '',
+      description: product.description || '',
+      price: product.price ?? '',
+      image_url: product.image_url || '',
+      category_id: product.category_id || '',
+      available: product.available !== false,
+    });
+    setShowProductForm(true);
+    setError('');
+  }
+
+  async function saveProduct(event) {
+    event.preventDefault();
+    const name = productForm.name.trim();
+    const price = Number(productForm.price);
+    if (!name) { setError('Enter a product name.'); return; }
+    if (!Number.isFinite(price) || price < 0) { setError('Enter a valid price.'); return; }
+
+    setSavingProduct(true); setError('');
+    const payload = {
+      merchant_id: merchant.id,
+      name,
+      description: productForm.description.trim() || null,
+      price,
+      image_url: productForm.image_url.trim() || null,
+      category_id: productForm.category_id || null,
+      available: productForm.available,
+      updated_at: new Date().toISOString(),
+    };
+
+    const result = productForm.id
+      ? await supabase.from('products').update(payload).eq('id', productForm.id).eq('merchant_id', merchant.id).select('id, category_id, name, description, price, image_url, available, updated_at').single()
+      : await supabase.from('products').insert(payload).select('id, category_id, name, description, price, image_url, available, updated_at').single();
+
+    if (result.error) {
+      setError(result.error.message);
+    } else {
+      setProducts((current) => productForm.id
+        ? current.map((item) => item.id === productForm.id ? result.data : item).sort((a, b) => a.name.localeCompare(b.name))
+        : [...current, result.data].sort((a, b) => a.name.localeCompare(b.name)));
+      setShowProductForm(false);
+      setProductForm(EMPTY_PRODUCT);
+    }
+    setSavingProduct(false);
+  }
+
   async function toggleProduct(product) {
     const { error: updateError } = await supabase.from('products').update({ available: !product.available, updated_at: new Date().toISOString() }).eq('id', product.id).eq('merchant_id', merchant.id);
     if (updateError) setError(updateError.message);
     else setProducts((current) => current.map((item) => item.id === product.id ? { ...item, available: !product.available } : item));
+  }
+
+  async function removeProduct(product) {
+    if (!window.confirm('Remove "' + product.name + '" from your customer menu?')) return;
+    const { error: updateError } = await supabase.from('products').update({ available: false, updated_at: new Date().toISOString() }).eq('id', product.id).eq('merchant_id', merchant.id);
+    if (updateError) setError(updateError.message);
+    else setProducts((current) => current.map((item) => item.id === product.id ? { ...item, available: false } : item));
   }
 
   async function signOut() {
@@ -125,7 +189,7 @@ export default function RestaurantDashboardPage() {
   const deliveredOrders = orders.filter((order) => order.status === 'delivered');
   const pendingCount = orders.filter((order) => ['pending', 'confirmed'].includes(order.status)).length;
   const sales = deliveredOrders.reduce((sum, order) => sum + Number(order.subtotal || 0), 0);
-
+  const categoryById = useMemo(() => Object.fromEntries(categories.map((category) => [category.id, category.name])), [categories]);
   const productById = useMemo(() => Object.fromEntries(products.map((product) => [product.id, product])), [products]);
   const itemsByOrder = useMemo(() => {
     const map = {};
@@ -149,7 +213,7 @@ export default function RestaurantDashboardPage() {
       {error && <div className="restaurant-alert"><XCircle size={17} />{error}</div>}
 
       <section className="restaurant-welcome">
-        <div><p>PARTNER DASHBOARD</p><h1>{merchant?.business_name}</h1><span>Manage incoming BG orders, your branches and product availability.</span></div>
+        <div><p>PARTNER DASHBOARD</p><h1>{merchant?.business_name}</h1><span>Manage incoming BG orders, branches and your customer menu.</span></div>
         <div className="branch-pill"><Store size={15} /> {locations.length} branch{locations.length === 1 ? '' : 'es'}</div>
       </section>
 
@@ -205,10 +269,28 @@ export default function RestaurantDashboardPage() {
 
       {active === 'products' && (
         <section className="restaurant-panel">
-          <div className="panel-head"><div><h2>Products</h2><p>Control whether a menu item is available to customers.</p></div></div>
+          <div className="panel-head">
+            <div><h2>Products</h2><p>Add, edit, hide or remove items from your customer menu.</p></div>
+            <button className="primary-button" onClick={openAddProduct}><Plus size={15} /> Add product</button>
+          </div>
           <div className="product-list">
-            {products.map((product) => <article className="product-row" key={product.id}><div><strong>{product.name}</strong><span>{product.description || 'Menu item'} · {money(product.price)}</span></div><button className={product.available ? 'available' : 'unavailable'} onClick={() => toggleProduct(product)}>{product.available ? 'Available' : 'Unavailable'}</button></article>)}
-            {!products.length && <div className="empty">No products are connected to this restaurant yet.</div>}
+            {products.map((product) => (
+              <article className={'product-row ' + (!product.available ? 'product-disabled' : '')} key={product.id}>
+                <div className="product-thumb">{product.image_url ? <img src={product.image_url} alt="" /> : <ImagePlus size={17} />}</div>
+                <div className="product-info">
+                  <strong>{product.name}</strong>
+                  <span>{categoryById[product.category_id] || 'Uncategorised'} · {money(product.price)}</span>
+                  {product.description && <small>{product.description}</small>}
+                </div>
+                <span className={'product-state ' + (product.available ? 'on' : 'off')}>{product.available ? 'Live' : 'Hidden'}</span>
+                <div className="product-actions">
+                  <button className="edit-button" onClick={() => openEditProduct(product)}><Pencil size={14} /> Edit</button>
+                  <button className="availability-button" onClick={() => toggleProduct(product)}>{product.available ? 'Hide' : 'Show'}</button>
+                  <button className="remove-button" onClick={() => removeProduct(product)}>Remove</button>
+                </div>
+              </article>
+            ))}
+            {!products.length && <div className="empty">No products yet. Add your first menu item.</div>}
           </div>
         </section>
       )}
@@ -221,6 +303,23 @@ export default function RestaurantDashboardPage() {
             {!locations.length && <div className="empty">No branches connected yet.</div>}
           </div>
         </section>
+      )}
+
+      {showProductForm && (
+        <div className="product-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget && !savingProduct) setShowProductForm(false); }}>
+          <form className="product-modal" onSubmit={saveProduct}>
+            <div className="modal-head"><div><p>{productForm.id ? 'EDIT MENU ITEM' : 'NEW MENU ITEM'}</p><h2>{productForm.id ? 'Edit product' : 'Add product'}</h2></div><button type="button" className="modal-close" onClick={() => setShowProductForm(false)}>×</button></div>
+            <label>Product name<input value={productForm.name} onChange={(e) => setProductForm((f) => ({ ...f, name: e.target.value }))} placeholder="e.g. Chicken Burger" autoFocus /></label>
+            <div className="form-two">
+              <label>Price<input type="number" min="0" step="0.01" value={productForm.price} onChange={(e) => setProductForm((f) => ({ ...f, price: e.target.value }))} placeholder="0.00" /></label>
+              <label>Category<select value={productForm.category_id} onChange={(e) => setProductForm((f) => ({ ...f, category_id: e.target.value }))}><option value="">No category</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select></label>
+            </div>
+            <label>Description<textarea rows="3" value={productForm.description} onChange={(e) => setProductForm((f) => ({ ...f, description: e.target.value }))} placeholder="Short description customers will see" /></label>
+            <label>Product image URL<input value={productForm.image_url} onChange={(e) => setProductForm((f) => ({ ...f, image_url: e.target.value }))} placeholder="https://..." /><small>Use a direct image link for the product photo.</small></label>
+            <label className="switch-line"><input type="checkbox" checked={productForm.available} onChange={(e) => setProductForm((f) => ({ ...f, available: e.target.checked }))} /><span>Show this product to customers</span></label>
+            <div className="modal-actions"><button type="button" className="secondary-button" onClick={() => setShowProductForm(false)} disabled={savingProduct}>Cancel</button><button type="submit" className="primary-button" disabled={savingProduct}>{savingProduct ? 'Saving…' : productForm.id ? 'Save changes' : 'Add product'}</button></div>
+          </form>
+        </div>
       )}
     </main>
   );
