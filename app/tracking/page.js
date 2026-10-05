@@ -26,7 +26,10 @@ function TrackingContent(){
   const [order,setOrder]=useState(null);
   const [loading,setLoading]=useState(true);
   const [pulse,setPulse]=useState(0);
-  const [driverLocation,setDriverLocation]=useState(null);\n  const [driverPhone,setDriverPhone]=useState('');
+  const [driverLocation,setDriverLocation]=useState(null);
+  const [driverPhone,setDriverPhone]=useState('');
+  const [driverName,setDriverName]=useState('');
+  const [driverVehicle,setDriverVehicle]=useState('');
 
   useEffect(()=>{const timer=setInterval(()=>setPulse(v=>v+1),5000);return()=>clearInterval(timer)},[]);
 
@@ -41,7 +44,7 @@ function TrackingContent(){
         const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,delivery_latitude,delivery_longitude,status,driver_id').eq('id',requestedId).eq('customer_id',user.id).single();
         data=q.data;
       }else{
-        const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status').eq('customer_id',user.id).in('status',['pending','confirmed','preparing','ready','assigned','picked_up']).order('created_at',{ascending:false}).limit(1).maybeSingle();
+        const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status,driver_id').eq('customer_id',user.id).in('status',['pending','confirmed','preparing','ready','assigned','picked_up']).order('created_at',{ascending:false}).limit(1).maybeSingle();
         data=q.data;
       }
       if(active){
@@ -49,7 +52,13 @@ function TrackingContent(){
         setId(data?.id||requestedId||'');
         if(data?.id){
           const loc=await supabase.from('driver_locations').select('order_id,driver_id,latitude,longitude,accuracy,heading,speed,updated_at').eq('order_id',data.id).maybeSingle();
-          if(active)setDriverLocation(loc.data||null);\n          if(data.driver_id){\n            const profile=await supabase.from('profiles').select('phone').eq('id',data.driver_id).maybeSingle();\n            if(active)setDriverPhone(profile.data?.phone||'');\n          } else if(active)setDriverPhone('');
+          if(active)setDriverLocation(loc.data||null);
+          if(data.driver_id){
+            const profile=await supabase.from('profiles').select('full_name,phone').eq('id',data.driver_id).maybeSingle();
+            if(active){setDriverPhone(profile.data?.phone||'');setDriverName(profile.data?.full_name||'BG Driver');}
+            const driver=await supabase.from('driver_profiles').select('vehicle_type,vehicle_registration').eq('id',data.driver_id).maybeSingle();
+            if(active)setDriverVehicle([driver.data?.vehicle_type,driver.data?.vehicle_registration].filter(Boolean).join(' • '));
+          } else if(active){setDriverPhone('');setDriverName('');setDriverVehicle('');}
         }else{
           setDriverLocation(null);
         }
@@ -148,7 +157,7 @@ function TrackingContent(){
         <aside className="tracking-side">
           <div className="card tracking-driver-card">
             <div className="tracking-side-heading"><span className="eyebrow">Your driver</span><span className={isLive?'driver-online':''}><span className="live-dot"></span>{isLive?'Online':'Standby'}</span></div>
-            <div className="driver-profile"><div className="driver-avatar">BG</div><div><strong>Your BG Driver</strong><span>BG Smart Services</span></div><ChevronRight size={18}/></div>
+            <div className="driver-profile"><div className="driver-avatar">{(driverName||"BG").split(" ").map(v=>v[0]).slice(0,2).join("").toUpperCase()}</div><div><strong>{driverName||"Your BG Driver"}</strong><span>{driverVehicle||"BG Smart Services driver"}</span></div><ChevronRight size={18}/></div>
             <div className="driver-actions"><a className="driver-contact-btn" href={driverPhone ? "tel:"+driverPhone : undefined} aria-disabled={!driverPhone} onClick={e=>{if(!driverPhone)e.preventDefault()}}><Phone size={16}/>{driverPhone?"Contact":"No number"}</a><button type="button" onClick={()=>document.querySelector(".bg-live-map")?.scrollIntoView({behavior:"smooth",block:"center"})}><Navigation size={16}/> Track</button></div>
           </div>
 
