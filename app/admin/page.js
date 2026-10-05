@@ -186,7 +186,7 @@ export default function AdminPage() {
     const [orders, shops, products, customers, payments, driverProfiles, supportRequests, payrollWeeks, payrollItems, restaurants, menuProducts, orderItems] = await Promise.all([
       supabase
         .from('orders')
-        .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id, payment_method')
+        .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id, payment_method, delivery_latitude, delivery_longitude')
         .order('created_at', { ascending: false })
         .limit(100),
       supabase
