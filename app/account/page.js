@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import Link from 'next/link';
 import {
-  UserRound, MapPin, CreditCard, ShoppingBag, Heart, PackageCheck,
+  UserRound, MapPin, CreditCard, ShoppingBag, Heart, PackageCheck, Gift,
   Bell, HelpCircle, FileText, ShieldCheck, LockKeyhole, LogOut,
   ChevronRight, Pencil, ArrowLeft
 } from 'lucide-react';
@@ -13,6 +13,7 @@ const accountLinks = [
   { href: '/orders', icon: ShoppingBag, title: 'My Orders', text: 'View your current and previous orders' },
   { href: '/favorites', icon: Heart, title: 'Favorites', text: 'Your saved products and stores' },
   { href: '/tracking', icon: PackageCheck, title: 'Track Delivery', text: 'Follow an active delivery' },
+  { href: '/account/rewards', icon: Gift, title: 'BG Rewards', text: 'Earn points and save on delivery' },
 ];
 
 const settingsLinks = [
