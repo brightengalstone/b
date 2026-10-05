@@ -6,6 +6,9 @@ import {supabase} from '../../lib/supabase';
 import Link from 'next/link';
 import {CheckCircle2,Clock3,PackageCheck,ChefHat,Truck,MapPin,ArrowLeft,Phone,Navigation,Radio,ShieldCheck,ChevronRight} from 'lucide-react';
 import NotificationBell from '../../components/NotificationBell';
+import dynamic from 'next/dynamic';
+
+const LiveDeliveryMap = dynamic(() => import('../../components/LiveDeliveryMap'), { ssr: false });
 
 const steps=[
   ['Order placed',CheckCircle2,'Your order has been received.'],
@@ -23,6 +26,7 @@ function TrackingContent(){
   const [order,setOrder]=useState(null);
   const [loading,setLoading]=useState(true);
   const [pulse,setPulse]=useState(0);
+  const [driverLocation,setDriverLocation]=useState(null);
 
   useEffect(()=>{const timer=setInterval(()=>setPulse(v=>v+1),5000);return()=>clearInterval(timer)},[]);
 
@@ -34,13 +38,23 @@ function TrackingContent(){
       if(!user){if(active){setLoading(false);window.location.href='/signin'}return}
       let data=null;
       if(requestedId){
-        const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status').eq('id',requestedId).eq('customer_id',user.id).single();
+        const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,delivery_latitude,delivery_longitude,status,driver_id').eq('id',requestedId).eq('customer_id',user.id).single();
         data=q.data;
       }else{
         const q=await supabase.from('orders').select('id,subtotal,delivery_fee,delivery_address,status').eq('customer_id',user.id).in('status',['pending','confirmed','preparing','ready','assigned','picked_up']).order('created_at',{ascending:false}).limit(1).maybeSingle();
         data=q.data;
       }
-      if(active){setOrder(data||null);setId(data?.id||requestedId||'');setLoading(false)}
+      if(active){
+        setOrder(data||null);
+        setId(data?.id||requestedId||'');
+        if (data?.id) {
+          const loc = await supabase.from('driver_locations').select('order_id,driver_id,latitude,longitude,accuracy,heading,speed,updated_at').eq('order_id', data.id).maybeSingle();
+          if (active) setDriverLocation(loc.data || null);
+        } else {
+          setDriverLocation(null);
+        }
+        setLoading(false)
+      }
     }
     load();
     let channel;
@@ -52,6 +66,12 @@ function TrackingContent(){
           if(requestedId&&payload?.new?.id!==requestedId)return;
           setOrder(current=>({...current||{},...payload.new}));
           setId(payload?.new?.id||requestedId||'');
+        })        }).on('postgres_changes',{event:'*',schema:'public',table:'driver_locations'},payload=>{
+          if(!active) return;
+          const row = payload?.new || payload?.old;
+          if (!row || (requestedId && row.order_id !== requestedId) || (!requestedId && order?.id && row.order_id !== order.id)) return;
+          if (payload.eventType === 'DELETE') setDriverLocation(null);
+          else setDriverLocation(payload.new);
         }).subscribe();
     });
     return()=>{active=false;if(channel&&supabase)supabase.removeChannel(channel)};
@@ -111,25 +131,10 @@ function TrackingContent(){
         <section className="tracking-main">
           <div className="card tracking-map-card">
             <div className="tracking-map-head"><div><span className="eyebrow">Delivery route</span><h2>{isLive?'Driver is on the way':isDelivered?'Delivered to you':eta}</h2></div><div className="tracking-live-badge"><Radio size={14}/>{lastUpdated}</div></div>
-            <div className="live-map">
-              <div className="map-grid-lines"></div>
-              <div className="map-neighborhood neighborhood-one">Eersterust</div>
-              <div className="map-neighborhood neighborhood-two">Willow Park</div>
-              <div className="map-neighborhood neighborhood-three">Silverton</div>
-              <div className="map-road road-a"></div><div className="map-road road-b"></div><div className="map-road road-c"></div>
-              <div className="map-road road-d"></div><div className="map-road road-e"></div>
-              <div className="map-route-shadow"></div><div className="map-route"></div>
-              <div className="route-node route-node-one"></div><div className="route-node route-node-two"></div><div className="route-node route-node-three"></div>
-              <div className="map-location restaurant-location"><div className="map-marker store-marker"><PackageCheck size={17}/></div><span>Collection point</span></div>
-              <div className={"map-driver "+(isLive?'moving':'')} style={{left:driverPosition.left+'%',top:driverPosition.top+'%'}}>
-                <div className="driver-pulse"></div><div className="driver-marker"><Truck size={18}/></div>
-                <div className="driver-live-tag"><Radio size={10}/> {driverPosition.label}</div>
-              </div>
-              <div className="map-location home-location"><div className="map-marker home-marker"><MapPin size={17}/></div><span>Your delivery</span></div>
-              <div className="map-scale"><span></span><b>Route</b></div>
-              <div className="map-label"><Navigation size={13}/> Eersterust delivery zone</div>
-              <div className="map-live-chip"><span className="live-dot"></span>{isDelivered?'Delivery complete':isLive?'Live route':'Route preview'}</div>
-            </div>
+            <LiveDeliveryMap
+              driverLocation={driverLocation}
+              destination={[order?.delivery_latitude, order?.delivery_longitude]}
+            />            </div>
             <div className="tracking-map-footer">
               <div><Clock3 size={17}/><span><small>Estimated arrival</small><strong>{eta}</strong></span></div>
               <div><ShieldCheck size={17}/><span><small>Delivery fee</small><strong>R{Number(order?.delivery_fee??65).toFixed(2)}</strong></span></div>
