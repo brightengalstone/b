@@ -26,7 +26,7 @@ function TrackingContent(){
   const [order,setOrder]=useState(null);
   const [loading,setLoading]=useState(true);
   const [pulse,setPulse]=useState(0);
-  const [driverLocation,setDriverLocation]=useState(null);
+  const [driverLocation,setDriverLocation]=useState(null);\n  const [driverPhone,setDriverPhone]=useState('');
 
   useEffect(()=>{const timer=setInterval(()=>setPulse(v=>v+1),5000);return()=>clearInterval(timer)},[]);
 
@@ -49,7 +49,7 @@ function TrackingContent(){
         setId(data?.id||requestedId||'');
         if(data?.id){
           const loc=await supabase.from('driver_locations').select('order_id,driver_id,latitude,longitude,accuracy,heading,speed,updated_at').eq('order_id',data.id).maybeSingle();
-          if(active)setDriverLocation(loc.data||null);
+          if(active)setDriverLocation(loc.data||null);\n          if(data.driver_id){\n            const profile=await supabase.from('profiles').select('phone').eq('id',data.driver_id).maybeSingle();\n            if(active)setDriverPhone(profile.data?.phone||'');\n          } else if(active)setDriverPhone('');
         }else{
           setDriverLocation(null);
         }
@@ -134,7 +134,7 @@ function TrackingContent(){
             <div className="tracking-map-footer">
               <div><Clock3 size={17}/><span><small>Estimated arrival</small><strong>{eta}</strong></span></div>
               <div><ShieldCheck size={17}/><span><small>Delivery fee</small><strong>R{Number(order?.delivery_fee??65).toFixed(2)}</strong></span></div>
-              {isLive&&<button className="tracking-call" type="button"><Phone size={16}/> Contact driver</button>}
+              {isLive&&<a className="tracking-call" href={driverPhone ? "tel:"+driverPhone : undefined} aria-disabled={!driverPhone} onClick={e=>{if(!driverPhone)e.preventDefault()}}><Phone size={16}/>{driverPhone?"Contact driver":"Driver contact unavailable"}</a>}
             </div>
           </div>
 
@@ -149,7 +149,7 @@ function TrackingContent(){
           <div className="card tracking-driver-card">
             <div className="tracking-side-heading"><span className="eyebrow">Your driver</span><span className={isLive?'driver-online':''}><span className="live-dot"></span>{isLive?'Online':'Standby'}</span></div>
             <div className="driver-profile"><div className="driver-avatar">BG</div><div><strong>Your BG Driver</strong><span>BG Smart Services</span></div><ChevronRight size={18}/></div>
-            <div className="driver-actions"><button type="button"><Phone size={16}/> Contact</button><button type="button"><Navigation size={16}/> Track</button></div>
+            <div className="driver-actions"><a className="driver-contact-btn" href={driverPhone ? "tel:"+driverPhone : undefined} aria-disabled={!driverPhone} onClick={e=>{if(!driverPhone)e.preventDefault()}}><Phone size={16}/>{driverPhone?"Contact":"No number"}</a><button type="button" onClick={()=>document.querySelector(".bg-live-map")?.scrollIntoView({behavior:"smooth",block:"center"})}><Navigation size={16}/> Track</button></div>
           </div>
 
           <div className="card tracking-summary">
