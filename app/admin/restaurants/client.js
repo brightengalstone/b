@@ -39,6 +39,22 @@ export default function AdminRestaurantsClient() {
     setForm((current) => ({ ...current, merchant_id: value, business_name: merchant?.business_name || '', branch_name: '', branch_address: '' }));
   }
 
+  async function setApproval(merchantId, action) {
+    setError(''); setMessage('');
+    const accessToken = await getToken();
+    const response = await fetch('/api/admin/restaurants', {
+      method: 'PATCH',
+      headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ merchant_id: merchantId, action }),
+    });
+    const result = await response.json();
+    if (!response.ok) setError(result?.error || 'Unable to update restaurant approval.');
+    else {
+      setMessage(action === 'approve' ? 'Restaurant approved.' : 'Restaurant rejected.');
+      await load();
+    }
+  }
+
   async function submit(event) {
     event.preventDefault();
     setSaving(true); setError(''); setMessage('');
@@ -111,7 +127,14 @@ export default function AdminRestaurantsClient() {
                   <article className="partner-row" key={merchant.id}>
                     <div className="partner-avatar">{(merchant.business_name || 'R').slice(0, 1).toUpperCase()}</div>
                     <div className="partner-info"><strong>{merchant.business_name}</strong><span>{merchant.branch_count} branch{merchant.branch_count === 1 ? '' : 'es'} · {merchant.cuisine || 'restaurant'}</span><small>{merchant.owner?.full_name ? 'Connected to ' + merchant.owner.full_name : 'No restaurant owner connected'}</small></div>
-                    <span className={merchant.approved && merchant.active && merchant.owner_id ? 'status good' : 'status pending'}>{merchant.approved && merchant.active && merchant.owner_id ? 'Connected' : merchant.approved ? 'Approved' : 'Not approved'}</span>
+                    <div className="partner-actions">
+                      <span className={merchant.approved && merchant.active ? 'status good' : 'status pending'}>{merchant.approved && merchant.active ? 'Approved' : 'Not approved'}</span>
+                      {merchant.approved && merchant.active ? (
+                        <button type="button" className="partner-action reject" onClick={() => setApproval(merchant.id, 'reject')}>Reject</button>
+                      ) : (
+                        <button type="button" className="partner-action approve" onClick={() => setApproval(merchant.id, 'approve')}>Approve</button>
+                      )}
+                    </div>
                   </article>
                 ))}
               </div>
