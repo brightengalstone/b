@@ -24,7 +24,7 @@ export default function RestaurantDashboardPage() {
   const [categories, setCategories] = useState([]);
   const [customers, setCustomers] = useState({});
   const [payments, setPayments] = useState({});
-  const [active, setActive] = useState('orders');
+  const [active, setActive] = useState('onboarding');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
@@ -45,7 +45,7 @@ export default function RestaurantDashboardPage() {
 
     const { data: merchantData, error: merchantError } = await supabase
       .from('merchants')
-      .select('id, business_name, description, phone, address, approved, active, logo_url, cuisine')
+      .select('id, business_name, description, phone, address, approved, active, logo_url, cuisine, onboarding_status, agreement_signed, info_form_completed, menu_setup_completed, test_order_completed, driver_test_completed, delivery_test_completed, go_live_at')
       .eq('owner_id', currentUser.id)
       .maybeSingle();
 
@@ -53,8 +53,8 @@ export default function RestaurantDashboardPage() {
       setError('This account is not connected to a restaurant partner record.');
       setLoading(false); setRefreshing(false); return;
     }
-    if (!merchantData.approved || !merchantData.active) {
-      setError('This restaurant partner account is not active.');
+    if (!merchantData.approved) {
+      setError('Your restaurant partnership is awaiting BG Smart Services approval.');
       setLoading(false); setRefreshing(false); return;
     }
     setMerchant(merchantData);
@@ -100,6 +100,45 @@ export default function RestaurantDashboardPage() {
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [merchant?.id]);
+
+  const onboardingStages = [
+    ['agreement_signed', 'Partnership agreement', 'Confirm the signed restaurant partnership agreement.'],
+    ['info_form_completed', 'Partner information form', 'Confirm the restaurant and branch information is complete.'],
+    ['menu_setup_completed', 'Menu & pricing', 'Confirm your menu, prices, availability and images are ready.'],
+    ['test_order_completed', 'Test order', 'Complete a full test order before launch.'],
+    ['driver_test_completed', 'Driver pickup test', 'Complete the restaurant-to-driver pickup test.'],
+    ['delivery_test_completed', 'Customer delivery test', 'Complete the final delivery test to an Eersterust customer.'],
+  ];
+
+  async function completeOnboardingStage(column) {
+    if (!merchant?.id || !supabase) return;
+    setError('');
+    const { data, error: updateError } = await supabase
+      .from('merchants')
+      .update({ [column]: true, onboarding_status: 'onboarding', onboarding_updated_at: new Date().toISOString() })
+      .eq('id', merchant.id)
+      .eq('owner_id', user.id)
+      .select('id, business_name, description, phone, address, approved, active, logo_url, cuisine, onboarding_status, agreement_signed, info_form_completed, menu_setup_completed, test_order_completed, driver_test_completed, delivery_test_completed, go_live_at')
+      .single();
+    if (updateError) { setError(updateError.message); return; }
+    setMerchant(data);
+  }
+
+  async function requestGoLive() {
+    if (!merchant?.id || !supabase) return;
+    const ready = onboardingStages.every(([column]) => merchant[column]);
+    if (!ready) { setError('Complete every onboarding and testing step first.'); return; }
+    setError('');
+    const { data, error: updateError } = await supabase
+      .from('merchants')
+      .update({ active: true, onboarding_status: 'live', go_live_at: new Date().toISOString(), onboarding_updated_at: new Date().toISOString() })
+      .eq('id', merchant.id)
+      .eq('owner_id', user.id)
+      .select('id, business_name, description, phone, address, approved, active, logo_url, cuisine, onboarding_status, agreement_signed, info_form_completed, menu_setup_completed, test_order_completed, driver_test_completed, delivery_test_completed, go_live_at')
+      .single();
+    if (updateError) setError(updateError.message);
+    else setMerchant(data);
+  }
 
   async function updateOrder(orderId, status) {
     setUpdating(orderId); setError('');
@@ -232,9 +271,29 @@ export default function RestaurantDashboardPage() {
       </div>
 
       <nav className="restaurant-tabs">
-        <button className={active === 'orders' ? 'active' : ''} onClick={() => setActive('orders')}>Orders</button>
-        <button className={active === 'products' ? 'active' : ''} onClick={() => setActive('products')}>Products</button>
+        <button className={active === 'onboarding' ? 'active' : ''} onClick={() => setActive('onboarding')}>Onboarding</button>
+        <button className={active === 'orders' ? 'active' : ''} onClick={() => setActive('orders')} disabled={!merchant?.active}>Orders</button>
+        <button className={active === 'products' ? 'active' : ''} onClick={() => setActive('products')} disabled={!merchant?.active}>Products</button>
         <button className={active === 'branches' ? 'active' : ''} onClick={() => setActive('branches')}>Branches</button>
+      </nav>
+
+      {active === 'onboarding' && (
+        <section className="restaurant-panel onboarding-restaurant-panel">
+          <div className="panel-head"><div><p className="onboarding-kicker">PARTNER ONBOARDING</p><h2>Get your restaurant ready to go live</h2><p>Complete each step with BG Smart Services. Real customer orders unlock only after the full onboarding and testing process is complete.</p></div><span className={'partner-live-badge ' + (merchant?.onboarding_status === 'live' ? 'live' : '')}>{merchant?.onboarding_status === 'live' ? 'LIVE' : (merchant?.onboarding_status || 'APPROVED').replace('_',' ')}</span></div>
+          <div className="restaurant-onboarding-progress"><div style={{ width: ((onboardingStages.filter(([column]) => merchant?.[column]).length / onboardingStages.length) * 100) + '%' }} /></div>
+          <div className="restaurant-onboarding-list">
+            {onboardingStages.map(([column, title, description], index) => {
+              const done = Boolean(merchant?.[column]);
+              return <article className={'restaurant-onboarding-step ' + (done ? 'done' : '')} key={column}><span className="restaurant-step-number">{done ? '✓' : index + 1}</span><div><strong>{title}</strong><small>{description}</small></div>{done ? <span className="step-complete">Completed</span> : <button className="step-action" onClick={() => completeOnboardingStage(column)}>Mark complete</button>}</article>;
+            })}
+          </div>
+          <div className="restaurant-onboarding-footer"><div><strong>{onboardingStages.filter(([column]) => merchant?.[column]).length}/6 completed</strong><span>{merchant?.active ? 'Your restaurant is live and can receive orders.' : 'Once all six checks are complete, request go-live.'}</span></div><button className="primary-button" disabled={merchant?.active || !onboardingStages.every(([column]) => merchant?.[column])} onClick={requestGoLive}>{merchant?.active ? 'Restaurant LIVE' : 'Go live'}</button></div>
+        </section>
+      )}
+
+      {active === 'orders' && !merchant?.active && <section className="restaurant-panel"><div className="empty">Orders will unlock after your restaurant is taken LIVE by BG Smart Services.</div></section>}
+
+      {active === 'orders' && merchant?.active && (
       </nav>
 
       {active === 'orders' && (
@@ -274,7 +333,7 @@ export default function RestaurantDashboardPage() {
         </section>
       )}
 
-      {active === 'products' && (
+      {active === 'products' && merchant?.active && (
         <section className="restaurant-panel">
           <div className="panel-head">
             <div><h2>Products</h2><p>Add, edit, hide or remove items from your customer menu.</p></div>
