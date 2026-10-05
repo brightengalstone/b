@@ -3,6 +3,7 @@ import './support.css';
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
   ArrowLeft,
   BarChart3,
@@ -29,7 +30,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import LiveDeliveryMap from '../../components/LiveDeliveryMap';
+const LiveDeliveryMap = dynamic(() => import('../../components/LiveDeliveryMap'), { ssr: false, loading: () => <div className="bg-live-map">Loading live map…</div> });
 
 const NAV_GROUPS = [
   { id: 'main', label: 'Main', items: [{ id: 'overview', label: 'Overview', icon: BarChart3 }] },
