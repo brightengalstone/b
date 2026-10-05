@@ -231,6 +231,9 @@ export default function DriverPage() {
       return;
     }
 
+    if (nextStatus === 'delivered' || nextStatus === 'cancelled') {
+      await supabase.from('driver_locations').delete().eq('order_id', order.id).eq('driver_id', user.id);
+    }
     await loadOrder(user.id);
     await loadWeeklyDeliveries(user.id);
     const { data: updatedDriver } = await supabase
