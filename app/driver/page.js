@@ -407,7 +407,7 @@ export default function DriverPage() {
         <header className="driver-header">
           <div className="driver-brand"><span className="brand-mark">BG</span><div><strong>BG Smart Services</strong><span>Driver Console</span></div></div>
           <div className="driver-header-actions">
-            <Link href="/help" className="driver-support-link" aria-label="BG Support"><LifeBuoy size={16} /> Support</Link>
+            <Link href="/help" className="driver-support-link" aria-label="BG Support" style={{display:"inline-flex",alignItems:"center",gap:6,textDecoration:"none",fontSize:12,fontWeight:700,color:"#16834a"}}><LifeBuoy size={16} /> Support</Link>
             <span className={driverProfile.available ? 'driver-online online' : 'driver-online'}><span className="driver-dot" /> {driverProfile.available ? 'Available' : 'Offline'}</span>
             <button className="driver-icon-button" onClick={refresh} disabled={busy} title="Refresh"><RefreshCw size={18} className={busy ? 'driver-spin' : ''} /></button>
           </div>
