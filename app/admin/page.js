@@ -6,6 +6,10 @@ import Link from 'next/link';
 import {
   ArrowLeft,
   BarChart3,
+  LineChart,
+  MapPinned,
+  LifeBuoy,
+  Utensils,
   Box,
   CheckCircle2,
   ChevronRight,
@@ -25,6 +29,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import LiveDeliveryMap from '../../components/LiveDeliveryMap';
 
 const NAV_GROUPS = [
   { id: 'main', label: 'Main', items: [{ id: 'overview', label: 'Overview', icon: BarChart3 }] },
@@ -82,7 +87,12 @@ export default function AdminPage() {
     payrollWeeks: [],
     payrollItems: [],
     customerOrders: [],
+    restaurants: [],
+    menuProducts: [],
+    orderItems: [],
+    driverLocations: [],
   });
+  const [selectedLiveDriver, setSelectedLiveDriver] = useState(null);
 
   useEffect(() => {
     let mounted = true;
@@ -173,7 +183,7 @@ export default function AdminPage() {
     if (showSpinner) setRefreshing(true);
     setError('');
 
-    const [orders, shops, products, customers, payments, driverProfiles, supportRequests, payrollWeeks, payrollItems] = await Promise.all([
+    const [orders, shops, products, customers, payments, driverProfiles, supportRequests, payrollWeeks, payrollItems, restaurants, menuProducts, orderItems] = await Promise.all([
       supabase
         .from('orders')
         .select('id, status, subtotal, delivery_fee, service_fee, total, delivery_address, created_at, updated_at, retailer_id, customer_id, driver_id, payment_method')
@@ -209,9 +219,12 @@ export default function AdminPage() {
         .limit(100),
       supabase.from('driver_payroll_weeks').select('id, week_start, week_end, driver_rate_percent, delivery_fee, status, total_deliveries, total_driver_gross, total_deductions, total_net, created_at, approved_at, paid_at').order('week_start', { ascending: false }).limit(12),
       supabase.from('driver_payroll_items').select('id, payroll_week_id, driver_id, completed_deliveries, delivery_fee, driver_rate_percent, gross_amount, uif_deduction, paye_deduction, other_deductions, net_amount, payslip_number, payment_status, payment_reference, paid_at, created_at').order('created_at', { ascending: false }).limit(1000),
+      supabase.from('merchants').select('id, business_name, approved, active, onboarding_status, cuisine, logo_url').order('business_name'),
+      supabase.from('products').select('id, merchant_id, category_id, name, price, available, image_url').order('name').limit(1000),
+      supabase.from('order_items').select('id, order_id, product_id, quantity, unit_price').limit(5000),
     ]);
 
-    const failures = [orders, shops, products, customers, payments, driverProfiles, supportRequests, payrollWeeks, payrollItems].filter((item) => item.error);
+    const failures = [orders, shops, products, customers, payments, driverProfiles, supportRequests, payrollWeeks, payrollItems, restaurants, menuProducts, orderItems].filter((item) => item.error);
     if (failures.length) {
       setError(failures.map((item) => item.error.message).join(' | '));
     }
@@ -244,9 +257,21 @@ export default function AdminPage() {
       payrollWeeks: payrollWeeks.data || [],
       payrollItems: payrollItems.data || [],
       customerOrders: customerManagement.orders || [],
+      restaurants: restaurants.data || [],
+      menuProducts: menuProducts.data || [],
+      orderItems: orderItems.data || [],
+      driverLocations: [],
     });
 
     if (showSpinner) setRefreshing(false);
+
+    const activeOrderIds = (orders.data || []).filter((order) => order.driver_id && !['delivered', 'cancelled'].includes(order.status)).map((order) => order.id);
+    if (activeOrderIds.length) {
+      const { data: liveLocations, error: locationError } = await supabase.from('driver_locations').select('order_id, driver_id, latitude, longitude, accuracy, heading, speed, updated_at').in('order_id', activeOrderIds);
+      if (!locationError) setData((current) => ({ ...current, driverLocations: liveLocations || [] }));
+    } else {
+      setData((current) => ({ ...current, driverLocations: [] }));
+    }
   }
 
   async function updateOrder(orderId, patch) {
@@ -596,16 +621,26 @@ export default function AdminPage() {
     const delivered = data.orders.filter((order) => order.status === 'delivered');
     const pending = data.orders.filter((order) => ['pending', 'confirmed', 'preparing', 'ready', 'assigned', 'picked_up'].includes(order.status));
     const revenue = delivered.reduce((sum, order) => sum + Number(order.subtotal || 0), 0);
+    const productById = Object.fromEntries(data.menuProducts.map((product) => [product.id, product]));
+    const salesByProduct = {};
+    const hourCounts = Array.from({ length: 24 }, () => 0);
+    data.orderItems.forEach((item) => {
+      if (!salesByProduct[item.product_id]) salesByProduct[item.product_id] = { quantity: 0, revenue: 0 };
+      salesByProduct[item.product_id].quantity += Number(item.quantity || 0);
+      salesByProduct[item.product_id].revenue += Number(item.unit_price || 0) * Number(item.quantity || 0);
+    });
+    data.orders.forEach((order) => { if (['delivered','confirmed','preparing','ready','assigned','picked_up'].includes(order.status)) hourCounts[new Date(order.created_at).getHours()] += 1; });
+    const topProducts = Object.entries(salesByProduct).map(([id, value]) => ({ id, name: productById[id]?.name || 'Product', ...value })).sort((a, b) => b.quantity - a.quantity).slice(0, 8);
+    const peakHour = hourCounts.reduce((best, count, hour) => count > best.count ? { hour, count } : best, { hour: 0, count: 0 });
     return {
-      orders: data.orders.length,
-      pending: pending.length,
-      revenue,
+      orders: data.orders.length, pending: pending.length, revenue,
       customers: data.customers.filter((item) => item.role === 'customer').length,
       purchasingCustomers: data.customers.filter((item) => item.role === 'customer' && data.customerOrders.some((order) => order.customer_id === item.id && order.status === 'delivered')).length,
       noPurchaseCustomers: data.customers.filter((item) => item.role === 'customer' && !data.customerOrders.some((order) => order.customer_id === item.id)).length,
       orderAttemptCustomers: data.customers.filter((item) => item.role === 'customer' && data.customerOrders.some((order) => order.customer_id === item.id) && !data.customerOrders.some((order) => order.customer_id === item.id && order.status === 'delivered')).length,
-      shops: data.shops.filter((shop) => shop.active).length,
-      products: data.products.filter((product) => product.available).length,
+      shops: data.restaurants.filter((shop) => shop.active && shop.approved).length,
+      products: data.menuProducts.filter((product) => product.available).length,
+      topProducts, hourCounts, peakHour,
     };
   }, [data]);
 
@@ -727,25 +762,35 @@ export default function AdminPage() {
 
         {active === 'overview' && (
           <>
-            <div className="admin-stat-grid">
-              <Stat icon={Package} label="Total orders" value={stats.orders} />
-              <Stat icon={Clock3} label="Orders in progress" value={stats.pending} />
-              <Stat icon={CircleDollarSign} label="Delivered sales" value={money(stats.revenue)} />
-              <Stat icon={Users} label="Customers" value={stats.customers} />
+            <div className="admin-hero-strip">
+              <div><p className="admin-kicker">Live business intelligence</p><h2>Know what BG customers want.</h2><span>Real order data, customer behaviour and delivery operations.</span></div>
+              <button className="admin-secondary" onClick={() => loadDashboard(true)}><RefreshCw size={14} /> Refresh data</button>
             </div>
-
+            <div className="admin-stat-grid">
+              <Stat icon={Package} label="Orders" value={stats.orders} />
+              <Stat icon={Clock3} label="In progress" value={stats.pending} />
+              <Stat icon={CircleDollarSign} label="Delivered food sales" value={money(stats.revenue)} />
+              <Stat icon={Users} label="Customers" value={stats.customers} />
+              <Stat icon={Utensils} label="Live restaurants" value={stats.shops} />
+              <Stat icon={ShoppingBag} label="Live menu items" value={stats.products} />
+              <Stat icon={UserRoundCheck} label="Drivers online" value={data.driverProfiles.filter((d) => d.approved && d.available).length} />
+              <Stat icon={LifeBuoy} label="Open support" value={data.supportRequests.filter((r) => r.status !== 'closed').length} />
+            </div>
+            <div className="admin-insight-grid">
+              <Panel title="When customers order most" subtitle="Based on actual order creation times.">
+                <div className="admin-hour-chart">{stats.hourCounts.map((count, hour) => <div className="admin-hour-bar" key={hour}><span style={{height: Math.max(4, Math.min(100, count * 14)) + '%'}} title={hour + ':00 · ' + count + ' orders'} /><small>{String(hour).padStart(2,'0')}</small></div>)}</div>
+                <div className="admin-insight-callout"><Clock3 size={16}/><strong>{stats.peakHour.count ? String(stats.peakHour.hour).padStart(2,'0') + ':00 is currently your busiest hour' : 'Waiting for order data'}</strong><span>{stats.peakHour.count ? stats.peakHour.count + ' order' + (stats.peakHour.count === 1 ? '' : 's') + ' recorded in this hour bucket.' : 'Your dashboard will learn this automatically after real orders arrive.'}</span></div>
+              </Panel>
+              <Panel title="Top-selling products" subtitle="Ranked by quantity sold from real order items.">
+                <div className="admin-top-products">{stats.topProducts.map((product, index) => <div className="admin-top-product" key={product.id}><b>{index + 1}</b><div><strong>{product.name}</strong><span>{product.quantity} sold · {money(product.revenue)}</span></div></div>)}{!stats.topProducts.length && <div className="admin-empty">No product sales yet. Real orders will populate this automatically.</div>}</div>
+              </Panel>
+            </div>
             <div className="admin-grid-two">
-              <Panel title="Recent orders" action={() => setActive('orders')}>
-                <OrderTable orders={recentOrders} shopById={shopById} customerById={customerById} updateOrder={updateOrder} />
+              <Panel title="Live driver operations" subtitle="Only active delivery locations are shown." action={() => setActive('delivery')}>
+                <div className="admin-live-drivers">{data.driverLocations.map((location) => { const driver = customerById[location.driver_id]; const order = data.orders.find((o) => o.id === location.order_id); return <button key={location.order_id} className={selectedLiveDriver?.order_id === location.order_id ? 'admin-live-driver active' : 'admin-live-driver'} onClick={() => setSelectedLiveDriver(location)}><span className="admin-live-dot" /><div><strong>{driver?.full_name || 'BG Driver'}</strong><span>Order #{location.order_id.slice(0,8).toUpperCase()} · {order?.status?.replace('_',' ') || 'active'}</span></div><MapPinned size={15}/></button> })}{!data.driverLocations.length && <div className="admin-empty">No active driver locations right now.</div>}</div>
+                {selectedLiveDriver && <LiveDeliveryMap driverLocation={selectedLiveDriver} destination={(() => { const o=data.orders.find((x)=>x.id===selectedLiveDriver.order_id); return o?.delivery_latitude != null && o?.delivery_longitude != null ? [o.delivery_latitude,o.delivery_longitude] : null; })()} />}
               </Panel>
-
-              <Panel title="Operations">
-                <div className="admin-operation-list">
-                  <Operation icon={Store} label="Active shops" value={stats.shops} />
-                  <Operation icon={ShoppingBag} label="Available products" value={stats.products} />
-                  <Operation icon={CircleDollarSign} label="Paid transactions" value={data.payments.filter((p) => p.status === 'paid').length} />
-                </div>
-              </Panel>
+              <Panel title="Recent orders" action={() => setActive('orders')}><OrderTable orders={recentOrders} shopById={shopById} customerById={customerById} updateOrder={updateOrder} /></Panel>
             </div>
           </>
         )}
