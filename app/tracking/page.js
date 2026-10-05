@@ -69,7 +69,7 @@ function TrackingContent(){
         })        }).on('postgres_changes',{event:'*',schema:'public',table:'driver_locations'},payload=>{
           if(!active) return;
           const row = payload?.new || payload?.old;
-          if (!row || (requestedId && row.order_id !== requestedId) || (!requestedId && order?.id && row.order_id !== order.id)) return;
+          if (!row || (row.order_id !== (requestedId || data?.id))) return;
           if (payload.eventType === 'DELETE') setDriverLocation(null);
           else setDriverLocation(payload.new);
         }).subscribe();
