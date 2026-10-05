@@ -53,10 +53,23 @@ export default function RestaurantLoginPage() {
       return;
     }
 
-    if (!['restaurant', 'partner'].includes(profile?.role)) {
+    if (profile?.role !== 'merchant') {
       await supabase.auth.signOut();
       setLoading(false);
       setMessage('This login is for approved BG Smart Services restaurant partners.');
+      return;
+    }
+
+    const { data: merchant, error: merchantError } = await supabase
+      .from('merchants')
+      .select('id, business_name, approved, active')
+      .eq('owner_id', data.user.id)
+      .maybeSingle();
+
+    if (merchantError || !merchant || !merchant.approved || !merchant.active) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      setMessage('This restaurant account is not approved or active yet.');
       return;
     }
 
