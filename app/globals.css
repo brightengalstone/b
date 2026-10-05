@@ -1438,3 +1438,16 @@ a{color:inherit}
   .mobile-auth-brand .mobile-auth-logo{width:270px!important;height:156px!important}
   .mobile-auth-brand .mobile-auth-logo img{width:270px!important;height:156px!important}
 }
+
+
+/* Live driver GPS map */
+.bg-live-map{position:relative;width:100%;height:520px;border-radius:20px;overflow:hidden;background:#e8edf1;border:1px solid #dfe5ea}
+.bg-live-map-container{width:100%;height:100%;z-index:1}
+.bg-live-map-badge,.bg-live-map-accuracy{position:absolute;z-index:500;display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.96);border:1px solid rgba(16,24,40,.08);box-shadow:0 8px 22px rgba(16,24,40,.12);border-radius:99px;padding:9px 12px;font-size:11px;font-weight:850}
+.bg-live-map-badge{left:14px;top:14px}
+.bg-live-map-badge span{width:8px;height:8px;border-radius:50%;background:#16875c;box-shadow:0 0 0 5px rgba(22,135,92,.12)}
+.bg-live-map-accuracy{right:14px;bottom:14px;color:#667085}
+.bg-live-driver-icon,.bg-live-destination-icon{background:transparent!important;border:0!important}
+.bg-live-driver-marker{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#101828;color:#fff;border:4px solid #fff;box-shadow:0 8px 20px rgba(16,24,40,.25);font-size:12px;font-weight:950;letter-spacing:-.5px}
+.bg-live-destination-marker{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:#fff;color:#101828;border:3px solid #101828;box-shadow:0 8px 18px rgba(16,24,40,.2);font-size:19px;font-weight:900}
+@media(max-width:700px){.bg-live-map{height:430px;border-radius:17px}.bg-live-map-badge{left:10px;top:10px;font-size:10px}.bg-live-map-accuracy{right:10px;bottom:10px;font-size:10px}}
