@@ -26,7 +26,7 @@ export async function GET(request) {
 
   const { data: merchants, error } = await auth.admin
     .from('merchants')
-    .select('id, business_name, description, phone, address, approved, active, slug, cuisine, owner_id, created_at')
+    .select('id, business_name, description, phone, address, approved, active, slug, cuisine, owner_id, created_at, onboarding_status, agreement_signed, info_form_completed, menu_setup_completed, test_order_completed, driver_test_completed, delivery_test_completed, go_live_at, onboarding_updated_at')
     .order('business_name');
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -63,19 +63,66 @@ export async function PATCH(request) {
 
   const merchantId = String(body?.merchant_id || '').trim();
   const action = String(body?.action || '').trim().toLowerCase();
-  if (!merchantId || !['approve', 'reject'].includes(action)) {
+  if (!merchantId || !['approve', 'reject', 'stage', 'go_live'].includes(action)) {
     return NextResponse.json({ error: 'Restaurant and approval action are required.' }, { status: 400 });
   }
 
+  if (action === 'stage') {
+    const stage = String(body?.stage || '').trim();
+    const stageMap = {
+      agreement: 'agreement_signed',
+      info_form: 'info_form_completed',
+      menu: 'menu_setup_completed',
+      test_order: 'test_order_completed',
+      driver_test: 'driver_test_completed',
+      delivery_test: 'delivery_test_completed',
+    };
+    const column = stageMap[stage];
+    if (!column) return NextResponse.json({ error: 'Invalid onboarding stage.' }, { status: 400 });
+
+    const { data: current, error: currentError } = await auth.admin
+      .from('merchants')
+      .select('approved, onboarding_status, agreement_signed, info_form_completed, menu_setup_completed, test_order_completed, driver_test_completed, delivery_test_completed')
+      .eq('id', merchantId)
+      .maybeSingle();
+    if (currentError) return NextResponse.json({ error: currentError.message }, { status: 500 });
+    if (!current) return NextResponse.json({ error: 'Restaurant record not found.' }, { status: 404 });
+    if (!current.approved) return NextResponse.json({ error: 'Approve the restaurant before progressing onboarding.' }, { status: 400 });
+
+    const update = { [column]: true, onboarding_status: 'onboarding', onboarding_updated_at: new Date().toISOString() };
+    const next = { ...current, ...update };
+    if (next.agreement_signed && next.info_form_completed && next.menu_setup_completed) update.onboarding_status = 'testing';
+    if (next.agreement_signed && next.info_form_completed && next.menu_setup_completed && next.test_order_completed && next.driver_test_completed && next.delivery_test_completed) update.onboarding_status = 'ready';
+
+    const { data, error } = await auth.admin.from('merchants').update(update).eq('id', merchantId).select('*').maybeSingle();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true, merchant: data });
+  }
+
+  if (action === 'go_live') {
+    const { data: current, error: currentError } = await auth.admin
+      .from('merchants')
+      .select('approved, agreement_signed, info_form_completed, menu_setup_completed, test_order_completed, driver_test_completed, delivery_test_completed')
+      .eq('id', merchantId)
+      .maybeSingle();
+    if (currentError) return NextResponse.json({ error: currentError.message }, { status: 500 });
+    if (!current) return NextResponse.json({ error: 'Restaurant record not found.' }, { status: 404 });
+    const ready = current.approved && current.agreement_signed && current.info_form_completed && current.menu_setup_completed && current.test_order_completed && current.driver_test_completed && current.delivery_test_completed;
+    if (!ready) return NextResponse.json({ error: 'Complete every onboarding and test step before going live.' }, { status: 400 });
+    const { data, error } = await auth.admin.from('merchants').update({ active: true, onboarding_status: 'live', go_live_at: new Date().toISOString(), onboarding_updated_at: new Date().toISOString() }).eq('id', merchantId).select('*').maybeSingle();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true, merchant: data });
+  }
+
   const update = action === 'approve'
-    ? { approved: true, active: true }
-    : { approved: false, active: false };
+    ? { approved: true, active: false, onboarding_status: 'approved', onboarding_updated_at: new Date().toISOString() }
+    : { approved: false, active: false, onboarding_status: 'rejected', onboarding_updated_at: new Date().toISOString() };
 
   const { data, error } = await auth.admin
     .from('merchants')
     .update(update)
     .eq('id', merchantId)
-    .select('id, business_name, approved, active, owner_id')
+    .select('id, business_name, approved, active, owner_id, onboarding_status')
     .maybeSingle();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
