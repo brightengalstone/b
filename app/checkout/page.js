@@ -50,10 +50,15 @@ export default function Checkout() {
         let productRows = [];
         if (supabase && ids.length) {
           const { data } = await supabase
+            .from('products')
+            .select('id,name,image_url,description')
+            .in('id', ids);
+          productRows = data || [];
+          const { data: legacyRows } = await supabase
             .from('retailer_products')
             .select('id,name,category,image_url')
             .in('id', ids);
-          productRows = data || [];
+          productRows = [...productRows, ...(legacyRows || [])];
         }
         const byId = Object.fromEntries(productRows.map(p => [p.id, p]));
         const hydrated = saved.map(item => {
@@ -108,7 +113,7 @@ export default function Checkout() {
   const itemCount = items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
 
   const stores = useMemo(
-    () => [...new Set(items.map(x => x.retailer_id || x.storeId || x.storeName || x.store || x.merchantName || 'Marketplace'))],
+    () => [...new Set(items.map(x => x.merchant_id || x.retailer_id || x.storeId || x.storeName || x.store || x.merchantName || 'Marketplace'))],
     [items]
   );
 
@@ -264,22 +269,19 @@ export default function Checkout() {
       return;
     }
 
+    const merchantId = first.merchant_id || null;
     const retailerId = first.retailer_id || first.storeId || null;
 
-    if (!retailerId) {
-      setMsg('We could not identify the selected store. Return to your cart and select a store again.');
+    if (!merchantId && !retailerId) {
+      setMsg('We could not identify the selected restaurant. Return to your cart and select a restaurant again.');
       setBusy(false);
       return;
     }
 
-    const rpcItems = items.map(x => ({
-      retailer_product_id: x.id,
-      quantity: Number(x.quantity || 1)
-    }));
-
-    const { data: orderId, error: orderError } = await supabase.rpc('create_order_with_items', {
-      p_retailer_id: retailerId,
-      p_items: rpcItems,
+    const rpcName = merchantId ? 'create_order_with_merchant_items' : 'create_order_with_items';
+    const rpcArgs = merchantId ? {
+      p_merchant_id: merchantId,
+      p_items: items.map(x => ({ product_id: x.id, quantity: Number(x.quantity || 1) })),
       p_delivery_address: verifiedAddress?.label || address.trim(),
       p_delivery_latitude: verifiedAddress?.latitude ?? null,
       p_delivery_longitude: verifiedAddress?.longitude ?? null,
@@ -287,7 +289,19 @@ export default function Checkout() {
       p_notes: notes,
       p_payment_method: paymentMethod,
       p_reward_credit: appliedRewardCredit
-    });
+    } : {
+      p_retailer_id: retailerId,
+      p_items: items.map(x => ({ retailer_product_id: x.id, quantity: Number(x.quantity || 1) })),
+      p_delivery_address: verifiedAddress?.label || address.trim(),
+      p_delivery_latitude: verifiedAddress?.latitude ?? null,
+      p_delivery_longitude: verifiedAddress?.longitude ?? null,
+      p_delivery_address_verified: Boolean(verifiedAddress),
+      p_notes: notes,
+      p_payment_method: paymentMethod,
+      p_reward_credit: appliedRewardCredit
+    };
+
+    const { data: orderId, error: orderError } = await supabase.rpc(rpcName, rpcArgs);
 
     if (orderError) {
       setMsg(orderError.message || 'We could not place the order. Please try again.');
