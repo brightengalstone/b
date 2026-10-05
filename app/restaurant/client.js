@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Clock3, ImagePlus, LogOut, Package, Pencil, Plus, RefreshCw, Store, Truck, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock3, ImagePlus, LifeBuoy, LogOut, Package, Pencil, Plus, RefreshCw, Store, Truck, XCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import './restaurant.css';
 
@@ -250,6 +250,7 @@ export default function RestaurantDashboardPage() {
       <header className="restaurant-header">
         <div className="restaurant-brand"><span>BG</span><div><strong>{merchant?.business_name || 'Restaurant'}</strong><small>RESTAURANT PORTAL</small></div></div>
         <div className="restaurant-header-actions">
+          <Link href="/help" className="customer-link" aria-label="BG Support"><LifeBuoy size={16} /> Support</Link>
           <button className="icon-button" onClick={() => load(true)} aria-label="Refresh"><RefreshCw size={17} className={refreshing ? 'spin' : ''} /></button>
           <Link href="/home" className="customer-link"><ArrowLeft size={16} /> Customer Experience</Link>
           <button className="icon-button" onClick={signOut} aria-label="Sign out"><LogOut size={17} /></button>
