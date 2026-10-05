@@ -132,7 +132,7 @@ export async function POST(request) {
   if (merchantId) {
     const { error: merchantError } = await auth.admin
       .from('merchants')
-      .update({ owner_id: ownerId, approved: true, active: true })
+      .update({ owner_id: ownerId, approved: false, active: false })
       .eq('id', merchantId);
     if (merchantError) {
       await auth.admin.auth.admin.deleteUser(ownerId);
@@ -147,8 +147,8 @@ export async function POST(request) {
         business_name: businessName,
         phone: phone || null,
         address: branchAddress || null,
-        approved: true,
-        active: true,
+        approved: false,
+        active: false,
         slug,
         cuisine: 'fast_food',
       })
