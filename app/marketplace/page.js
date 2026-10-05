@@ -239,31 +239,56 @@ function MarketplaceContent() {
       return;
     }
 
-    const [{ data: rs, error: re }, { data: ps, error: pe }] = await Promise.all([
-      supabase.from('retailers')
-        .select('id,name,slug,marketplace_category,shopping_location,pickup_address,directions_url,logo_mark,logo_url,active')
+    const [{ data: ms, error: me }, { data: ps, error: pe }] = await Promise.all([
+      supabase.from('merchants')
+        .select('id,business_name,slug,logo_url,address,active,approved,onboarding_status,cuisine')
         .eq('active', true)
-        .eq('marketplace_category', 'fast-food')
-        .order('name'),
-      supabase.from('retailer_products')
-        .select('id,retailer_id,name,description,category,size,price,promo_price,image_url,last_verified_at,available')
+        .eq('approved', true)
+        .eq('onboarding_status', 'live')
+        .eq('cuisine', 'fast_food')
+        .order('business_name'),
+      supabase.from('products')
+        .select('id,merchant_id,name,description,category_id,price,image_url,available,updated_at,categories(name)')
         .eq('available', true)
         .order('name')
         .limit(1000),
     ]);
 
-    if (re || pe) {
+    if (me || pe) {
       setMsg('The restaurant catalogue is temporarily unavailable. Please refresh.');
       setRetailers([]);
       setProducts([]);
     } else {
-      const allowedRetailers = (rs || []).filter(r => FAST_FOOD_SLUGS.has(r.slug));
-      const allowedIds = new Set(allowedRetailers.map(r => r.id));
-      setRetailers(allowedRetailers);
-      setProducts((ps || []).filter(p => allowedIds.has(p.retailer_id)));
+      const liveMerchants = (ms || []).map(m => ({
+        id: m.id,
+        merchant_id: m.id,
+        name: m.business_name,
+        slug: m.slug || m.id,
+        marketplace_category: 'fast-food',
+        shopping_location: m.address || 'Eersterust',
+        pickup_address: m.address || '',
+        directions_url: '',
+        logo_mark: null,
+        logo_url: m.logo_url || null,
+        active: m.active,
+      }));
+      const liveIds = new Set(liveMerchants.map(r => r.id));
+      const normalizedProducts = (ps || [])
+        .filter(p => liveIds.has(p.merchant_id))
+        .map(p => ({
+          ...p,
+          retailer_id: p.merchant_id,
+          category: p.categories?.name || '',
+          size: '',
+          promo_price: null,
+          last_verified_at: p.updated_at || null,
+          merchant_id: p.merchant_id,
+        }));
+      setRetailers(liveMerchants);
+      setProducts(normalizedProducts);
 
       if (requested) {
-        const match = allowedRetailers.find(r => r.slug === requested);
+        const match = liveMerchants.find(r => r.slug === requested);
         if (match) setSelectedId(match.id);
       }
     }
@@ -386,7 +411,9 @@ function MarketplaceContent() {
       merchant: selected?.name || 'Restaurant',
       merchantName: selected?.name || 'Restaurant',
       storeName: selected?.name || 'Restaurant',
-      retailer_id: p.retailer_id,
+      retailer_id: null,
+      merchant_id: p.merchant_id || selected?.merchant_id || selected?.id || null,
+      storeId: p.merchant_id || selected?.merchant_id || selected?.id || null,
       shopping_location: selected?.shopping_location || '',
       pickup_address: selected?.pickup_address || '',
       directions_url: selected?.directions_url || '',
