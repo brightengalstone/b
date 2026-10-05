@@ -50,6 +50,8 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [newProducts, setNewProducts] = useState(true);
+  const [savingPreference, setSavingPreference] = useState(false);
 
   async function loadNotifications(userId) {
     const { data } = await supabase
@@ -76,6 +78,21 @@ export default function NotificationsPage() {
       }
 
       await loadNotifications(currentUser.id);
+      const { data: preference } = await supabase
+        .from('notification_preferences')
+        .select('new_products')
+        .eq('customer_id', currentUser.id)
+        .maybeSingle();
+      if (preference) {
+        setNewProducts(preference.new_products !== false);
+      } else {
+        const { data: createdPreference } = await supabase
+          .from('notification_preferences')
+          .insert({ customer_id: currentUser.id, new_products: true })
+          .select('new_products')
+          .single();
+        if (createdPreference) setNewProducts(createdPreference.new_products !== false);
+      }
       if (!active) return;
 
       channel = supabase
@@ -194,6 +211,34 @@ export default function NotificationsPage() {
           </div>
         </section>
 
+        <section className="notification-preferences-card">
+          <div>
+            <span className="eyebrow">Email preferences</span>
+            <h2>New product alerts</h2>
+            <p>Get an email when one of your BG Smart Services restaurants adds a new menu item.</p>
+          </div>
+          <button
+            type="button"
+            className={'notification-toggle' + (newProducts ? ' is-on' : '')}
+            onClick={async () => {
+              if (!user || savingPreference) return;
+              const next = !newProducts;
+              setSavingPreference(true);
+              const { error } = await supabase.from('notification_preferences').upsert(
+                { customer_id: user.id, new_products: next, updated_at: new Date().toISOString() },
+                { onConflict: 'customer_id' }
+              );
+              if (!error) setNewProducts(next);
+              setSavingPreference(false);
+            }}
+            aria-pressed={newProducts}
+            disabled={savingPreference}
+          >
+            <span className="notification-toggle-track"><span /></span>
+            {newProducts ? 'On' : 'Off'}
+          </button>
+        </section>
+
         <section className="notifications-content">
           <div className="notifications-toolbar">
             <div>
@@ -292,6 +337,9 @@ export default function NotificationsPage() {
         .notifications-bell-orb{width:88px;height:88px;border-radius:27px;display:grid;place-items:center;background:#06c167;color:#fff;box-shadow:0 0 0 10px rgba(6,193,103,.1),0 20px 48px rgba(0,0,0,.32);animation:notificationsFloat 3s ease-in-out infinite}
         .notifications-orbit-dot{position:absolute;width:9px;height:9px;border-radius:50%;background:#06c167;box-shadow:0 0 0 5px rgba(6,193,103,.1)}
         .notifications-orbit-dot.dot-one{top:31px;left:54px}.notifications-orbit-dot.dot-two{right:25px;top:112px}.notifications-orbit-dot.dot-three{bottom:42px;left:79px}
+        .notification-preferences-card{max-width:900px;margin:0 auto 18px;padding:19px 20px;display:flex;align-items:center;justify-content:space-between;gap:20px;background:#fff;border:1px solid #e2e6ea;border-radius:17px;box-shadow:0 7px 24px rgba(16,24,40,.045)}
+        .notification-preferences-card h2{margin:6px 0 4px;font-size:17px;letter-spacing:-.4px}.notification-preferences-card p{margin:0;color:#667085;font-size:11px;line-height:1.5}
+        .notification-toggle{display:flex;align-items:center;gap:8px;flex:none;border:0;background:transparent;color:#667085;font-size:10px;font-weight:900}.notification-toggle-track{width:42px;height:24px;padding:3px;border-radius:99px;background:#d7dcd9;transition:.2s}.notification-toggle-track span{display:block;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.2s}.notification-toggle.is-on{color:#078b4b}.notification-toggle.is-on .notification-toggle-track{background:#06c167}.notification-toggle.is-on .notification-toggle-track span{transform:translateX(18px)}
         .notifications-content{max-width:900px;margin:0 auto}
         .notifications-toolbar{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:0 0 15px}
         .notifications-toolbar h2{margin:7px 0 0;font-size:27px;letter-spacing:-1.1px}
