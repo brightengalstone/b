@@ -82,9 +82,9 @@ function ProductImage({ product, selected, className = '' }) {
 
   if (!src || failed) {
     return (
-      <div className="product-image-placeholder" aria-label="Product image unavailable">
+      <div className="product-image-placeholder" aria-label="Product photo coming soon">
         <Store size={24} />
-        <span>Product image unavailable</span>
+        <span>Product photo coming soon</span>
       </div>
     );
   }
