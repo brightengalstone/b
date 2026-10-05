@@ -245,3 +245,26 @@
   .admin-grouped-nav{padding:9px 0 4px!important}
   .admin-nav-group-title{padding-left:8px!important;padding-right:8px!important}
 }
+
+
+/* BG Admin 2.0 — operations + insights */
+.admin-hero-strip{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 24px;margin-bottom:18px;border:1px solid rgba(25,199,122,.16);border-radius:22px;background:linear-gradient(135deg,#ffffff 0%,#effaf5 100%);box-shadow:0 10px 28px rgba(13,36,24,.05)}
+.admin-hero-strip h2{margin:4px 0 5px;font-size:22px;letter-spacing:-.04em}.admin-hero-strip span{color:#667085;font-size:12px}
+.admin-insight-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,.8fr);gap:20px;margin-bottom:20px}
+.admin-hour-chart{height:190px;display:flex;align-items:flex-end;gap:5px;padding:20px 18px 10px;border-bottom:1px solid #eef0f4}
+.admin-hour-bar{height:100%;flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;min-width:0}
+.admin-hour-bar span{display:block;width:100%;max-width:22px;border-radius:6px 6px 2px 2px;background:#19c77a;min-height:4px;transition:height .3s ease}
+.admin-hour-bar small{font-size:8px;color:#98a2b3}
+.admin-insight-callout{display:grid;grid-template-columns:auto 1fr;gap:3px 8px;margin:0 18px 18px;padding:12px 13px;border-radius:13px;background:#f4fbf7;color:#344054}
+.admin-insight-callout svg{grid-row:1 / span 2;color:#0b9f50}.admin-insight-callout strong{font-size:11px}.admin-insight-callout span{font-size:10px;color:#667085}
+.admin-top-products{padding:8px 18px 18px;display:grid;gap:2px}
+.admin-top-product{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #f0f2f5}
+.admin-top-product:last-child{border-bottom:0}.admin-top-product>b{width:24px;height:24px;border-radius:8px;background:#f2f4f7;display:grid;place-items:center;font-size:10px;color:#475467}
+.admin-top-product>div{display:grid;gap:3px;min-width:0}.admin-top-product strong{font-size:11px;color:#101828;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.admin-top-product span{font-size:10px;color:#667085}
+.admin-live-drivers{padding:8px 14px 14px;display:grid;gap:7px}
+.admin-live-driver{width:100%;border:1px solid #e8ebf0;background:#fff;border-radius:13px;padding:11px 12px;display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer}
+.admin-live-driver:hover,.admin-live-driver.active{border-color:#19c77a;background:#f5fcf8}.admin-live-driver>div{min-width:0;display:grid;gap:3px;flex:1}.admin-live-driver strong{font-size:11px;color:#101828}.admin-live-driver span:not(.admin-live-dot){font-size:10px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.admin-live-dot{width:8px;height:8px;border-radius:50%;background:#19c77a;box-shadow:0 0 0 4px rgba(25,199,122,.12);flex:0 0 auto}
+.admin-live-drivers+.bg-live-map{margin:0 14px 14px!important;border-radius:15px;overflow:hidden}
+@media(max-width:950px){.admin-insight-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.admin-hero-strip{align-items:flex-start;flex-direction:column;padding:18px}.admin-hero-strip .admin-secondary{width:100%}.admin-hour-chart{height:155px;gap:2px;padding-left:10px;padding-right:10px}.admin-hour-bar span{max-width:14px}}
