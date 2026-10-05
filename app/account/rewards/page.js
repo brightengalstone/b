@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Gift, History, ShoppingBag, Truck, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Gift, History, ShoppingBag, Truck, CheckCircle2, Sparkles, ChevronRight, Clock3 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import './rewards.css';
 
 const rewards = [
-  { points: 100, credit: 10, title: 'R10 delivery credit' },
-  { points: 200, credit: 20, title: 'R20 delivery credit' },
-  { points: 300, credit: 30, title: 'R30 delivery credit' },
+  { points: 100, credit: 10, title: 'R10 delivery credit', label: 'Quick saving' },
+  { points: 200, credit: 20, title: 'R20 delivery credit', label: 'Bigger saving' },
+  { points: 300, credit: 30, title: 'R30 delivery credit', label: 'Best value' },
 ];
 
 export default function RewardsPage() {
@@ -18,6 +18,7 @@ export default function RewardsPage() {
   const [history, setHistory] = useState([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('success');
 
   async function load() {
     if (!supabase) return;
@@ -34,97 +35,142 @@ export default function RewardsPage() {
 
   useEffect(() => { load(); }, []);
 
-  async function redeem(points) {
+  async function redeem(pointsToRedeem) {
     setBusy(true);
     setMessage('');
-    const { error } = await supabase.rpc('redeem_bg_reward', { p_points: points });
-    if (error) setMessage(error.message.includes('NOT_ENOUGH_POINTS') ? 'You do not have enough BG Points for that reward yet.' : 'We could not redeem that reward. Please try again.');
-    else {
-      setMessage('Reward added to your BG delivery credits. It will be available automatically at checkout.');
+    const { error } = await supabase.rpc('redeem_bg_reward', { p_points: pointsToRedeem });
+    if (error) {
+      setMessageType('error');
+      setMessage(error.message.includes('NOT_ENOUGH_POINTS') ? 'You do not have enough BG Points for that reward yet.' : 'We could not redeem that reward. Please try again.');
+    } else {
+      setMessageType('success');
+      setMessage('Your delivery credit is ready and will be applied automatically at checkout.');
       await load();
     }
     setBusy(false);
   }
 
   const points = Number(account.points || 0);
-  const next = rewards.find(r => r.points > points) || rewards[rewards.length - 1];
-  const previous = rewards.filter(r => r.points <= points).pop();
+  const credit = Number(account.delivery_credit || 0);
+  const next = rewards.find((reward) => reward.points > points);
   const progressTarget = next?.points || 300;
   const progress = Math.min(100, Math.round((points / progressTarget) * 100));
+  const pointsToNext = next ? Math.max(0, next.points - points) : 0;
 
-  if (!user) return <main className="rewards-page"><div className="rewards-shell"><div className="rewards-loading">Loading BG Rewards…</div></div></main>;
+  const historyLabel = (reason) => {
+    if (reason === 'order_completed') return 'Order completed';
+    if (reason === 'reward_redeemed') return 'Reward redeemed';
+    if (reason === 'delivery_credit_used') return 'Delivery credit used';
+    return 'BG Rewards activity';
+  };
+
+  if (!user) return <main className="rewards-page"><div className="rewards-shell"><div className="rewards-loading">Loading BG Rewards...</div></div></main>;
 
   return (
     <main className="rewards-page">
       <div className="rewards-shell">
         <header className="rewards-topbar">
-          <Link href="/account" className="rewards-back"><ArrowLeft size={17} /> Account</Link>
+          <Link href="/account" className="rewards-back"><ArrowLeft size={17} /><span>Account</span></Link>
           <div className="rewards-brand"><span className="brand-mark">BG</span><span>Smart Services</span></div>
         </header>
 
         <section className="rewards-hero">
-          <div>
-            <span className="eyebrow">BG REWARDS</span>
-            <h1>Every order gives you something back.</h1>
-            <p>Complete deliveries, earn BG Points and turn your points into delivery credit.</p>
+          <div className="rewards-hero-copy">
+            <div className="rewards-kicker"><Sparkles size={14} /><span>BG REWARDS</span></div>
+            <h1>Order more.<br />Get rewarded.</h1>
+            <p>Every completed BG Smart Services order helps you earn BG Points that can become real delivery savings.</p>
+            <div className="rewards-hero-stats">
+              <div><strong>{points}</strong><span>BG Points</span></div>
+              <div><strong>R{credit.toFixed(2)}</strong><span>Delivery credit</span></div>
+            </div>
           </div>
-          <div className="rewards-points-card">
-            <span className="rewards-icon"><Gift size={22} /></span>
-            <small>Your BG Points</small>
+
+          <div className="rewards-balance-card">
+            <div className="balance-card-top"><span className="balance-icon"><Gift size={21} /></span><span>YOUR BALANCE</span></div>
             <strong>{points}</strong>
-            <span>points</span>
+            <span className="balance-points-label">BG Points</span>
+            <div className="balance-divider" />
+            <div className="balance-credit"><Truck size={17} /><span><small>Available delivery credit</small><b>R{credit.toFixed(2)}</b></span></div>
           </div>
         </section>
 
-        {message && <div className="rewards-message"><CheckCircle2 size={17} /> {message}</div>}
+        {message && <div className={messageType === 'error' ? 'rewards-message error' : 'rewards-message'}><CheckCircle2 size={17} /><span>{message}</span></div>}
 
-        <section className="rewards-credit-card">
-          <div><Truck size={20} /><span><small>Available delivery credit</small><strong>R{Number(account.delivery_credit || 0).toFixed(2)}</strong></span></div>
-          <p>Use your saved credit automatically on a future delivery.</p>
-        </section>
-
-        <section className="rewards-progress">
-          <div className="rewards-section-head"><div><span className="eyebrow">KEEP GOING</span><h2>Your next reward</h2></div><strong>{Math.max(0, progressTarget - points)} points to go</strong></div>
+        <section className="rewards-progress rewards-panel">
+          <div className="rewards-section-head">
+            <div><span className="eyebrow">YOUR PROGRESS</span><h2>{next ? 'Your next reward' : 'All rewards unlocked'}</h2></div>
+            <strong>{next ? pointsToNext + ' points to go' : '300+ points'}</strong>
+          </div>
+          <div className="progress-value-row"><span>{points} points</span><span>{progressTarget} points</span></div>
           <div className="reward-progress-track"><span style={{ width: progress + '%' }} /></div>
-          <div className="reward-progress-labels"><span>{previous ? previous.title : 'Start earning'}</span><span>{next.title}</span></div>
+          <div className="reward-progress-bottom">
+            <span>{next ? 'Reach ' + next.points + ' points' : 'Keep earning for future rewards'}</span>
+            <b>{next ? next.title : 'R30 delivery credit unlocked'}</b>
+          </div>
         </section>
 
-        <section className="rewards-section">
-          <div className="rewards-section-head"><div><span className="eyebrow">REDEEM</span><h2>Choose your reward</h2></div><span>More orders = more savings</span></div>
+        <section className="rewards-section rewards-panel">
+          <div className="rewards-section-head">
+            <div><span className="eyebrow">REDEEM YOUR POINTS</span><h2>Choose your reward</h2></div>
+            <span>Points can become delivery savings.</span>
+          </div>
+
           <div className="rewards-grid">
-            {rewards.map(reward => {
+            {rewards.map((reward) => {
               const canRedeem = points >= reward.points;
               return (
                 <article className={canRedeem ? 'reward-card ready' : 'reward-card'} key={reward.points}>
-                  <div className="reward-card-icon"><Gift size={20} /></div>
-                  <div><strong>{reward.title}</strong><span>{reward.points} BG Points</span></div>
-                  <button disabled={!canRedeem || busy} onClick={() => redeem(reward.points)}>
-                    {canRedeem ? 'Redeem' : reward.points - points + ' more'}
-                  </button>
+                  <div className="reward-card-top">
+                    <span className="reward-card-icon"><Gift size={19} /></span>
+                    {canRedeem && <span className="reward-ready">READY</span>}
+                  </div>
+                  <span className="reward-card-label">{reward.label}</span>
+                  <strong>{reward.title}</strong>
+                  <p>Use it automatically toward a future delivery.</p>
+                  <div className="reward-card-footer">
+                    <span>{reward.points} BG Points</span>
+                    <button disabled={!canRedeem || busy} onClick={() => redeem(reward.points)}>
+                      {canRedeem ? 'Redeem' : (reward.points - points) + ' more'}
+                      {canRedeem && <ChevronRight size={15} />}
+                    </button>
+                  </div>
                 </article>
               );
             })}
           </div>
         </section>
 
-        <section className="rewards-how">
-          <div className="rewards-section-head"><div><span className="eyebrow">HOW IT WORKS</span><h2>Simple rewards</h2></div></div>
+        <section className="rewards-how rewards-panel">
+          <div className="rewards-section-head"><div><span className="eyebrow">HOW BG REWARDS WORKS</span><h2>Simple. Automatic. Worth it.</h2></div></div>
           <div className="rewards-steps">
-            <div><span>01</span><ShoppingBag size={19} /><strong>Order</strong><p>Complete a BG Smart Services order.</p></div>
-            <div><span>02</span><Gift size={19} /><strong>Earn</strong><p>Get at least 10 BG Points when your order is delivered.</p></div>
-            <div><span>03</span><Truck size={19} /><strong>Save</strong><p>Redeem points for delivery credit on your next order.</p></div>
+            <div><span className="step-number">01</span><ShoppingBag size={19} /><strong>Place an order</strong><p>Order your favourite food through BG Smart Services.</p></div>
+            <div><span className="step-number">02</span><Gift size={19} /><strong>Earn BG Points</strong><p>Points are added automatically when your order is delivered.</p></div>
+            <div><span className="step-number">03</span><Truck size={19} /><strong>Save on delivery</strong><p>Redeem points and your delivery credit is applied at checkout.</p></div>
           </div>
         </section>
 
-        <section className="rewards-history">
-          <div className="rewards-section-head"><div><span className="eyebrow">ACTIVITY</span><h2>Points history</h2></div><History size={19} /></div>
-          {!history.length ? <p className="rewards-empty">Your completed orders will appear here.</p> : history.map((item, index) => (
-            <div className="reward-history-row" key={index}>
-              <span className={item.points_delta < 0 ? 'history-icon spent' : 'history-icon'}><Gift size={16} /></span>
-              <div><strong>{item.reason === 'order_completed' ? 'Completed order' : item.reason === 'reward_redeemed' ? 'Reward redeemed' : 'Delivery credit used'}</strong><small>{new Date(item.created_at).toLocaleDateString('en-ZA')}</small></div>
-              <b className={item.points_delta < 0 ? 'negative' : ''}>{item.points_delta > 0 ? '+' : ''}{item.points_delta} pts</b>
+        <section className="rewards-history rewards-panel">
+          <div className="rewards-section-head"><div><span className="eyebrow">RECENT ACTIVITY</span><h2>Your BG Rewards history</h2></div><History size={19} /></div>
+
+          {!history.length ? (
+            <div className="rewards-empty"><Clock3 size={20} /><div><strong>Your rewards activity will appear here.</strong><span>Complete your first BG Smart Services order to start earning.</span></div></div>
+          ) : (
+            <div className="reward-history-list">
+              {history.map((item, index) => {
+                const positive = Number(item.points_delta || 0) > 0;
+                const pointsDelta = Number(item.points_delta || 0);
+                return (
+                  <div className="reward-history-row" key={item.created_at + '-' + index}>
+                    <span className={positive ? 'history-icon' : 'history-icon spent'}><Gift size={16} /></span>
+                    <div><strong>{historyLabel(item.reason)}</strong><small>{new Date(item.created_at).toLocaleDateString('en-ZA')}</small></div>
+                    <b className={positive ? 'positive' : 'negative'}>{pointsDelta > 0 ? '+' : ''}{pointsDelta} pts</b>
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          )}
+
+          {history.length > 0 && <div className="rewards-history-note"><CheckCircle2 size={15} /><span>Your latest rewards activity is shown above.</span></div>}
         </section>
       </div>
     </main>
