@@ -131,7 +131,7 @@ export default function RestaurantDashboardPage() {
     setError('');
     const { data, error: updateError } = await supabase
       .from('merchants')
-      .update({ active: true, onboarding_status: 'live', go_live_at: new Date().toISOString(), onboarding_updated_at: new Date().toISOString() })
+      .update({ active: false, onboarding_status: 'ready', onboarding_updated_at: new Date().toISOString() })
       .eq('id', merchant.id)
       .eq('owner_id', user.id)
       .select('id, business_name, description, phone, address, approved, active, logo_url, cuisine, onboarding_status, agreement_signed, info_form_completed, menu_setup_completed, test_order_completed, driver_test_completed, delivery_test_completed, go_live_at')
@@ -287,7 +287,7 @@ export default function RestaurantDashboardPage() {
               return <article className={'restaurant-onboarding-step ' + (done ? 'done' : '')} key={column}><span className="restaurant-step-number">{done ? '✓' : index + 1}</span><div><strong>{title}</strong><small>{description}</small></div>{done ? <span className="step-complete">Completed</span> : <button className="step-action" onClick={() => completeOnboardingStage(column)}>Mark complete</button>}</article>;
             })}
           </div>
-          <div className="restaurant-onboarding-footer"><div><strong>{onboardingStages.filter(([column]) => merchant?.[column]).length}/6 completed</strong><span>{merchant?.active ? 'Your restaurant is live and can receive orders.' : 'Once all six checks are complete, request go-live.'}</span></div><button className="primary-button" disabled={merchant?.active || !onboardingStages.every(([column]) => merchant?.[column])} onClick={requestGoLive}>{merchant?.active ? 'Restaurant LIVE' : 'Go live'}</button></div>
+          <div className="restaurant-onboarding-footer"><div><strong>{onboardingStages.filter(([column]) => merchant?.[column]).length}/6 completed</strong><span>{merchant?.active ? 'Your restaurant is live and can receive orders.' : merchant?.onboarding_status === 'ready' ? 'Submitted for final BG Smart Services approval.' : 'Once all six checks are complete, request go-live.'}</span></div><button className="primary-button" disabled={merchant?.active || merchant?.onboarding_status === 'ready' || !onboardingStages.every(([column]) => merchant?.[column])} onClick={requestGoLive}>{merchant?.active ? 'Restaurant LIVE' : merchant?.onboarding_status === 'ready' ? 'Awaiting approval' : 'Request go-live'}</button></div>
         </section>
       )}
 
