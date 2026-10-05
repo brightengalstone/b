@@ -7,13 +7,18 @@ export const metadata = {
   title: 'BG Smart Services',
   description: 'Local shopping, delivered in Eersterust.',
   applicationName: 'BG Smart Services',
+  manifest: '/manifest.webmanifest',
+  icons: {
+    icon: '/icon.svg',
+    apple: '/apple-icon.svg',
+  },
 };
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#101828',
+  themeColor: '#18c968',
 };
 
 export default function Layout({ children }) {
