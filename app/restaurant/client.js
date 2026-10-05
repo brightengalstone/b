@@ -163,6 +163,13 @@ export default function RestaurantDashboardPage() {
         : [...current, result.data].sort((a, b) => a.name.localeCompare(b.name)));
       setShowProductForm(false);
       setProductForm(EMPTY_PRODUCT);
+
+      if (!productForm.id && result.data?.available) {
+        const { error: notifyError } = await supabase.functions.invoke('notify-new-product', {
+          body: { product_id: result.data.id },
+        });
+        if (notifyError) setError('Product added successfully, but customer notifications could not be sent yet.');
+      }
     }
     setSavingProduct(false);
   }
