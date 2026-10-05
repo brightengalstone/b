@@ -208,6 +208,15 @@ export default function RestaurantDashboardPage() {
 
   return (
     <main className="restaurant-shell">
+      <header className="restaurant-header">
+        <div className="restaurant-brand"><span>BG</span><div><strong>{merchant?.business_name || 'Restaurant'}</strong><small>RESTAURANT PORTAL</small></div></div>
+        <div className="restaurant-header-actions">
+          <button className="icon-button" onClick={() => load(true)} aria-label="Refresh"><RefreshCw size={17} className={refreshing ? 'spin' : ''} /></button>
+          <Link href="/home" className="customer-link"><ArrowLeft size={16} /> Customer Experience</Link>
+          <button className="icon-button" onClick={signOut} aria-label="Sign out"><LogOut size={17} /></button>
+        </div>
+      </header>
+
       {error && <div className="restaurant-alert"><XCircle size={17} />{error}</div>}
 
       <section className="restaurant-welcome">
