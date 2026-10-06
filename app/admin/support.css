@@ -749,3 +749,44 @@
 @media(max-width:900px){
   .admin-more-menu{margin-left:0;padding-left:0;border-left:0}
 }
+
+
+/* Premium mobile admin */
+.admin-mobile-menu-button{display:none}
+.admin-mobile-backdrop{display:none}
+.admin-shell{background:#f7f9f8}
+.admin-sidebar{background:rgba(255,255,255,.96);border-right:1px solid #e5ebe8;backdrop-filter:blur(12px)}
+.admin-brand-mark{box-shadow:0 8px 18px rgba(24,59,49,.14)}
+.admin-kpi-card{transition:transform .18s ease,box-shadow .18s ease}
+.admin-kpi-card:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(25,40,35,.07)}
+.admin-table-wrap{border-radius:12px;border:1px solid #edf1ef;overflow:auto}
+@media(max-width:640px){
+  .admin-mobile-menu-button{
+    display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;
+    border:1px solid #dfe6e2;border-radius:11px;background:#fff;color:#183b31;
+    box-shadow:0 3px 12px rgba(25,40,35,.05);cursor:pointer;
+  }
+  .admin-mobile-backdrop{
+    display:block;position:fixed;inset:0;background:rgba(15,28,24,.38);
+    border:0;padding:0;margin:0;z-index:90;backdrop-filter:blur(2px);
+  }
+  .admin-shell.mobile-menu-open .admin-sidebar{
+    display:flex;position:fixed;left:0;top:0;bottom:0;width:min(82vw,310px);
+    z-index:100;padding:20px 14px;box-shadow:18px 0 45px rgba(10,30,24,.18);
+    animation:adminMenuIn .2s ease-out;
+  }
+  .admin-shell.mobile-menu-open .admin-sidebar-brand{
+    justify-content:flex-start;padding:4px 6px 24px;
+  }
+  .admin-shell.mobile-menu-open .admin-sidebar-brand>div:last-child,
+  .admin-shell.mobile-menu-open .admin-nav-item span,
+  .admin-shell.mobile-menu-open .admin-sidebar-bottom .admin-nav-item span{
+    display:block;
+  }
+  .admin-shell.mobile-menu-open .admin-nav-item{justify-content:flex-start;padding:0 11px}
+  .admin-shell.mobile-menu-open .admin-sidebar-bottom .admin-nav-item{justify-content:flex-start}
+  .admin-shell.mobile-menu-open .admin-nav-item em{position:static;margin-left:auto}
+  .admin-shell.mobile-menu-open .admin-sidebar-tools{display:none}
+  .admin-shell.mobile-menu-open .admin-more-menu{margin-left:8px;padding-left:8px;border-left:1px solid #e5ebe8}
+}
+@keyframes adminMenuIn{from{transform:translateX(-100%);opacity:.7}to{transform:translateX(0);opacity:1}}
