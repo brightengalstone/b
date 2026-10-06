@@ -727,3 +727,25 @@
   .admin-command-bar{display:block}
   .admin-command-actions{margin-top:12px}
 }
+
+
+/* Admin navigation cleanup */
+.admin-more-menu{
+  display:grid;
+  gap:3px;
+  margin:0 0 4px 8px;
+  padding:4px 0 4px 8px;
+  border-left:1px solid #e5ebe8;
+}
+.admin-more-menu .admin-nav-item{
+  min-height:36px;
+  font-size:12px;
+}
+.admin-more-chevron{
+  margin-left:auto;
+  transition:transform .16s ease;
+}
+.admin-more-chevron.open{transform:rotate(180deg)}
+@media(max-width:900px){
+  .admin-more-menu{margin-left:0;padding-left:0;border-left:0}
+}
