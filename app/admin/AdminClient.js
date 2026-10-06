@@ -70,6 +70,7 @@ export default function AdminPage() {
   const [profile, setProfile] = useState(null);
   const [active, setActive] = useState('overview');
   const [moreOpen, setMoreOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [creatingDriver, setCreatingDriver] = useState(false);
@@ -703,7 +704,8 @@ export default function AdminPage() {
   const customerById = Object.fromEntries(data.customers.map((customer) => [customer.id, customer]));
 
   return (
-    <main className="admin-shell">
+    <main className={mobileMenuOpen ? "admin-shell mobile-menu-open" : "admin-shell"}>
+      {mobileMenuOpen && <button className="admin-mobile-backdrop" aria-label="Close menu" onClick={() => setMobileMenuOpen(false)} />}
       <aside className="admin-sidebar">
         <div className="admin-sidebar-brand">
           <div className="admin-brand-mark">BG</div>
@@ -711,7 +713,7 @@ export default function AdminPage() {
         </div>
         <nav className="admin-simple-nav" aria-label="Admin navigation">
           {NAV.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" className={active === id ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => { setActive(id); setMoreOpen(false); }}>
+            <button key={id} type="button" className={active === id ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => { setActive(id); setMoreOpen(false); setMobileMenuOpen(false); }}>
               <Icon size={17} /><span>{label}</span>
               {id === 'orders' && stats.pending > 0 && <em>{stats.pending}</em>}
             </button>
@@ -721,7 +723,7 @@ export default function AdminPage() {
           </button>
           {moreOpen && <div className="admin-more-menu">
             {MORE_NAV.map(({ id, label, icon: Icon }) => (
-              <button key={id} type="button" className={active === id ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => { setActive(id); setMoreOpen(false); }}>
+              <button key={id} type="button" className={active === id ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => { setActive(id); setMoreOpen(false); setMobileMenuOpen(false); }}>
                 <Icon size={16} /><span>{label}</span>
                 {id === 'support' && data.supportRequests.filter((request) => request.status !== 'closed').length > 0 && <em>{data.supportRequests.filter((request) => request.status !== 'closed').length}</em>}
               </button>
@@ -737,6 +739,7 @@ export default function AdminPage() {
 
       <section className="admin-main">
         <header className="admin-header admin-simple-header">
+          <button className="admin-mobile-menu-button" type="button" onClick={() => setMobileMenuOpen(true)} aria-label="Open admin menu"><Menu size={20} /></button>
           <div className="admin-header-copy">
             <p className="admin-kicker">BG SMART SERVICES</p>
             <h1>{active === 'overview' ? 'Good to see you' : NAV.find((item) => item.id === active)?.label || 'Admin'}</h1>
