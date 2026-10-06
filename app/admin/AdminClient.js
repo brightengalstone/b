@@ -32,16 +32,15 @@ import {
 import { supabase } from '../../lib/supabase';
 const LiveDeliveryMap = dynamic(() => import('../../components/LiveDeliveryMap'), { ssr: false, loading: () => <div className="bg-live-map">Loading live map…</div> });
 
-const NAV_GROUPS = [
-  { id: 'main', label: 'Main', items: [{ id: 'overview', label: 'Overview', icon: BarChart3 }] },
-  { id: 'orders', label: 'Orders', items: [{ id: 'orders', label: 'All Orders', icon: Package }, { id: 'delivery', label: 'Delivery', icon: Truck }] },
-  { id: 'marketplace', label: 'Marketplace', items: [{ id: 'shops', label: 'Shops', icon: Store }, { id: 'products', label: 'Products', icon: ShoppingBag }] },
-  { id: 'customers', label: 'Customers', items: [{ id: 'customers', label: 'Customer Management', icon: Users }, { id: 'support', label: 'Support', icon: MessageSquare }] },
-  { id: 'finance', label: 'Finance', items: [{ id: 'payments', label: 'Payments', icon: CircleDollarSign }, { id: 'payroll', label: 'Driver Payroll', icon: FileText }] },
-  { id: 'drivers', label: 'Drivers', items: [{ id: 'drivers', label: 'Driver Management', icon: UserRoundCheck }] },
+const NAV = [
+  { id: 'overview', label: 'Dashboard', icon: BarChart3 },
+  { id: 'orders', label: 'Orders', icon: Package },
+  { id: 'shops', label: 'Restaurants', icon: Store },
+  { id: 'customers', label: 'Customers', icon: Users },
+  { id: 'drivers', label: 'Drivers', icon: UserRoundCheck },
+  { id: 'payments', label: 'Payments', icon: CircleDollarSign },
+  { id: 'support', label: 'Support', icon: MessageSquare },
 ];
-
-const NAV = NAV_GROUPS.flatMap((group) => group.items);
 const ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'assigned', 'picked_up', 'delivered', 'cancelled'];
 
 function money(value) {
@@ -62,7 +61,6 @@ export default function AdminPage() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [active, setActive] = useState('overview');
-  const [openNavGroups, setOpenNavGroups] = useState({ main: true, orders: true, marketplace: true, customers: true, finance: false, drivers: false });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [creatingDriver, setCreatingDriver] = useState(false);
@@ -698,73 +696,74 @@ export default function AdminPage() {
   return (
     <main className="admin-shell">
       <aside className="admin-sidebar">
-        <div className="admin-logo">
+        <div className="admin-sidebar-brand">
           <div className="admin-brand-mark">BG</div>
-          <div><strong>BG Smart</strong><span>Admin Console</span></div>
+          <div>
+            <strong>BG Smart Services</strong>
+            <span>Admin</span>
+          </div>
         </div>
 
-        <nav className="admin-nav admin-grouped-nav">
-          {NAV_GROUPS.map((group) => {
-            const groupOpen = openNavGroups[group.id];
-            const groupActive = group.items.some((item) => item.id === active);
-            return (
-              <div className={groupActive ? 'admin-nav-group active-group' : 'admin-nav-group'} key={group.id}>
-                <button
-                  type="button"
-                  className="admin-nav-group-title"
-                  onClick={() => setOpenNavGroups((current) => ({ ...current, [group.id]: !current[group.id] }))}
-                  aria-expanded={groupOpen}
-                >
-                  <span>{group.label}</span>
-                  <ChevronRight size={15} className={groupOpen ? 'admin-nav-chevron open' : 'admin-nav-chevron'} />
-                </button>
-                {groupOpen && (
-                  <div className="admin-nav-submenu">
-                    {group.items.map(({ id, label, icon: Icon }) => (
-                      <button key={id} className={active === id ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => setActive(id)}>
-                        <Icon size={17} />
-                        <span>{label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="admin-sidebar-label">Workspace</div>
+        <nav className="admin-nav admin-simple-nav">
+          {NAV.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              className={active === id ? 'admin-nav-item active' : 'admin-nav-item'}
+              onClick={() => setActive(id)}
+            >
+              <Icon size={18} />
+              <span>{label}</span>
+              {id === 'orders' && stats.pending > 0 && <em>{stats.pending}</em>}
+              {id === 'support' && data.supportRequests.filter((request) => request.status !== 'closed').length > 0 && (
+                <em>{data.supportRequests.filter((request) => request.status !== 'closed').length}</em>
+              )}
+            </button>
+          ))}
         </nav>
 
+        <div className="admin-sidebar-divider" />
+
+        <div className="admin-sidebar-tools">
+          <button className="admin-nav-item" onClick={() => setActive('products')}>
+            <ShoppingBag size={18} /><span>Products</span>
+          </button>
+          <button className="admin-nav-item" onClick={() => setActive('delivery')}>
+            <Truck size={18} /><span>Delivery</span>
+          </button>
+          <button className="admin-nav-item" onClick={() => setActive('payroll')}>
+            <FileText size={18} /><span>Driver payouts</span>
+          </button>
+        </div>
+
         <div className="admin-sidebar-bottom">
-          <Link className="admin-nav-item" href="/admin/restaurants"><Store size={18} /><span>Restaurant Partners</span></Link>
-          <Link className="admin-nav-item admin-customer-experience-link" href="/home"><ArrowLeft size={18} /><span>Customer Experience</span></Link>
-          <button className={active === 'settings' ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => setActive('settings')}><Settings size={18} /><span>Settings</span></button>
+          <Link className="admin-nav-item" href="/admin/restaurants"><Store size={18} /><span>Restaurant portal</span></Link>
+          <Link className="admin-nav-item" href="/home"><ArrowLeft size={18} /><span>Customer view</span></Link>
+          <button className={active === 'settings' ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => setActive('settings')}>
+            <Settings size={18} /><span>Settings</span>
+          </button>
           <button className="admin-nav-item danger" onClick={signOut}><LogOut size={18} /><span>Sign out</span></button>
         </div>
       </aside>
 
       <section className="admin-main">
-        <header className="admin-header admin-modern-header">
+        <header className="admin-header admin-simple-header">
           <div className="admin-header-copy">
-            <div className="admin-header-title-row">
-              <div className="admin-brand-mark admin-header-mark">BG</div>
-              <div>
-                <p className="admin-kicker">BG SMART SERVICES · OPERATIONS</p>
-                <h1>Operations Center</h1>
-                <p className="admin-header-subtitle">A clear view of orders, customers, restaurants and delivery activity.</p>
-              </div>
-            </div>
+            <p className="admin-kicker">BG SMART SERVICES</p>
+            <h1>{active === 'overview' ? 'Good to see you' : NAV.find((item) => item.id === active)?.label || 'Admin'}</h1>
+            <p className="admin-header-subtitle">
+              {active === 'overview' ? 'Here is what is happening across your business today.' : 'Manage BG Smart Services from one place.'}
+            </p>
           </div>
           <div className="admin-header-actions">
-            <Link className="admin-mobile-customer-link" href="/home" aria-label="Go to customer experience">
-              <ArrowLeft size={16} />
-              <span>Customer Experience</span>
-            </Link>
+            <button className="admin-icon-button" onClick={() => loadDashboard(true)} title="Refresh" aria-label="Refresh">
+              <RefreshCw size={18} className={refreshing ? 'admin-spin' : ''} />
+            </button>
             <div className="admin-user-chip">
               <span className="admin-online-dot" />
               <div><strong>{profile.full_name || 'Administrator'}</strong><span>{user.email}</span></div>
             </div>
-            <button className="admin-icon-button" onClick={() => loadDashboard(true)} title="Refresh dashboard" aria-label="Refresh dashboard">
-              <RefreshCw size={18} className={refreshing ? 'admin-spin' : ''} />
-            </button>
           </div>
         </header>
 
