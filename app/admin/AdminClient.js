@@ -742,17 +742,26 @@ export default function AdminPage() {
       </aside>
 
       <section className="admin-main">
-        <header className="admin-header">
-          <div>
-            <p className="admin-kicker">Management</p>
-            <h1>{NAV.find((item) => item.id === active)?.label || 'Settings'}</h1>
+        <header className="admin-header admin-modern-header">
+          <div className="admin-header-copy">
+            <div className="admin-header-title-row">
+              <div className="admin-brand-mark admin-header-mark">BG</div>
+              <div>
+                <p className="admin-kicker">BG SMART SERVICES · OPERATIONS</p>
+                <h1>Operations Center</h1>
+                <p className="admin-header-subtitle">A clear view of orders, customers, restaurants and delivery activity.</p>
+              </div>
+            </div>
           </div>
           <div className="admin-header-actions">
             <Link className="admin-mobile-customer-link" href="/home" aria-label="Go to customer experience">
               <ArrowLeft size={16} />
               <span>Customer Experience</span>
             </Link>
-            <span className="admin-user">{profile.full_name || user.email}</span>
+            <div className="admin-user-chip">
+              <span className="admin-online-dot" />
+              <div><strong>{profile.full_name || 'Administrator'}</strong><span>{user.email}</span></div>
+            </div>
             <button className="admin-icon-button" onClick={() => loadDashboard(true)} title="Refresh dashboard" aria-label="Refresh dashboard">
               <RefreshCw size={18} className={refreshing ? 'admin-spin' : ''} />
             </button>
@@ -763,38 +772,133 @@ export default function AdminPage() {
 
         {active === 'overview' && (
           <>
-            <div className="admin-hero-strip">
-              <div><p className="admin-kicker">Live business intelligence</p><h2>Know what BG customers want.</h2><span>Real order data, customer behaviour and delivery operations.</span></div>
-              <button className="admin-secondary" onClick={() => loadDashboard(true)}><RefreshCw size={14} /> Refresh data</button>
+            <div className="admin-command-bar">
+              <div>
+                <span className="admin-command-label">Today at a glance</span>
+                <strong>{stats.pending ? stats.pending + ' active order' + (stats.pending === 1 ? '' : 's') : 'No active orders right now'}</strong>
+                <span>{data.driverProfiles.filter((d) => d.approved && d.available).length} drivers available · {stats.shops} restaurants live · {stats.purchasingCustomers} purchasing customers</span>
+              </div>
+              <div className="admin-command-actions">
+                <button className="admin-secondary compact" onClick={() => setActive('orders')}><Package size={15} /> View orders</button>
+                <button className="admin-primary compact" onClick={() => loadDashboard(true)}><RefreshCw size={15} /> Refresh</button>
+              </div>
             </div>
-            <div className="admin-stat-grid">
-              <Stat icon={Package} label="Orders" value={stats.orders} />
-              <Stat icon={Clock3} label="In progress" value={stats.pending} />
-              <Stat icon={CircleDollarSign} label="Delivered food sales" value={money(stats.revenue)} />
-              <Stat icon={Users} label="Customers" value={stats.customers} />
-              <Stat icon={Utensils} label="Live restaurants" value={stats.shops} />
-              <Stat icon={ShoppingBag} label="Live menu items" value={stats.products} />
-              <Stat icon={UserRoundCheck} label="Drivers online" value={data.driverProfiles.filter((d) => d.approved && d.available).length} />
-              <Stat icon={LifeBuoy} label="Open support" value={data.supportRequests.filter((r) => r.status !== 'closed').length} />
+
+            <div className="admin-kpi-grid">
+              <button className="admin-kpi-card" onClick={() => setActive('orders')}>
+                <div className="admin-kpi-top"><span>Orders</span><span className="admin-kpi-icon"><Package size={17} /></span></div>
+                <strong>{stats.orders}</strong>
+                <span className="admin-kpi-meta">{stats.pending} currently active</span>
+              </button>
+              <button className="admin-kpi-card" onClick={() => setActive('payments')}>
+                <div className="admin-kpi-top"><span>Food sales</span><span className="admin-kpi-icon"><CircleDollarSign size={17} /></span></div>
+                <strong>{money(stats.revenue)}</strong>
+                <span className="admin-kpi-meta">{data.payments.filter((p) => p.status === 'paid').length} recorded paid payments</span>
+              </button>
+              <button className="admin-kpi-card" onClick={() => setActive('customers')}>
+                <div className="admin-kpi-top"><span>Customers</span><span className="admin-kpi-icon"><Users size={17} /></span></div>
+                <strong>{stats.customers}</strong>
+                <span className="admin-kpi-meta">{stats.purchasingCustomers} have completed a purchase</span>
+              </button>
+              <button className="admin-kpi-card" onClick={() => setActive('drivers')}>
+                <div className="admin-kpi-top"><span>Drivers online</span><span className="admin-kpi-icon"><Truck size={17} /></span></div>
+                <strong>{data.driverProfiles.filter((d) => d.approved && d.available).length}</strong>
+                <span className="admin-kpi-meta">{data.driverProfiles.filter((d) => d.approved).length} approved drivers</span>
+              </button>
             </div>
-            <div className="admin-insight-grid">
-              <Panel title="When customers order most" subtitle="Based on actual order creation times.">
-                <div className="admin-hour-chart">{stats.hourCounts.map((count, hour) => <div className="admin-hour-bar" key={hour}><span style={{height: Math.max(4, Math.min(100, count * 14)) + '%'}} title={hour + ':00 · ' + count + ' orders'} /><small>{String(hour).padStart(2,'0')}</small></div>)}</div>
-                <div className="admin-insight-callout"><Clock3 size={16}/><strong>{stats.peakHour.count ? String(stats.peakHour.hour).padStart(2,'0') + ':00 is currently your busiest hour' : 'Waiting for order data'}</strong><span>{stats.peakHour.count ? stats.peakHour.count + ' order' + (stats.peakHour.count === 1 ? '' : 's') + ' recorded in this hour bucket.' : 'Your dashboard will learn this automatically after real orders arrive.'}</span></div>
+
+            <div className="admin-overview-grid">
+              <Panel title="Live Orders" subtitle="The latest orders that need attention." action={() => setActive('orders')}>
+                <div className="admin-live-order-list">
+                  {data.orders.slice(0, 6).map((order) => {
+                    const customer = customerById[order.customer_id];
+                    const shop = shopById[order.retailer_id];
+                    return (
+                      <button className="admin-live-order-row" key={order.id} onClick={() => setActive('orders')}>
+                        <div className="admin-order-number">#{order.id.slice(0, 6).toUpperCase()}</div>
+                        <div className="admin-live-order-main">
+                          <strong>{customer?.full_name || 'Customer'}</strong>
+                          <span>{shop?.name || 'Restaurant'} · {formatDate(order.created_at)}</span>
+                        </div>
+                        <span className={order.status === 'delivered' ? 'admin-status success' : order.status === 'cancelled' ? 'admin-status danger' : 'admin-status neutral'}>{order.status.replaceAll('_', ' ')}</span>
+                        <strong className="admin-live-order-total">{money(order.total)}</strong>
+                      </button>
+                    );
+                  })}
+                  {!data.orders.length && <div className="admin-empty">No orders yet. New customer orders will appear here.</div>}
+                </div>
               </Panel>
-              <Panel title="Top-selling products" subtitle="Ranked by quantity sold from real order items.">
+
+              <Panel title="Live Operations" subtitle="What is happening across the delivery network.">
+                <div className="admin-operations-stack">
+                  <Operation icon={Clock3} label="Awaiting driver" value={data.orders.filter((o) => !o.driver_id && !['delivered','cancelled'].includes(o.status)).length} />
+                  <Operation icon={Truck} label="Active deliveries" value={data.orders.filter((o) => o.driver_id && !['delivered','cancelled'].includes(o.status)).length} />
+                  <Operation icon={Utensils} label="Restaurants live" value={stats.shops} />
+                  <Operation icon={LifeBuoy} label="Support requiring attention" value={data.supportRequests.filter((r) => r.status !== 'closed').length} />
+                </div>
+                <div className="admin-operation-footer">
+                  <div><span>Delivery area</span><strong>Eersterust</strong></div>
+                  <div><span>Delivery fee</span><strong>R65.00</strong></div>
+                </div>
+              </Panel>
+            </div>
+
+            <div className="admin-overview-grid">
+              <Panel title="Driver Activity" subtitle="Approved drivers and current availability." action={() => setActive('drivers')}>
+                <div className="admin-driver-activity">
+                  {data.driverProfiles.slice(0, 5).map((driver) => {
+                    const account = customerById[driver.id];
+                    return (
+                      <div className="admin-driver-activity-row" key={driver.id}>
+                        <div className="admin-avatar">{(account?.full_name || 'D').slice(0,1).toUpperCase()}</div>
+                        <div><strong>{account?.full_name || 'Driver'}</strong><span>{driver.vehicle_type || 'Delivery vehicle'}{driver.vehicle_registration ? ' · ' + driver.vehicle_registration : ''}</span></div>
+                        <span className={driver.approved && driver.available ? 'admin-status success' : driver.approved ? 'admin-status neutral' : 'admin-status muted'}>{!driver.approved ? 'Pending' : driver.available ? 'Available' : 'Offline'}</span>
+                      </div>
+                    );
+                  })}
+                  {!data.driverProfiles.length && <div className="admin-empty">No driver accounts yet.</div>}
+                </div>
+              </Panel>
+
+              <Panel title="Customer Growth" subtitle="Understand the difference between registrations and real buyers." action={() => setActive('customers')}>
+                <div className="admin-customer-metric-grid">
+                  <div><span>Registered</span><strong>{stats.customers}</strong></div>
+                  <div><span>Purchased</span><strong>{stats.purchasingCustomers}</strong></div>
+                  <div><span>No purchase</span><strong>{stats.noPurchaseCustomers}</strong></div>
+                  <div><span>Order attempts</span><strong>{stats.orderAttemptCustomers}</strong></div>
+                </div>
+                <div className="admin-progress-line">
+                  <span>Purchase conversion</span>
+                  <strong>{stats.customers ? Math.round((stats.purchasingCustomers / stats.customers) * 100) : 0}%</strong>
+                </div>
+                <div className="admin-progress-track"><span style={{ width: (stats.customers ? Math.min(100, (stats.purchasingCustomers / stats.customers) * 100) : 0) + '%' }} /></div>
+              </Panel>
+            </div>
+
+            <div className="admin-overview-grid">
+              <Panel title="Peak Ordering Time" subtitle="Based on real order creation times.">
+                <div className="admin-peak-card">
+                  <div className="admin-peak-number">{stats.peakHour.count ? String(stats.peakHour.hour).padStart(2,'0') + ':00' : '—'}</div>
+                  <div><strong>{stats.peakHour.count ? stats.peakHour.count + ' order' + (stats.peakHour.count === 1 ? '' : 's') + ' in the busiest hour bucket' : 'Waiting for order data'}</strong><span>Use this signal to plan restaurant and driver capacity.</span></div>
+                </div>
+                <div className="admin-hour-chart admin-hour-chart-modern">{stats.hourCounts.map((count, hour) => <div className="admin-hour-bar" key={hour}><span style={{height: Math.max(4, Math.min(100, count * 14)) + '%'}} title={hour + ':00 · ' + count + ' orders'} /><small>{String(hour).padStart(2,'0')}</small></div>)}</div>
+              </Panel>
+
+              <Panel title="Top Products" subtitle="Best-selling menu items from real order items.">
                 <div className="admin-top-products">{stats.topProducts.map((product, index) => <div className="admin-top-product" key={product.id}><b>{index + 1}</b><div><strong>{product.name}</strong><span>{product.quantity} sold · {money(product.revenue)}</span></div></div>)}{!stats.topProducts.length && <div className="admin-empty">No product sales yet. Real orders will populate this automatically.</div>}</div>
               </Panel>
             </div>
+
             <div className="admin-grid-two">
-              <Panel title="Live driver operations" subtitle="Only active delivery locations are shown." action={() => setActive('delivery')}>
+              <Panel title="Live Driver Map" subtitle="Only active delivery locations are shown." action={() => setActive('delivery')}>
                 <div className="admin-live-drivers">{data.driverLocations.map((location) => { const driver = customerById[location.driver_id]; const order = data.orders.find((o) => o.id === location.order_id); return <button key={location.order_id} className={selectedLiveDriver?.order_id === location.order_id ? 'admin-live-driver active' : 'admin-live-driver'} onClick={() => setSelectedLiveDriver(location)}><span className="admin-live-dot" /><div><strong>{driver?.full_name || 'BG Driver'}</strong><span>Order #{location.order_id.slice(0,8).toUpperCase()} · {order?.status?.replace('_',' ') || 'active'}</span></div><MapPinned size={15}/></button> })}{!data.driverLocations.length && <div className="admin-empty">No active driver locations right now.</div>}</div>
                 {selectedLiveDriver && <LiveDeliveryMap driverLocation={selectedLiveDriver} destination={(() => { const o=data.orders.find((x)=>x.id===selectedLiveDriver.order_id); return o?.delivery_latitude != null && o?.delivery_longitude != null ? [o.delivery_latitude,o.delivery_longitude] : null; })()} />}
               </Panel>
-              <Panel title="Recent orders" action={() => setActive('orders')}><OrderTable orders={recentOrders} shopById={shopById} customerById={customerById} updateOrder={updateOrder} /></Panel>
+              <Panel title="Recent Orders" action={() => setActive('orders')}><OrderTable orders={recentOrders} shopById={shopById} customerById={customerById} updateOrder={updateOrder} /></Panel>
             </div>
           </>
         )}
+
         {active === 'orders' && (
           <Panel title="All orders" subtitle="Monitor and manage every BG Smart Services order.">
             <OrderTable orders={data.orders} shopById={shopById} customerById={customerById} updateOrder={updateOrder} detailed />
