@@ -268,3 +268,56 @@
 .admin-live-drivers+.bg-live-map{margin:0 14px 14px!important;border-radius:15px;overflow:hidden}
 @media(max-width:950px){.admin-insight-grid{grid-template-columns:1fr}}
 @media(max-width:650px){.admin-hero-strip{align-items:flex-start;flex-direction:column;padding:18px}.admin-hero-strip .admin-secondary{width:100%}.admin-hour-chart{height:155px;gap:2px;padding-left:10px;padding-right:10px}.admin-hour-bar span{max-width:14px}}
+
+
+/* BG Admin — clean neutral premium finish (no yellow branding) */
+.admin-shell{background:#f6f7f9!important;color:#101828!important}
+.admin-sidebar{
+  background:#fff!important;color:#101828!important;
+  border-right:1px solid #e4e7ec!important;
+  box-shadow:8px 0 28px rgba(16,24,40,.04)!important;
+}
+.admin-logo{border-bottom-color:#eef0f4!important}
+.admin-logo strong{color:#101828!important}
+.admin-logo span{color:#98a2b3!important}
+.admin-brand-mark{
+  background:#101828!important;color:#fff!important;
+  box-shadow:0 6px 16px rgba(16,24,40,.12)!important;
+}
+.admin-nav-group-title{color:#98a2b3!important}
+.admin-nav-group.active-group .admin-nav-group-title{color:#667085!important}
+.admin-nav-submenu .admin-nav-item{
+  color:#667085!important;
+}
+.admin-nav-submenu .admin-nav-item:hover{
+  background:#f4f6f8!important;color:#101828!important;
+}
+.admin-nav-submenu .admin-nav-item.active{
+  background:#ecfdf3!important;color:#067647!important;
+  box-shadow:inset 3px 0 0 #12b76a!important;
+}
+.admin-nav-submenu .admin-nav-item.active svg{color:#067647!important}
+.admin-sidebar-bottom{border-top-color:#eef0f4!important}
+.admin-sidebar-bottom .admin-nav-item{color:#667085!important}
+.admin-customer-experience-link{background:#ecfdf3!important;color:#067647!important}
+.admin-sidebar-bottom .admin-nav-item.danger{color:#b42318!important}
+.admin-main{background:transparent!important}
+.admin-header{border-bottom-color:#e4e7ec!important}
+.admin-kicker{color:#067647!important}
+.admin-icon-button{border-color:#e4e7ec!important;background:#fff!important}
+.admin-stat,.admin-panel,.admin-customer-section,.admin-payroll-week{
+  border-color:#e4e7ec!important;
+  box-shadow:0 6px 20px rgba(16,24,40,.04)!important;
+}
+.admin-primary{background:#101828!important;color:#fff!important}
+.admin-primary:hover{background:#1d2939!important}
+.admin-secondary{border-color:#d0d5dd!important;background:#fff!important;color:#344054!important}
+.admin-status.warning{background:#f2f4f7!important;color:#475467!important}
+.admin-hero-strip{background:#fff!important;border-color:#e4e7ec!important}
+.admin-hour-bar span{background:#12b76a!important}
+.admin-live-driver:hover,.admin-live-driver.active{border-color:#12b76a!important;background:#f6fdf9!important}
+.admin-live-dot{background:#12b76a!important}
+@media(max-width:720px){
+  .admin-sidebar{background:#fff!important;border-bottom-color:#e4e7ec!important}
+  .admin-nav{background:#fff!important}
+}
