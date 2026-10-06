@@ -28,6 +28,8 @@ import {
   Users,
   UserRoundCheck,
   XCircle,
+  Menu,
+  ChevronDown,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 const LiveDeliveryMap = dynamic(() => import('../../components/LiveDeliveryMap'), { ssr: false, loading: () => <div className="bg-live-map">Loading live map…</div> });
@@ -38,8 +40,14 @@ const NAV = [
   { id: 'shops', label: 'Restaurants', icon: Store },
   { id: 'customers', label: 'Customers', icon: Users },
   { id: 'drivers', label: 'Drivers', icon: UserRoundCheck },
+];
+const MORE_NAV = [
   { id: 'payments', label: 'Payments', icon: CircleDollarSign },
+  { id: 'delivery', label: 'Delivery', icon: Truck },
+  { id: 'payroll', label: 'Driver payouts', icon: FileText },
+  { id: 'products', label: 'Products', icon: ShoppingBag },
   { id: 'support', label: 'Support', icon: MessageSquare },
+  { id: 'settings', label: 'Settings', icon: Settings },
 ];
 const ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'assigned', 'picked_up', 'delivered', 'cancelled'];
 
@@ -61,6 +69,7 @@ export default function AdminPage() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [active, setActive] = useState('overview');
+  const [moreOpen, setMoreOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [creatingDriver, setCreatingDriver] = useState(false);
@@ -698,52 +707,31 @@ export default function AdminPage() {
       <aside className="admin-sidebar">
         <div className="admin-sidebar-brand">
           <div className="admin-brand-mark">BG</div>
-          <div>
-            <strong>BG Smart Services</strong>
-            <span>Admin</span>
-          </div>
+          <div><strong>BG Smart Services</strong><span>Admin Console</span></div>
         </div>
-
-        <div className="admin-sidebar-label">Workspace</div>
-        <nav className="admin-nav admin-simple-nav">
+        <nav className="admin-simple-nav" aria-label="Admin navigation">
           {NAV.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              type="button"
-              className={active === id ? 'admin-nav-item active' : 'admin-nav-item'}
-              onClick={() => setActive(id)}
-            >
-              <Icon size={18} />
-              <span>{label}</span>
+            <button key={id} type="button" className={active === id ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => { setActive(id); setMoreOpen(false); }}>
+              <Icon size={17} /><span>{label}</span>
               {id === 'orders' && stats.pending > 0 && <em>{stats.pending}</em>}
-              {id === 'support' && data.supportRequests.filter((request) => request.status !== 'closed').length > 0 && (
-                <em>{data.supportRequests.filter((request) => request.status !== 'closed').length}</em>
-              )}
             </button>
           ))}
+          <button type="button" className={moreOpen || MORE_NAV.some((item) => item.id === active) ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => setMoreOpen((value) => !value)}>
+            <Menu size={17} /><span>More</span><ChevronDown size={15} className={moreOpen ? 'admin-more-chevron open' : 'admin-more-chevron'} />
+          </button>
+          {moreOpen && <div className="admin-more-menu">
+            {MORE_NAV.map(({ id, label, icon: Icon }) => (
+              <button key={id} type="button" className={active === id ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => { setActive(id); setMoreOpen(false); }}>
+                <Icon size={16} /><span>{label}</span>
+                {id === 'support' && data.supportRequests.filter((request) => request.status !== 'closed').length > 0 && <em>{data.supportRequests.filter((request) => request.status !== 'closed').length}</em>}
+              </button>
+            ))}
+          </div>}
         </nav>
-
-        <div className="admin-sidebar-divider" />
-
-        <div className="admin-sidebar-tools">
-          <button className="admin-nav-item" onClick={() => setActive('products')}>
-            <ShoppingBag size={18} /><span>Products</span>
-          </button>
-          <button className="admin-nav-item" onClick={() => setActive('delivery')}>
-            <Truck size={18} /><span>Delivery</span>
-          </button>
-          <button className="admin-nav-item" onClick={() => setActive('payroll')}>
-            <FileText size={18} /><span>Driver payouts</span>
-          </button>
-        </div>
-
         <div className="admin-sidebar-bottom">
-          <Link className="admin-nav-item" href="/admin/restaurants"><Store size={18} /><span>Restaurant portal</span></Link>
-          <Link className="admin-nav-item" href="/home"><ArrowLeft size={18} /><span>Customer view</span></Link>
-          <button className={active === 'settings' ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => setActive('settings')}>
-            <Settings size={18} /><span>Settings</span>
-          </button>
-          <button className="admin-nav-item danger" onClick={signOut}><LogOut size={18} /><span>Sign out</span></button>
+          <Link className="admin-nav-item" href="/admin/restaurants"><Store size={17} /><span>Restaurant portal</span></Link>
+          <Link className="admin-nav-item" href="/home"><ArrowLeft size={17} /><span>Customer view</span></Link>
+          <button className="admin-nav-item danger" onClick={signOut}><LogOut size={17} /><span>Sign out</span></button>
         </div>
       </aside>
 
