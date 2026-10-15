@@ -2,7 +2,7 @@
 
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
-import {ShoppingCart,Package,Heart,UserRound,Settings,CircleHelp,LogOut,House,Store,X,Search,Bell,MapPin,ChevronRight,Utensils,MoreHorizontal,Clock3,Star,ArrowRight,Pill,StoreIcon,Gift} from 'lucide-react';
+import {ShoppingCart,Package,Heart,UserRound,Settings,CircleHelp,LogOut,House,Store,X,Search,Bell,MapPin,ChevronRight,Utensils,MoreHorizontal,Clock3,Star,ArrowRight,Pill,StoreIcon,Gift,BadgePercent} from 'lucide-react';
 import {supabase} from '../../lib/supabase';
 
 function TukTuk({size=24}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 15h14l-1-6H8l-3 6Z"/><path d="M8 9V6h7l3 3"/><path d="M5 15v2h14v-2"/><path d="M8 17a2 2 0 1 0 4 0M16 17a2 2 0 1 0 4 0"/><path d="M19 9h1.5a1.5 1.5 0 0 1 0 3H19"/></svg>}
