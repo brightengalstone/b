@@ -448,7 +448,6 @@ function MarketplaceContent() {
       merchant: productStore?.name || 'Restaurant',
       merchantName: productStore?.name || 'Restaurant',
       storeName: productStore?.name || 'Restaurant',
-      retailer_id: null,
       merchant_id: p.merchant_id || productStore?.merchant_id || productStore?.id || null,
       storeId: p.merchant_id || productStore?.merchant_id || productStore?.id || null,
       retailer_id: p.retailer_id || null,
