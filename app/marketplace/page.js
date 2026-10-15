@@ -380,11 +380,12 @@ function MarketplaceContent() {
       .sort((a, b) => a.brand.localeCompare(b.brand));
   }, [retailers, products, query, requestedCraving]);
 
-  const selected = retailers.find(r => r.id === selectedId) || null;
+  const selected = retailers.find(r => r.id === selectedId) || (requestedCraving && !requested ? { id: '__all__', name: 'All restaurants', slug: 'all-food', shopping_location: 'Across participating restaurants', pickup_address: '', directions_url: '', logo_url: null, merchant_id: null } : null);
+  const productStoreFor = product => retailers.find(r => r.id === product?.retailer_id) || selected;
 
   const categories = useMemo(() => {
     if (!selected) return [];
-    return [...new Set(products.filter(p => p.retailer_id === selected.id && p.category).map(p => p.category))].sort();
+    return [...new Set(products.filter(p => (selected.id === '__all__' || p.retailer_id === selected.id) && p.category).map(p => p.category))].sort();
   }, [products, selected]);
 
   const visibleProducts = useMemo(() => {
@@ -392,7 +393,7 @@ function MarketplaceContent() {
     const term = query.trim().toLowerCase();
     const craving = requestedCraving.trim().toLowerCase();
     return products.filter(p => {
-      const matchesBranch = p.retailer_id === selected.id;
+      const matchesBranch = selected.id === '__all__' || p.retailer_id === selected.id;
       const matchesCategory = category === 'all' || p.category === category;
       const text = [p.name, p.description, p.category, p.size].filter(Boolean).join(' ').toLowerCase();
       return matchesBranch && matchesCategory && matchesCraving(p, craving) && (!term || text.includes(term));
@@ -433,6 +434,7 @@ function MarketplaceContent() {
 
   function addToCart(p, qty = null) {
     const cart = getCart();
+    const productStore = retailers.find(r => r.id === p.retailer_id) || selected;
     const index = cart.findIndex(x => x.id === p.id);
     const price = Number(p.promo_price ?? p.price);
     const nextQty = qty == null ? (index >= 0 ? Number(cart[index].quantity || 0) + 1 : 1) : qty;
@@ -443,15 +445,16 @@ function MarketplaceContent() {
       name: p.name,
       price,
       quantity: nextQty,
-      merchant: selected?.name || 'Restaurant',
-      merchantName: selected?.name || 'Restaurant',
-      storeName: selected?.name || 'Restaurant',
+      merchant: productStore?.name || 'Restaurant',
+      merchantName: productStore?.name || 'Restaurant',
+      storeName: productStore?.name || 'Restaurant',
       retailer_id: null,
-      merchant_id: p.merchant_id || selected?.merchant_id || selected?.id || null,
-      storeId: p.merchant_id || selected?.merchant_id || selected?.id || null,
-      shopping_location: selected?.shopping_location || '',
-      pickup_address: selected?.pickup_address || '',
-      directions_url: selected?.directions_url || '',
+      merchant_id: p.merchant_id || productStore?.merchant_id || productStore?.id || null,
+      storeId: p.merchant_id || productStore?.merchant_id || productStore?.id || null,
+      retailer_id: p.retailer_id || null,
+      shopping_location: productStore?.shopping_location || '',
+      pickup_address: productStore?.pickup_address || '',
+      directions_url: productStore?.directions_url || '',
       description: p.description || '',
       size: p.size || '',
       image_url: productImage(p) || '',
@@ -588,13 +591,13 @@ function MarketplaceContent() {
                 <RetailerLogo slug={selected.slug} large logoUrl={selected.logo_url} name={brandName(selected.name)}/>
                 <div>
                   <div className="eyebrow">BG Smart Services · Fast Food</div>
-                  <h1>{brandName(selected.name)}</h1>
+                  <h1>{selected.id === '__all__' ? requestedCraving.charAt(0).toUpperCase() + requestedCraving.slice(1) + ' available now' : brandName(selected.name)}</h1>
                   <div className="selected-store-meta">
                     <span><Star size={14} fill="currentColor"/> {restaurantMeta(selected.name).rating}</span>
                     <span><Clock size={14}/> {restaurantMeta(selected.name).eta}</span>
                     <span><BadgePercent size={14}/> {restaurantMeta(selected.name).offer}</span>
                   </div>
-                  <p>{selected.shopping_location} · Selected pickup branch</p>
+                  <p>{selected.id === '__all__' ? 'Available from participating restaurants across Eersterust' : selected.shopping_location + ' · Selected pickup branch'}</p>
                 </div>
               </div>
               <div className="store-location-card">
@@ -604,7 +607,7 @@ function MarketplaceContent() {
               </div>
             </div>
 
-            <div className="market-search"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder={'Search ' + brandName(selected.name) + ' menu'}/></div>
+            <div className="market-search"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder={selected.id === '__all__' ? 'Search available ' + requestedCraving : 'Search ' + brandName(selected.name) + ' menu'}/></div>
             <div className="category-chips"><button className={category === 'all' ? 'active' : ''} onClick={() => setCategory('all')}>All</button>{categories.map(c => <button key={c} className={category === c ? 'active' : ''} onClick={() => setCategory(c)}>{c}</button>)}</div>
             {msg && <div className="notice">{msg}</div>}
             <div className="market-heading"><div><span className="eyebrow">{brandName(selected.name)} menu</span><h2>{loading ? 'Loading menu…' : visibleProducts.length + ' products'}</h2></div><button className="refresh-button" onClick={load} aria-label="Refresh menu"><RefreshCw size={17}/></button></div>
@@ -621,7 +624,7 @@ function MarketplaceContent() {
                         <ProductImage product={p} selected={selected} />
                         <button type="button" className={'favorite-toggle ' + (favoriteIds.has(p.id) ? 'is-favorite' : '')} onClick={e => { e.stopPropagation(); toggleFavorite(p); }} aria-label="Favorite"><Heart size={18} fill={favoriteIds.has(p.id) ? 'currentColor' : 'none'}/></button>
                       </div>
-                      <div className="product-store">{selected.shopping_location}</div>
+                      <div className="product-store">{productStoreFor(p)?.name || 'Restaurant'} · {productStoreFor(p)?.shopping_location || 'Eersterust'}</div>
                       <h3>{p.name}</h3>
                       {p.size && <p className="product-size">{p.size}</p>}
                       <div className="product-price-row">
@@ -643,7 +646,7 @@ function MarketplaceContent() {
             <section className="product-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
               <button className="product-modal-close" type="button" onClick={() => setSelectedProduct(null)} aria-label="Close"><X size={22}/></button>
               <div className="product-modal-image"><ProductImage product={selectedProduct} selected={selected} /></div>
-              <div className="product-modal-store">{selected?.name} · {selected?.shopping_location}</div>
+              <div className="product-modal-store">{productStoreFor(selectedProduct)?.name} · {productStoreFor(selectedProduct)?.shopping_location}</div>
               <h2>{selectedProduct.name}</h2>
               {selectedProduct.size && <p className="product-modal-size">{selectedProduct.size}</p>}
               <p className="product-modal-description">{selectedProduct.description || 'Product details from the selected restaurant catalogue.'}</p>
@@ -660,7 +663,7 @@ function MarketplaceContent() {
           <div className="product-modal-backdrop" role="presentation" onClick={() => setQuantityPrompt(null)}>
             <section className="quantity-confirm-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
               <button className="product-modal-close" type="button" onClick={() => setQuantityPrompt(null)} aria-label="Close"><X size={22}/></button>
-              <div className="product-modal-store">{selected?.name} · {selected?.shopping_location}</div>
+              <div className="product-modal-store">{productStoreFor(quantityPrompt.product)?.name} · {productStoreFor(quantityPrompt.product)?.shopping_location}</div>
               <h2>Confirm quantity</h2>
               <p>How many <strong>{quantityPrompt.product.name}</strong> do you want?</p>
               <div className="confirm-quantity-row"><button type="button" onClick={() => setQuantityPrompt(q => ({...q, quantity: Math.max(1, Number(q.quantity) - 1)}))}><Minus size={18}/></button><strong>{quantityPrompt.quantity}</strong><button type="button" onClick={() => setQuantityPrompt(q => ({...q, quantity: Number(q.quantity) + 1}))}><Plus size={18}/></button></div>
