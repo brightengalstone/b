@@ -27,12 +27,28 @@ export default function Signin(){
       if(!normalizedEmail){setMsg('Please enter your email address.');return}
       if(password!==retype){setMsg('Passwords do not match.');return}
       setLoading(true);
-      const{data:signUpData,error}=await supabase.auth.signUp({email:normalizedEmail,password,options:{data:{name,surname,cellphone,address,full_name:`${name} ${surname}`.trim()}}});
-      setLoading(false);
-      if(error){setMsg(error.message);return}
-      setSignupConfirmation(!signUpData?.session);
-      setSignupSuccess(true);
-      setMsg('');
+      try {
+        const { data: signUpData, error } = await supabase.auth.signUp({
+          email: normalizedEmail,
+          password,
+          options: { data: { name, surname, cellphone, address, full_name: `${name} ${surname}`.trim() } },
+        });
+        if (error) {
+          setMsg(error.message);
+          return;
+        }
+        if (!signUpData?.user) {
+          setMsg('We could not create your account. Please try again.');
+          return;
+        }
+        setSignupConfirmation(!signUpData.session);
+        setSignupSuccess(true);
+        setMsg('');
+      } catch {
+        setMsg('We could not connect to create your account. Check your connection and try again.');
+      } finally {
+        setLoading(false);
+      }
       return
     }
     if(!normalizedEmail){setMsg('Please enter your email address.');return}
@@ -133,7 +149,7 @@ export default function Signin(){
               {!forgot&&<div className="modern-forgot"><button type="button" onClick={()=>{setForgot(true);setMsg('')}}>Forgot password?</button></div>}
               <div className="modern-actions">{forgot&&<button type="button" className="modern-secondary" onClick={()=>{setForgot(false);setMsg('')}}><ArrowLeft size={17}/></button>}<button type="submit" className="modern-primary" disabled={loading}>{loading?(forgot?'Sending…':'Signing in…'):(forgot?'Send reset link':'Sign In')}<ArrowRight size={17}/></button></div>
             </form>
-            <div className="modern-switch">New to BG Smart Services? <Link href="/signin?mode=signup">Create an account</Link></div>
+            <div className="modern-switch">New to BG Smart Services? <button type="button" onClick={() => { setForgot(false); setSignupStep(1); setSignup(true); setMsg(""); }}>Create an account</button></div>
           </section>
         </div><footer className="modern-footer">LOCAL <span>•</span> CONVENIENT <span>•</span> MADE FOR POORT</footer>
       </div>}
